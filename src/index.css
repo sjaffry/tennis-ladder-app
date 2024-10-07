@@ -1,0 +1,60 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f4f7fa;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* CSS based spinner */
+.spinner {
+  margin: 100px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  text-align: center;
+  
+  -webkit-animation: sk-rotate 2.0s infinite linear;
+  animation: sk-rotate 2.0s infinite linear;
+}
+
+.spinner-dot {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  position: absolute;
+  background-color: #333333;
+  
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out;
+}
+
+.spinner-dot1 { top: 0; left: 0;}
+.spinner-dot2 { top: 0; right: 0;}
+.spinner-dot3 { bottom: 0; right: 0;}
+.spinner-dot4 { bottom: 0; left: 0;}
+
+@-webkit-keyframes sk-rotate { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes sk-rotate { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg);}}
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% { -webkit-transform: scale(0); }
+  50% { -webkit-transform: scale(1.0); }
+}
+
+@keyframes sk-bounce {
+  0%, 100% { 
+    transform: scale(0);
+    -webkit-transform: scale(0);
+  } 50% { 
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
