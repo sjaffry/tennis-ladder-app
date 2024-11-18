@@ -1,0 +1,24 @@
+{
+    "match_type": "singles",
+    "players": {
+        "winner_firstName": "Vincent",
+        "winner_lastName": "",
+        "loser_firstName": "Syed",
+        "loser_lastName": ""
+    },
+    "score": {
+        "set_1": {
+            "winner_score": 1,
+            "loser_score": 6
+        },
+        "set_2": {
+            "winner_score": 6,
+            "loser_score": 3
+        },
+        "set_3": {
+            "winner_score": 1,
+            "loser_score": 0
+        }
+    }
+}
+

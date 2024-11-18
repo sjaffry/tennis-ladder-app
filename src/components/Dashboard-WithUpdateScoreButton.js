@@ -38,7 +38,6 @@ const Dashboard = ({
   const [open, setOpen] = useState(false);  // To control dialog open/close
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [matchData, setMatchData] = useState([]);
-  const [matchDataChanged, setMatchDataChanged] = useState(false);
   const [isFormDataChanged, setIsFormDataChanged] = useState(false);
   const [isScoreConfirmed, setIsScoreConfirmed] = useState(false);
   const [formData, setFormData] = useState({
@@ -54,8 +53,7 @@ const Dashboard = ({
     loser_id: '',
     league_id: '',
     entered_by: '',
-    player1_confirmed: '',
-    player2_confirmed: ''
+    confirmed_by: ''
   });
 
   useEffect(() => {
@@ -74,9 +72,6 @@ const Dashboard = ({
     }
   }, [formData, isScoreConfirmed]);
 
-  useEffect(() => {
-  }, [matchDataChanged]);
-  
   const handleClickOpen = (match) => {
     setSelectedMatch(match);
 
@@ -91,8 +86,7 @@ const Dashboard = ({
       player2_id: match.player2_id,
       league_id: match.league_id,
       entered_by: email,
-      player1_confirmed: (match.player1_email == email ? email: ''),
-      player2_confirmed: (match.player2_email == email ? email: '')
+      confirmed_by: ''
     });
   
     setIsFormDataChanged(false);
@@ -161,9 +155,7 @@ const Dashboard = ({
     setFormData((prevFormData) => ({
       ...prevFormData,
       winner_id: winnerId,
-      loser_id: loserId,
-      player1_confirmed: (prevFormData.player1_confirmed == email ? email : null),
-      player2_confirmed: (prevFormData.player2_confirmed == email ? email : null)
+      loser_id: loserId
     }));
 
     setIsFormDataChanged(true);
@@ -185,15 +177,7 @@ const Dashboard = ({
     if (response.ok) {
       setOpen(false);
       alert('Score added successfully');
-      const jsonResponse = await response.json(); // Parse response JSON once
-
-      // Access Match_data directly if jsonResponse.body is already parsed
-      const responseBody = typeof jsonResponse.body === 'string'
-        ? JSON.parse(jsonResponse.body)
-        : jsonResponse.body;
-
-      const updatedMatchData = responseBody.Match_data;
-
+      
       setMatchData((prevMatchData) =>
         prevMatchData.map((match) =>
           match.player1_id === selectedMatch.player1_id &&
@@ -201,45 +185,37 @@ const Dashboard = ({
           match.league_id === selectedMatch.league_id
             ? {
                 ...match,
-                set1_p1: updatedMatchData.set1_p1,
-                set1_p2: updatedMatchData.set1_p2,
-                set2_p1: updatedMatchData.set2_p1,
-                set2_p2: updatedMatchData.set2_p2,
-                set3_p1: updatedMatchData.set3_p1,
-                set3_p2: updatedMatchData.set3_p2,
-                player1_confirmed: updatedMatchData.player1_confirmed,
-                player2_confirmed: updatedMatchData.player2_confirmed
+                set1_p1: formData.player1_set1,
+                set1_p2: formData.player2_set1,
+                set2_p1: formData.player1_set2,
+                set2_p2: formData.player2_set2,
+                set3_p1: formData.player1_set3,
+                set3_p2: formData.player2_set3
               }
             : match
         )
       );
-
-      // Forcing the button next to the score to update
-      setMatchDataChanged(prev => !prev);
-
     } else {
       alert('Error adding score');
     }
-  };
+  };  
   
   const handleConfirmScoreClick = async (match) => {
     setSelectedMatch(match);
 
     setFormData({
-      player1_set1: match.set1_p1,
-      player1_set2: match.set2_p1,
-      player1_set3: match.set3_p1,
-      player2_set1: match.set1_p2,
-      player2_set2: match.set2_p2,
-      player2_set3: match.set3_p2,
+      player1_set1: match.set1_p1 || '',
+      player1_set2: match.set2_p1 || '',
+      player1_set3: match.set3_p1 || '',
+      player2_set1: match.set1_p2 || '',
+      player2_set2: match.set2_p2 || '',
+      player2_set3: match.set3_p2 || '',
       player1_id: match.player1_id,
       player2_id: match.player2_id,
       league_id: match.league_id,
       winner_id: match.winner_id,
-      loser_id: match.loser_id,
       entered_by: match.entered_by,
-      player1_confirmed: (match.player1_email == email ? email: match.player1_email),
-      player2_confirmed: (match.player2_email == email ? email: match.player2_email)
+      confirmed_by: email
     });
   
     setIsScoreConfirmed(true);
@@ -385,21 +361,27 @@ const Dashboard = ({
                                 sx={{ width: '60px', height: '30px', fontSize: '9px' }}>
                                 Add score
                               </Button>
-                            ) : (match.entered_by !== email && (match.player1_confirmed !== email && match.player2_confirmed !== email)) ? (
+                            ) : (match.entered_by === "robot") ? (
+                              <Button 
+                                variant="contained" 
+                                onClick={() => handleClickOpen({...match})}
+                                sx={{ 
+                                  backgroundColor: '#454746', 
+                                  '&:hover': {
+                                    backgroundColor: '#1d2636',
+                                  },
+                                  width: '60px', 
+                                  height: '30px', 
+                                  fontSize: '9px' }}>
+                                Update score
+                              </Button>
+                            ) : (match.entered_by !== email && match.confirmed_by !== email) ? (
                               <Button 
                                 variant="contained" 
                                 color="secondary"
                                 onClick={() => handleConfirmScoreClick({...match})}
                                 sx={{ width: '60px', height: '30px', fontSize: '9px' }}>
                                 Confirm score
-                              </Button>
-                            ) : (match.player1_confirmed == null || match.player2_confirmed == null) ? (
-                              <Button 
-                                variant="contained" 
-                                sx={{ width: '60px', height: '30px', fontSize: '9px' }}
-                                disabled
-                                >
-                                Pending confirm
                               </Button>
                             ) : null
                             }

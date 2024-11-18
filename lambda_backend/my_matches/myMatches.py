@@ -29,7 +29,8 @@ def lambda_handler(event, context):
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
-    category = event["queryStringParameters"]['category']
+    email = event["queryStringParameters"]['email']
+    league_id = event["queryStringParameters"]['league_id']
     decoded = decode_jwt(token)
     # We only ever expect the user to be in one group only - business rule
     business_name = decoded['cognito:groups'][0]
@@ -46,24 +47,49 @@ def lambda_handler(event, context):
     try:
         with connection.cursor() as cursor:
             # Define the SQL query
-            sql_query = """SELECT DISTINCT l.league_id as "league_id", l.league_name as "league_name" 
-                        FROM league l, player_league pl, player p
-                        WHERE l.league_id = pl.league_id
-                        AND p.player_id = pl.player_id
-                        AND l.business_name = %s
-                        AND l.category = %s;
-                        """
+            sql_query = """
+                    WITH matches AS (
+                        SELECT
+                        p1.first_name as player1_fname,
+                        p1.last_name as player1_lname,
+                        p2.first_name as player2_fname,
+                        p2.last_name as player2_lname,
+                        p1.email as player1_email,
+                        p2.email as player2_email,
+                        sm.player1_id,
+                        sm.player2_id,
+                        sm.entered_by,
+                        sm.player1_confirmed,
+                        sm.player2_confirmed,
+                        sm.league_id,
+                        sm.winner_id,
+                        sm.loser_id,
+                        sm.set1_p1,
+                        sm.set1_p2,
+                        sm.set2_p1,
+                        sm.set2_p2,
+                        sm.set3_p1,
+                        sm.set3_p2
+                        FROM singles_match sm, player p1, player p2
+                        WHERE sm.player1_id = p1.player_id
+                        AND sm.player2_id = p2.player_id
+                        AND sm.league_id = %s)
+                    SELECT m.* 
+                    FROM player p, matches m
+                    WHERE p.email = %s
+                    AND (p.player_id = m.player1_id OR p.player_id = m.player2_id);
+                    """
         
             # Execute the query with 'FTSC' as the parameter
-            cursor.execute(sql_query, (business_name, category))
+            cursor.execute(sql_query, (league_id, email))
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall()  
-            #league_names = [item['league_name'] for item in resp if 'league_name' in item]
+            print(resp)
     
         result = {
             "Business name": business_name,
-            "Leagues": resp
+            "matchups": resp
 
         }
 

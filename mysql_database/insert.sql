@@ -33,9 +33,72 @@ INSERT INTO `tennis_ladder`.`player_league`
 (`league_id`,
 `player_id`)
 VALUES
-(1,
-4);
+(2,
+2);
 
 
 SELECT * FROM player_league;
 
+INSERT INTO `tennis_ladder`.`singles_match`
+(
+`player1_id`,
+`player2_id`,
+`league_id`)
+VALUES
+(4,
+1,
+2);
+
+SELECT * FROM singles_match;
+
+INSERT INTO `tennis_ladder`.`singles_ladder`
+(`player_id`,
+`league_id`,
+`points`,
+`wins`,
+`losses`
+)
+VALUES
+(1,
+2,
+3,
+1,
+2);
+
+-- WIN ENTRY
+INSERT INTO `tennis_ladder`.`singles_ladder`
+(`player_id`,
+`league_id`,
+`matches`,
+`points`,
+`wins`,
+`losses`
+)
+VALUES
+(1,
+2,
+1,
+3,
+1,
+0)
+ON DUPLICATE KEY UPDATE
+matches = matches + 1, points = points + 3, wins = wins + 1;
+
+DELETE FROM singles_ladder WHERE player_id=2 and league_id=2;
+
+SELECT * FROM singles_ladder;
+
+-- LOSS ENTRY
+INSERT INTO `tennis_ladder`.`singles_ladder`
+(`player_id`,
+`league_id`,
+`matches`,
+`losses`
+)
+VALUES
+(1,
+2,
+1,
+1)
+ON DUPLICATE KEY UPDATE
+matches = matches + 1, losses = losses + 1;

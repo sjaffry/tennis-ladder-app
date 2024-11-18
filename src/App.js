@@ -21,32 +21,89 @@ const theme = createTheme({
 });
 
 const App = ({ signOut, user }) => {
+  const [selectedCategoryTile, setSelectedCategoryTile] = useState(null);
   const [selectedTile, setSelectedTile] = useState(null);
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [reviewDate, setReviewDate] = useState('');
-  const [query, setQuery] = useState('');
-  const [response, setResponse] = useState(null);
-  const [summary, setSummary] = useState(null);
-  const [recommendations, setRecommendations] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [externalData, setExternalData] = useState(null);
-  const [reviewCount, setReviewCount] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [matchData, setMatchData] = useState(null);
+  const [ladderData, setLadderData] = useState(null);
   const business_name = user.signInUserSession.idToken.payload['cognito:groups'];
+  const email = user.signInUserSession.idToken.payload['email'];
   const jwtToken = user.signInUserSession.idToken.jwtToken;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));  
+
 
   // Call page load API
   useEffect(() => {
   }, []); 
 
-  const handleLeagueClick = async () => {}
+  const handleLeagueClick = async (index, league_id, email) => {
+    setSelectedTile(index);
+    loadMyMatches(email, league_id);
+    loadLadder(league_id);
+  }
+
+  const loadMyMatches = async (email, league_id) => {
+    setPageLoading(true);
+    setDataLoading(true);
+    const url1 = 'https://35t1hlnog6.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.get(url1, {
+      params: {
+        league_id: league_id,
+        email: email
+      },
+      headers: {
+        Authorization: jwtToken
+      }
+    })
+    .then(response => {
+      const mData = response.data["matchups"];
+      setMatchData(mData);
+      setPageLoading(false);
+      setDataLoading(false);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setErrorMsg(error.message);
+      alert('Session expired! Please refresh the page and try again.');
+    });
+  }
+
+  const loadLadder = async (league_id) => {
+    setPageLoading(true);
+    setDataLoading(true);
+    const url1 = 'https://30q2ey80ni.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.get(url1, {
+      params: {
+        league_id: league_id
+      },
+      headers: {
+        Authorization: jwtToken
+      }
+    })
+    .then(response => {
+      const lData = response.data["ladder"];
+      setLadderData(lData);
+      setPageLoading(false);
+      setDataLoading(false);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setErrorMsg(error.message);
+      alert('Session expired! Please refresh the page and try again.');
+    });
+  }
 
   const handleCategoryClick = async (index, category) => {
-    setSelectedTile(index);
+    setMatchData(null);
+    setLadderData(null);
+    setSelectedTile(null);
+    setSelectedCategoryTile(index);
     setPageLoading(true);
     const url1 = 'https://35qu1lc1ie.execute-api.us-west-2.amazonaws.com/Prod';
 
@@ -65,7 +122,6 @@ const App = ({ signOut, user }) => {
     .catch(error => {
       console.error('Error:', error);
       setErrorMsg(error.message);
-      setSummary(null);
       alert('Session expired! Please refresh the page and try again.');
     });
 
@@ -106,10 +162,10 @@ const App = ({ signOut, user }) => {
                   width: '30%',
                   p: 2,
                   m: 0.5,
-                  backgroundColor: selectedTile === "1" ? '#1d2636' : 'white',
-                  color: selectedTile === "1" ? 'white' : '#1d2636',
+                  backgroundColor: selectedCategoryTile === "1" ? '#1d2636' : 'white',
+                  color: selectedCategoryTile === "1" ? 'white' : '#1d2636',
                   '&:hover': {
-                      backgroundColor: selectedTile === "1" ? '#1d2636' : 'white',
+                      backgroundColor: selectedCategoryTile === "1" ? '#1d2636' : 'white',
                   },
               }}
               onClick={() => handleCategoryClick("1", "Tennis")}
@@ -123,10 +179,10 @@ const App = ({ signOut, user }) => {
                   width: '30%',
                   p: 2,
                   m: 0.5,
-                  backgroundColor: selectedTile === "2" ? '#1d2636' : 'white',
-                  color: selectedTile === "2" ? 'white' : '#1d2636',
+                  backgroundColor: selectedCategoryTile === "2" ? '#1d2636' : 'white',
+                  color: selectedCategoryTile === "2" ? 'white' : '#1d2636',
                   '&:hover': {
-                      backgroundColor: selectedTile === "2" ? '#1d2636' : 'white',
+                      backgroundColor: selectedCategoryTile === "2" ? '#1d2636' : 'white',
                   },
               }}
               onClick={() => handleCategoryClick("2", "Pickleball")}
@@ -152,22 +208,20 @@ const App = ({ signOut, user }) => {
                             backgroundColor: selectedTile === index ? '#1d2636' : 'white',
                         },
                     }}
-                    onClick={() => handleLeagueClick(index, league)}
+                    onClick={() => handleLeagueClick(index, league["league_id"], email)}
                 >
-                    {league}
+                    {league["league_name"]}
                 </Button>
               );
             })}
           </Box>
           )}
           <Dashboard
-            summaryLoading={summaryLoading}
-            summary={summary}
-            recommendations={recommendations}
-            reviewDate={reviewDate}
+            matchData={matchData}
+            ladderData={ladderData}
+            dataLoading={dataLoading}
             jwtToken={jwtToken}
-            eventName=''
-            reviewCount={reviewCount}
+            email={email}
           />
         </Box>
       </Box>

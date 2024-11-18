@@ -24,15 +24,35 @@ def decode_jwt(token):
     return json.loads(payload)
 
 def lambda_handler(event, context):
+
     db_host = os.environ['DB_HOST']
     db_user = os.environ['DB_USER']
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
-    token = event['headers']['Authorization']
-    category = event["queryStringParameters"]['category']
-    decoded = decode_jwt(token)
-    # We only ever expect the user to be in one group only - business rule
-    business_name = decoded['cognito:groups'][0]
+    #token = event['headers']['Authorization']
+    email_content_b64 = event['Records'][0]['Sns']['Message']['content']
+    email_content = decode_base64_url(email_content_b64)
+    print(email_content)
+
+    # # Match info
+    # winner_id = event['body']['winner_id']
+    # loser_id = event['body']['loser_id']
+    # entered_by = event['body']['entered_by']
+    # p1_confirmed = event['body']['player1_confirmed']
+    # p2_confirmed = event['body']['player2_confirmed']
+    # league_id = event['body']['league_id']
+    # p1_set1 = event['body']['player1_set1']
+    # p2_set1 = event['body']['player2_set1']
+    # p1_set2 = event['body']['player1_set2']
+    # p2_set2 = event['body']['player2_set2']
+    # p1_set3 = event['body']['player1_set3']
+    # p2_set3 = event['body']['player2_set3']
+
+    # # API Auth
+    # decoded = decode_jwt(token)
+    # # We only ever expect the user to be in one group only - business rule
+    # business_name = decoded['cognito:groups'][0]
+    business_name = "FTSC"
     
     # Connect to the RDS MySQL database
     connection = pymysql.connect(
@@ -45,30 +65,22 @@ def lambda_handler(event, context):
     
     try:
         with connection.cursor() as cursor:
-            # Define the SQL query
-            sql_query = """SELECT DISTINCT l.league_id as "league_id", l.league_name as "league_name" 
-                        FROM league l, player_league pl, player p
-                        WHERE l.league_id = pl.league_id
-                        AND p.player_id = pl.player_id
-                        AND l.business_name = %s
-                        AND l.category = %s;
-                        """
-        
-            # Execute the query with 'FTSC' as the parameter
-            cursor.execute(sql_query, (business_name, category))
-            
-            # Fetch all the rows that match the condition
-            resp = cursor.fetchall()  
-            #league_names = [item['league_name'] for item in resp if 'league_name' in item]
-    
-        result = {
-            "Business name": business_name,
-            "Leagues": resp
+            # sql_query = CALL `tennis_ladder`.`UpdateMatchScoreAndLadderRobot`('2024-01-01', %s, %s, %s, %s, %s, %s,%s,%s,%s,%s,%s)
+            sql_query = "select * from league;"
 
+            # Execute the query with 'FTSC' as the parameter
+            cursor.execute(sql_query, ())
+
+            # Fetch all the rows that match the condition
+            resp = cursor.fetchall() 
+
+        result = {
+            "Business_name": business_name,
+            "Match_data": resp[0]
         }
 
     except Exception as e:
-        print('Error querying items from MySQL:', e)
+        print('Error adding score into MySQL:', e)
         raise e
         
 
@@ -81,3 +93,4 @@ def lambda_handler(event, context):
     },    
         'body': json.dumps(result)
     } 
+

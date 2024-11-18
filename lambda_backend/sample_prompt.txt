@@ -1,0 +1,80 @@
+Your task is to take the email provided representing the outcome of a tennis match and convert it into a well-organized table format using JSON. The email was sent to Mariano, who is not a player in the match so do not identify him as a player.
+
+<email>
+b'Return-Path: <0100016d07eb7477-8e1938ce-475e-4e4b-89cb-example-000000@amazonses.com>\n
+Received: from a1-23.smtp-out.amazonses.com (a1-23.smtp-out.amazonses.com [203.0.113.0])\n 
+by inbound-smtp.us-east-1.amazonaws.com with SMTP id enq10iame1qcu31jh5da2gn89imvot2k6example\n 
+for recipient@example.com;\n Fri, 06 Sep 2019 18:52:14 +0000 (UTC)\n
+X-SES-Spam-Verdict: PASS\nX-SES-Virus-Verdict: PASS\n
+Received-SPF: pass (spfCheck: domain of amazonses.com designates 203.0.113.0 as permitted sender) client-ip=203.0.113.0; envelope-from=0100016d07eb7477-8e1938ce-475e-4e4b-89cb-example-000000@amazonses.com; helo=a1-23.smtp-out.amazonses.com;\n
+Authentication-Results: amazonses.com;\n
+spf=pass (spfCheck: domain of amazonses.com designates 203.0.113.0 as permitted sender) client-ip=203.0.113.0; envelope-from=0100016d07eb7477-8e1938ce-475e-4e4b-89cb-example-000000@amazonses.com; helo=a1-23.smtp-out.amazonses.com;\n
+dkim=pass header.i=@amazonses.com;\n dmarc=none header.from=example.com;\n
+X-SES-RECEIPT: AEFBQUFBQUFBQUFFQkx0QUJZZENEXAMPLE=\nX-SES-DKIM-SIGNATURE: a=rsa-sha256; q=dns/txt; b=d5azwgA2iBqAjA4NBm1ARzjJ95raRmy4G84iVdd3x2JzSHeUnQuTuLmJAqRrYY3WpMIVRFy01hITaguCVjUPWBR0xF6fCEXH85cf3RNeFQyLfWZqoXKfBdjFRV+13troDterH2MxBUL8rjzcvdHetl0ImwlaK2PGmePTexample=; c=relaxed/simple; s=EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000; d=amazonses.com; t=1567795935; v=1; bh=CZ1SghsYaA6SSCbitzsLISeFoNlpdtH1Pyiexample=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;\nDKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;\n
+\ts=EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000; d=amazonses.com; t=1567795934;\n\t
+h=From:To:Subject:MIME-Version:Content-Type:Message-ID:Date:Feedback-ID;\n\t
+bh=CZ1SghsYaA6SSCbitzsLISeFoNlpdtH1PyiMexample=;\n\t
+b=example=\n
+From: sender@example.com\n
+To: recipient@example.com\n
+Subject: Amazon SES Test\n
+MIME-Version: 1.0\n
+Content-Type: multipart/alternative; \n\t
+boundary="----=_Part_869787_396523212.15677example"\n
+Message-ID: <0100016d07eb7477-8e1938ce-475e-4e4b-89cb-example-000000@email.amazonses.com>\n
+Date: Fri, 6 Sep 2019 18:52:14 +0000\n
+X-SES-Outgoing: 2019.09.06-203.0.113.0\n
+Feedback-ID: 1.us-east-1.ZitRoTk0xziun8WEJevt+example=:AmazonSES\n\n
+------=_Part_869787_396523212.15677example\n
+Content-Type: text/plain; charset=UTF-8\n
+Content-Transfer-Encoding: 7bit\n\n
+Amazon SES Test\n
+Hi Mariano,
+
+I squeaked out a win today against Syed with a score of 1-6, 6-3, 1-0.  Thanks for everyone for a great match. 
+
+Vincent\n
+------=_Part_869787_396523212.15677example\n
+Content-Type: text/html; charset=UTF-8\n
+Content-Transfer-Encoding: 7bit\n\n
+<html>\n<head></head>\n<body>\n  <h1>Amazon SES Test</h1>\n
+<p>This email was sent with Amazon SES.</p>\n
+<img alt="" src="http://example.r.us-east-1.awstrack.me/I0/0100016d07eb7477-8e1938ce-475e-4e4b-89cb-example-000000/u-YJahtdM2SrXYCd" style="display: none; width: 1px; height: 1px;">\n</body>\n</html>\n            \n------=_Part_869787_396523212.15677example--\n'
+</email>
+
+To execute this task, identify the players, identify if it's a singles or a doubles match and determine the score per set, assosociate each set score with their corresponding teams and also identify who the winner of the match was in the text and use them as keys in the JSON object. Then, extract the relevant information from the text and populate the corresponding values in the JSON object. Ensure that the data is accurately represented and properly formatted within the JSON structure. The resulting JSON table should provide a clear, structured overview of the information presented in the original text.
+
+
+```json
+{
+  "matchType": "singles",
+  "players": [
+    "Vincent",
+    "Syed"
+  ],
+  "scores": [
+    {
+      "set": 1,
+      "score": {
+        "Vincent": 1,
+        "Syed": 6
+      }
+    },
+    {
+      "set": 2,
+      "score": {
+        "Vincent": 6,
+        "Syed": 3
+      }
+    },
+    {
+      "set": 3,
+      "score": {
+        "Vincent": 1,
+        "Syed": 0
+      }
+    }
+  ],
+  "winner": "Vincent"
+}
+```

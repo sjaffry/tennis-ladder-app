@@ -29,7 +29,7 @@ def lambda_handler(event, context):
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
-    category = event["queryStringParameters"]['category']
+    league_id = event["queryStringParameters"]['league_id']
     decoded = decode_jwt(token)
     # We only ever expect the user to be in one group only - business rule
     business_name = decoded['cognito:groups'][0]
@@ -46,25 +46,30 @@ def lambda_handler(event, context):
     try:
         with connection.cursor() as cursor:
             # Define the SQL query
-            sql_query = """SELECT DISTINCT l.league_id as "league_id", l.league_name as "league_name" 
-                        FROM league l, player_league pl, player p
-                        WHERE l.league_id = pl.league_id
-                        AND p.player_id = pl.player_id
-                        AND l.business_name = %s
-                        AND l.category = %s;
-                        """
+            sql_query = """
+                SELECT ROW_NUMBER() OVER() AS "rank",
+                        p.`first_name`,
+                        p.`last_name`,
+                        sl.`points`,
+                        sl.`matches`,
+                        sl.`wins`,
+                        sl.`losses`,
+                        CAST(ROUND(sl.`wins` / sl.`matches` * 100, 2) AS CHAR) AS "win_rate"
+                    FROM singles_ladder as sl, player p
+                    WHERE sl.`league_id` = %s
+                    AND sl.player_id = p.player_id
+                    ORDER BY sl.`points` DESC
+                    """
         
             # Execute the query with 'FTSC' as the parameter
-            cursor.execute(sql_query, (business_name, category))
+            cursor.execute(sql_query, (league_id))
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall()  
-            #league_names = [item['league_name'] for item in resp if 'league_name' in item]
     
         result = {
             "Business name": business_name,
-            "Leagues": resp
-
+            "ladder": resp
         }
 
     except Exception as e:
@@ -81,3 +86,4 @@ def lambda_handler(event, context):
     },    
         'body': json.dumps(result)
     } 
+
