@@ -7,6 +7,6 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-COPY roboEntryMatchScore.py ./
+COPY loadLadder.py ./
 
-CMD ["roboEntryMatchScore.lambda_handler"]
+CMD ["loadLadder.lambda_handler"]

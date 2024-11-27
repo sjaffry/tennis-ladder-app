@@ -1,0 +1,151 @@
+{'Records': [
+        {'EventSource': 'aws:sns', 'EventVersion': '1.0', 'EventSubscriptionArn': 'arn:aws:sns:us-west-2: 303830944942:roboEntry:ead5ff04-317d-4c36-a10a-f35683ddd0cf', 'Sns': {'Type': 'Notification', 'MessageId': '90dc9d94-564f-5b14-bf96-c223d3418070', 'TopicArn': 'arn:aws:sns:us-west-2: 303830944942:roboEntry', 'Subject': 'Amazon SES Email Receipt Notification', 'Message': {
+                    "notificationType": "Received",
+                    "mail": {
+                        "timestamp": "2024-11-20T06:33:49.720Z",
+                        "source": "sajaffry@gmail.com",
+                        "messageId": "3js34fmhr62t39t8ji1r03g7pcl8agmf5jom4n01",
+                        "destination": [
+                            "ftsc-robot@onreaction.com"
+                        ],
+                        "headersTruncated": false,
+                        "headers": [
+                            {
+                                "name": "Return-Path",
+                                "value": "<sajaffry@gmail.com>"
+                            },
+                            {
+                                "name": "Received",
+                                "value": "from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171]) by inbound-smtp.us-west-2.amazonaws.com with SMTP id 3js34fmhr62t39t8ji1r03g7pcl8agmf5jom4n01 for ftsc-robot@onreaction.com; Wed, 20 Nov 2024 06:33:49 +0000 (UTC)"
+                            },
+                            {
+                                "name": "X-SES-Spam-Verdict",
+                                "value": "PASS"
+                            },
+                            {
+                                "name": "X-SES-Virus-Verdict",
+                                "value": "PASS"
+                            },
+                            {
+                                "name": "Received-SPF",
+                                "value": "pass (spfCheck: domain of _spf.google.com designates 209.85.208.171 as permitted sender) client-ip=209.85.208.171; envelope-from=sajaffry@gmail.com; helo=mail-lj1-f171.google.com;"
+                            },
+                            {
+                                "name": "Authentication-Results",
+                                "value": "amazonses.com; spf=pass (spfCheck: domain of _spf.google.com designates 209.85.208.171 as permitted sender) client-ip=209.85.208.171; envelope-from=sajaffry@gmail.com; helo=mail-lj1-f171.google.com; dkim=pass header.i=@gmail.com; dmarc=pass header.from=gmail.com;"
+                            },
+                            {
+                                "name": "X-SES-RECEIPT",
+                                "value": "AEFBQUFBQUFBQUFINW9YN2d2dC8vSEJ1Q1RHTk5vWWtDVHBPZW0xV3RkbHJOZzJuMlBNNjBHYVRXU1ROL21GcWNLTGRJWWc5cEdCdVY0dXRBMmxvcXZJcHlVaGYwK3VMRWxCTVNvYVM4YzVhQjVwN3pEVFNKVU03ZXBzRDVjSmM4ZW1yRnhGbEM2MnRJSFVGZWtVYlo4Q2cwQTVOWDNZMHgxQjJvMVJoL0taQ0VTOC9hUEwxMVZhcGNDOE1EQVoxN1JITGkwdXVsR2s2NW1TMXprYzJrQ0Zya01Ka0N0YXU2VTFDNWNlelQvaVMrTDlQWVBRbys2WCtvWHVpSTRab3BxY3VlYjFQVVdIUSs4cnhWNGwyR0orYU5yUzNzNUpUazlxa21WTWwzdlRqbTdyRjQyYXhOSWc9PQ=="
+                            },
+                            {
+                                "name": "X-SES-DKIM-SIGNATURE",
+                                "value": "a=rsa-sha256; q=dns/txt; b=LX/YOymz4AOqQyfyv3th3gsIeJPMWV1eKzKN86pWwYNDVToL6zj1mdqAvAOcqRYAPwovZzuME7DIzDhNnbA2dR/7pPEEpbGeOhILViGR8HUhBjJakcWruGw5/ema3pKZPhBx4sEu3G1Upx1DmGckzxpF0CCE/fBLq48dKgUbJe0=; c=relaxed/simple; s=7v7vs6w47njt4pimodk5mmttbegzsi6n; d=amazonses.com; t=1732084430; v=1; bh=ttIojYcw/c9rMcgBN3Vrbik6fin0QDJ4zRVHqQcfAbM=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;"
+                            },
+                            {
+                                "name": "Received",
+                                "value": "by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2fb5014e2daso35795661fa.0 for <ftsc-robot@onreaction.com>; Tue, 19 Nov 2024 22:33:49 -0800 (PST)"
+                            },
+                            {
+                                "name": "DKIM-Signature",
+                                "value": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20230601; t=1732084427; x=1732689227; darn=onreaction.com; h=to:subject:message-id:date:from:in-reply-to:references:mime-version:from:to:cc:subject:date:message-id:reply-to; bh=ttIojYcw/c9rMcgBN3Vrbik6fin0QDJ4zRVHqQcfAbM=; b=e/UKkroeU6oIXuxK/yJqLCdgVeXctiJSUXnYX+hJWduqsIglrwN3o0Du5s01/NQlepApWBZatXlrkeae3NGPBUhM5B3BWPqYaoy/10f0EI3luS0nl4YA6Jhrq9ZY3WV4z+4q+Hs+j74B73SBP39E83+7ke6Isn9ScR7bP7P2F1Q7DDGAGMrR2ut9c/PhD4S1kRqA5HM97giOIACP2773vxegc8/OdaNKFGg4kxdgF+9xZaIhxu0K7hoM+sBAZ9wPe+dxDByynHWoooERhjagEbFAxsPm/DIQxVRM9o5DEmBS29PwBRTZIv8QrjoJheVmNLMDPURd8V3MbqucDR0ULA=="
+                            },
+                            {
+                                "name": "X-Google-DKIM-Signature",
+                                "value": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20230601; t=1732084427; x=1732689227; h=to:subject:message-id:date:from:in-reply-to:references:mime-version :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to; bh=ttIojYcw/c9rMcgBN3Vrbik6fin0QDJ4zRVHqQcfAbM=; b=sHQjx1DSzXK1KV0gYLawPtK8t8+FN07cRXS+TaBLbQ16VPYGWo6Vzga2jZO/GJR259 QB9FJrxwFGTLF39uD9U5VgM7Fbki/Lj2M8Zhni1ruGuMkeCZz55+vFY6LQpj5U9lRnVW uIBSauOGlB7fO8yLl/zZgpJOZG9CP0ma2NMlTt/lb+hhpdJfVSOjuSETbwdflshRax8v cI1vmIa4XJ9mMmx/Kzw/nx1xPj4iNsfOYHNcL58vFvVJwCtevNmDIeoo4MbbB3593I15 Y3tQRsjwGWgYAxoaCgOTKO4p6dChzcDNIBkNCAKJOj+/ge2KTR37eboUaIFYWQIC2jMa AH1g=="
+                            },
+                            {
+                                "name": "X-Gm-Message-State",
+                                "value": "AOJu0YwkDvKt3H+PeKUR4SlEk6zf7hU5fTwEeqXjKHeAZ7/9QRhQrImQ /ViyjM8zzTLNu5DF+TuvjxT3NzHene5toHwbyocFovl36SaL1bDL7BEUv+92b6Aa78D/tYlgA0v b4KfJJa7wEiQn7VKnlO6EC8bEWG/QoaNU"
+                            },
+                            {
+                                "name": "X-Google-Smtp-Source",
+                                "value": "AGHT+IEG3f3fWRbI9nucqbiA+aEIabkpAxqxMrg8VoeJZtGS9TjH1HQisD0cAFnz7vHRYUl3QoS/OYqJZdoY7ddORao="
+                            },
+                            {
+                                "name": "X-Received",
+                                "value": "by 2002:a2e:a80f:0:b0:2fa:ddb5:77f9 with SMTP id 38308e7fff4ca-2ff8dd67023mr7430531fa.40.1732084426647; Tue, 19 Nov 2024 22:33:46 -0800 (PST)"
+                            },
+                            {
+                                "name": "MIME-Version",
+                                "value": "1.0"
+                            },
+                            {
+                                "name": "References",
+                                "value": "<CAF7tXvRTj6286drQci45Li2So13u4LR-_q3Kb7iK8Fp5E=MUTQ@mail.gmail.com>"
+                            },
+                            {
+                                "name": "In-Reply-To",
+                                "value": "<CAF7tXvRTj6286drQci45Li2So13u4LR-_q3Kb7iK8Fp5E=MUTQ@mail.gmail.com>"
+                            },
+                            {
+                                "name": "From",
+                                "value": "Syed Jaffry <sajaffry@gmail.com>"
+                            },
+                            {
+                                "name": "Date",
+                                "value": "Tue, 19 Nov 2024 22:33:35 -0800"
+                            },
+                            {
+                                "name": "Message-ID",
+                                "value": "<CAF7tXvSFmoKGzbfwbdXMpqWtoomyd4qscy3Ab--L_EAO3MR3bg@mail.gmail.com>"
+                            },
+                            {
+                                "name": "Subject",
+                                "value": "Fwd: match score"
+                            },
+                            {
+                                "name": "To",
+                                "value": "ftsc-robot@onreaction.com"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "multipart/alternative; boundary=\\"000000000000f8ae310627525449\\""
+                            },
+                            {
+                                "name": "business-name",
+                                "value": "FTSC"
+                            }
+                        ],
+                        "commonHeaders": {
+                            "returnPath": "sajaffry@gmail.com",
+                            "from": [
+                                "Syed Jaffry <sajaffry@gmail.com>"
+                            ],
+                            "date": "Tue, 19 Nov 2024 22:33:35 -0800",
+                            "to": [
+                                "ftsc-robot@onreaction.com"
+                            ],
+                            "messageId": "<CAF7tXvSFmoKGzbfwbdXMpqWtoomyd4qscy3Ab--L_EAO3MR3bg@mail.gmail.com>",
+                            "subject": "Fwd: match score"
+                        }
+                    },
+                    "receipt": {
+                        "timestamp": "2024-11-20T06:33:49.720Z",
+                        "processingTimeMillis": 722,
+                        "recipients": [
+                            "ftsc-robot@onreaction.com"
+                        ],
+                        "spamVerdict": {
+                            "status": "PASS"
+                        },
+                        "virusVerdict": {
+                            "status": "PASS"
+                        },
+                        "spfVerdict": {
+                            "status": "PASS"
+                        },
+                        "dkimVerdict": {
+                            "status": "PASS"
+                        },
+                        "dmarcVerdict": {
+                            "status": "PASS"
+                        },
+                        "action": {
+                            "type": "SNS",
+                            "topicArn": "arn:aws:sns:us-west-2:303830944942:roboEntry",
+                            "encoding": "UTF8"
+                        }
+                    },
+                    "content": "Return-Path: <sajaffry@gmail.com>\\r\\nReceived: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])\\r\\n by inbound-smtp.us-west-2.amazonaws.com with SMTP id 3js34fmhr62t39t8ji1r03g7pcl8agmf5jom4n01\\r\\n for ftsc-robot@onreaction.com;\\r\\n Wed, 20 Nov 2024 06:33:49 +0000 (UTC)\\r\\nX-SES-Spam-Verdict: PASS\\r\\nX-SES-Virus-Verdict: PASS\\r\\nReceived-SPF: pass (spfCheck: domain of _spf.google.com designates 209.85.208.171 as permitted sender) client-ip=209.85.208.171; envelope-from=sajaffry@gmail.com; helo=mail-lj1-f171.google.com;\\r\\nAuthentication-Results: amazonses.com;\\r\\n spf=pass (spfCheck: domain of _spf.google.com designates 209.85.208.171 as permitted sender) client-ip=209.85.208.171; envelope-from=sajaffry@gmail.com; helo=mail-lj1-f171.google.com;\\r\\n dkim=pass header.i=@gmail.com;\\r\\n dmarc=pass header.from=gmail.com;\\r\\nX-SES-RECEIPT: AEFBQUFBQUFBQUFINW9YN2d2dC8vSEJ1Q1RHTk5vWWtDVHBPZW0xV3RkbHJOZzJuMlBNNjBHYVRXU1ROL21GcWNLTGRJWWc5cEdCdVY0dXRBMmxvcXZJcHlVaGYwK3VMRWxCTVNvYVM4YzVhQjVwN3pEVFNKVU03ZXBzRDVjSmM4ZW1yRnhGbEM2MnRJSFVGZWtVYlo4Q2cwQTVOWDNZMHgxQjJvMVJoL0taQ0VTOC9hUEwxMVZhcGNDOE1EQVoxN1JITGkwdXVsR2s2NW1TMXprYzJrQ0Zya01Ka0N0YXU2VTFDNWNlelQvaVMrTDlQWVBRbys2WCtvWHVpSTRab3BxY3VlYjFQVVdIUSs4cnhWNGwyR0orYU5yUzNzNUpUazlxa21WTWwzdlRqbTdyRjQyYXhOSWc9PQ==\\r\\nX-SES-DKIM-SIGNATURE: a=rsa-sha256; q=dns/txt; b=LX/YOymz4AOqQyfyv3th3gsIeJPMWV1eKzKN86pWwYNDVToL6zj1mdqAvAOcqRYAPwovZzuME7DIzDhNnbA2dR/7pPEEpbGeOhILViGR8HUhBjJakcWruGw5/ema3pKZPhBx4sEu3G1Upx1DmGckzxpF0CCE/fBLq48dKgUbJe0=; c=relaxed/simple; s=7v7vs6w47njt4pimodk5mmttbegzsi6n; d=amazonses.com; t=1732084430; v=1; bh=ttIojYcw/c9rMcgBN3Vrbik6fin0QDJ4zRVHqQcfAbM=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;\\r\\nReceived: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2fb5014e2daso35795661fa.0\\r\\n        for <ftsc-robot@onreaction.com>; Tue, 19 Nov 2024 22:33:49 -0800 (PST)\\r\\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\\r\\n        d=gmail.com; s=20230601; t=1732084427; x=1732689227; darn=onreaction.com;\\r\\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\\r\\n         :from:to:cc:subject:date:message-id:reply-to;\\r\\n        bh=ttIojYcw/c9rMcgBN3Vrbik6fin0QDJ4zRVHqQcfAbM=;\\r\\n        b=e/UKkroeU6oIXuxK/yJqLCdgVeXctiJSUXnYX+hJWduqsIglrwN3o0Du5s01/NQlep\\r\\n         ApWBZatXlrkeae3NGPBUhM5B3BWPqYaoy/10f0EI3luS0nl4YA6Jhrq9ZY3WV4z+4q+H\\r\\n         s+j74B73SBP39E83+7ke6Isn9ScR7bP7P2F1Q7DDGAGMrR2ut9c/PhD4S1kRqA5HM97g\\r\\n         iOIACP2773vxegc8/OdaNKFGg4kxdgF+9xZaIhxu0K7hoM+sBAZ9wPe+dxDByynHWooo\\r\\n         ERhjagEbFAxsPm/DIQxVRM9o5DEmBS29PwBRTZIv8QrjoJheVmNLMDPURd8V3MbqucDR\\r\\n         0ULA==\\r\\nX-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\\r\\n        d=1e100.net; s=20230601; t=1732084427; x=1732689227;\\r\\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\\r\\n         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;\\r\\n        bh=ttIojYcw/c9rMcgBN3Vrbik6fin0QDJ4zRVHqQcfAbM=;\\r\\n        b=sHQjx1DSzXK1KV0gYLawPtK8t8+FN07cRXS+TaBLbQ16VPYGWo6Vzga2jZO/GJR259\\r\\n         QB9FJrxwFGTLF39uD9U5VgM7Fbki/Lj2M8Zhni1ruGuMkeCZz55+vFY6LQpj5U9lRnVW\\r\\n         uIBSauOGlB7fO8yLl/zZgpJOZG9CP0ma2NMlTt/lb+hhpdJfVSOjuSETbwdflshRax8v\\r\\n         cI1vmIa4XJ9mMmx/Kzw/nx1xPj4iNsfOYHNcL58vFvVJwCtevNmDIeoo4MbbB3593I15\\r\\n         Y3tQRsjwGWgYAxoaCgOTKO4p6dChzcDNIBkNCAKJOj+/ge2KTR37eboUaIFYWQIC2jMa\\r\\n         AH1g==\\r\\nX-Gm-Message-State: AOJu0YwkDvKt3H+PeKUR4SlEk6zf7hU5fTwEeqXjKHeAZ7/9QRhQrImQ\\r\\n\\t/ViyjM8zzTLNu5DF+TuvjxT3NzHene5toHwbyocFovl36SaL1bDL7BEUv+92b6Aa78D/tYlgA0v\\r\\n\\tb4KfJJa7wEiQn7VKnlO6EC8bEWG/QoaNU\\r\\nX-Google-Smtp-Source: AGHT+IEG3f3fWRbI9nucqbiA+aEIabkpAxqxMrg8VoeJZtGS9TjH1HQisD0cAFnz7vHRYUl3QoS/OYqJZdoY7ddORao=\\r\\nX-Received: by 2002:a2e:a80f:0:b0:2fa:ddb5:77f9 with SMTP id\\r\\n 38308e7fff4ca-2ff8dd67023mr7430531fa.40.1732084426647; Tue, 19 Nov 2024\\r\\n 22:33:46 -0800 (PST)\\r\\nMIME-Version: 1.0\\r\\nReferences: <CAF7tXvRTj6286drQci45Li2So13u4LR-_q3Kb7iK8Fp5E=MUTQ@mail.gmail.com>\\r\\nIn-Reply-To: <CAF7tXvRTj6286drQci45Li2So13u4LR-_q3Kb7iK8Fp5E=MUTQ@mail.gmail.com>\\r\\nFrom: Syed Jaffry <sajaffry@gmail.com>\\r\\nDate: Tue, 19 Nov 2024 22:33:35 -0800\\r\\nMessage-ID: <CAF7tXvSFmoKGzbfwbdXMpqWtoomyd4qscy3Ab--L_EAO3MR3bg@mail.gmail.com>\\r\\nSubject: Fwd: match score\\r\\nTo: ftsc-robot@onreaction.com\\r\\nContent-Type: multipart/alternative; boundary=\\"000000000000f8ae310627525449\\"\\r\\nbusiness-name: FTSC\\r\\n\\r\\n--000000000000f8ae310627525449\\r\\nContent-Type: text/plain; charset=\\"UTF-8\\"\\r\\n\\r\\nHi Mariano, below is the match score:\\r\\n\\r\\nPlayers:\\r\\nSyed Jaffry\\r\\nCharlie Tritschler\\r\\nScore: 6-1, 6-4 (Syed won)\\r\\n\\r\\nleague: men\'s 3.0 flex\\r\\n\\r\\nThanks\\r\\nSyed\\r\\n\\r\\n--000000000000f8ae310627525449\\r\\nContent-Type: text/html; charset=\\"UTF-8\\"\\r\\nContent-Transfer-Encoding: quoted-printable\\r\\n\\r\\n<div dir=3D\\"ltr\\"><div class=3D\\"gmail_quote\\"><div dir=3D\\"ltr\\">Hi Mariano, be=\\r\\nlow is the match score:<div><br></div><div>Players:</div><div>Syed Jaffry</=\\r\\ndiv><div>Charlie=C2=A0Tritschler</div><div>Score: 6-1, 6-4 (Syed won)</div>=\\r\\n<div><br></div><div>league: men&#39;s 3.0 flex</div><div><br></div><div>Tha=\\r\\nnks</div><font color=3D\\"#888888\\"><font color=3D\\"#888888\\"><font color=3D\\"#88=\\r\\n8888\\"><font color=3D\\"#888888\\"><font color=3D\\"#888888\\"><font color=3D\\"#88888=\\r\\n8\\"><font color=3D\\"#888888\\"><div>Syed</div></font></font></font></font></fon=\\r\\nt></font></font></div>\\r\\n</div></div>\\r\\n\\r\\n--000000000000f8ae310627525449--\\r\\n"
+                }, 'Timestamp': '2024-11-20T06: 33: 50.469Z', 'SignatureVersion': '1', 'Signature': 'K3XrgEb0rFeTAHRe7o4PaTawCeSEtAY4dxPJkRw0d/qiViHyTnBcqFOBQsWc1m9lMt39z+Tq/PUIOx5uzjKw8EnNhjgPKgdr5igyr7o+uH/voqEuahQYhfPRrSnt677s4jl99VthIJXdF9GgG3Sroei6KIIRss7JId6WjlQXHav2XpY1DOr7G7gV8lhfMrEvfDVNpmGrq9nArUoSvBPKv6T7e7edrREVg0OX7LWpGuK3yCA0x/i8UeZK45NlhyeOh2DOdFo553yoVdrCzeSPob914BwdKJOEbHINZ9PbrReFWjHnHvrgZ0uoDVBPvp/ecK+TqWBCy/4btB6GjPw92g==', 'SigningCertUrl': 'https: //sns.us-west-2.amazonaws.com/SimpleNotificationService-9c6465fa7f48f5cacd23014631ec1136.pem', 'UnsubscribeUrl': 'https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:303830944942:roboEntry:ead5ff04-317d-4c36-a10a-f35683ddd0cf', 'MessageAttributes': {}}}]}

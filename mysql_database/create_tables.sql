@@ -36,6 +36,15 @@ CREATE TABLE doubles_team (
     FOREIGN KEY (player2_id) REFERENCES player(player_id)
 );
 
+DROP TABLE IF EXISTS team_league;
+CREATE TABLE team_league (
+    league_id INT NOT NULL,
+    team_id INT NOT NULL,
+    PRIMARY KEY (league_id, team_id),
+    FOREIGN KEY (team_id) REFERENCES doubles_team(team_id),
+    FOREIGN KEY (league_id) REFERENCES league(league_id)
+);
+
 DROP TABLE IF EXISTS singles_match;
 CREATE TABLE singles_match (
 	match_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,9 +86,17 @@ CREATE TABLE doubles_match (
     set3_t2 INT,
     league_id INT NOT NULL,
     completed CHAR(1),
+    entered_by VARCHAR(255),
+    team1_confirmed VARCHAR(255),
+    team2_confirmed VARCHAR(255),
+    winner_team_id INT,
+    loser_team_id INT,
     FOREIGN KEY (team1_id) REFERENCES doubles_team(team_id),
     FOREIGN KEY (team2_id) REFERENCES doubles_team(team_id),
-    FOREIGN KEY (league_id) REFERENCES league(league_id)
+    FOREIGN KEY (league_id) REFERENCES league(league_id),
+    FOREIGN KEY (team1_id, league_id) REFERENCES team_league(team_id, league_id),
+    FOREIGN KEY (team2_id, league_id) REFERENCES team_league(team_id, league_id),
+    UNIQUE (team1_id, team2_id, match_id, league_id)
 );
 
 DROP TABLE IF EXISTS singles_ladder;

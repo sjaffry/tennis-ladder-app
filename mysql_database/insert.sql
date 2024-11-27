@@ -19,25 +19,44 @@ INSERT INTO `tennis_ladder`.`player`
 `usta_rating`,
 `business_name`)
 VALUES
-('shoutavouch2@gmail.com',
-4,
-'Jill',
-'Jackson',
-'F',
+('charlie@gmail.com',
+5,
+'Charlie',
+'Tristsner',
+'M',
 '3.0',
 'FTSC');
 
 SELECT * FROM player;
+
+INSERT INTO `tennis_ladder`.`doubles_team`
+(`team_id`,
+`player1_id`,
+`player2_id`)
+VALUES
+(2,
+3,
+4);
+
+SELECT * FROM doubles_team;
 
 INSERT INTO `tennis_ladder`.`player_league`
 (`league_id`,
 `player_id`)
 VALUES
 (2,
-2);
-
+5);
 
 SELECT * FROM player_league;
+
+INSERT INTO `tennis_ladder`.`team_league`
+(`league_id`,
+`team_id`)
+VALUES
+(2,
+2);
+
+SELECT * FROM team_league;
 
 INSERT INTO `tennis_ladder`.`singles_match`
 (
@@ -45,11 +64,23 @@ INSERT INTO `tennis_ladder`.`singles_match`
 `player2_id`,
 `league_id`)
 VALUES
-(4,
+(5,
 1,
 2);
 
 SELECT * FROM singles_match;
+
+INSERT INTO `tennis_ladder`.`doubles_match`
+(
+`team1_id`,
+`team2_id`,
+`league_id`)
+VALUES
+(1,
+2,
+2);
+
+SELECT * FROM doubles_match;
 
 INSERT INTO `tennis_ladder`.`singles_ladder`
 (`player_id`,

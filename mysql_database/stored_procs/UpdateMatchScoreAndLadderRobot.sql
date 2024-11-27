@@ -67,7 +67,6 @@ IF v_match_id IS NULL THEN
 	SET MESSAGE_TEXT = 'No matches found';
 END IF;
     
-    -- We want both the match score and the ladder to be updated together or none
     START TRANSACTION;
 	-- update a match score. Scores are assumed to be provided from winner's perspective
 	UPDATE `tennis_ladder`.`singles_match` 
@@ -89,7 +88,9 @@ WHERE
 	COMMIT;
     
 	-- Retrieve and return all data for the updated match
-    SELECT sm.player1_id, 
+    SELECT "singles" as Match_type,
+		sm.match_id,
+		sm.player1_id, 
 		sm.player2_id,
         sm.entered_by,
         sm.player1_confirmed,
