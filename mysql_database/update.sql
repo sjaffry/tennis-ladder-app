@@ -13,8 +13,25 @@ SET
 `entered_by` = null,
 `player1_confirmed` = null,
 `player2_confirmed` = null
-WHERE `match_id` = 11;
+WHERE `match_id` = 1;
 
+
+UPDATE `tennis_ladder`.`doubles_match`
+SET
+`match_date` = '2024-01-01',
+`winner_team_id` = null,
+`loser_team_id` = null,
+`set1_t1` = null,
+`set1_t2` = null,
+`set2_t1` = null,
+`set2_t2` = null,
+`set3_t1` = null,
+`set3_t2` = null,
+`completed` = null,
+`entered_by` = null,
+`team1_confirmed` = null,
+`team2_confirmed` = null
+WHERE `match_id` = 1;
 
 UPDATE `tennis_ladder`.`singles_match`
 SET
@@ -38,7 +55,6 @@ SET
 category = 'Tennis'
 WHERE league_id in (1,2);
 
-UPDATE player
-SET
-last_name = 'Tritschler'
-WHERE player_id = 5
+UPDATE singles_match
+SET player1_confirmed = null
+WHERE match_id = 10;

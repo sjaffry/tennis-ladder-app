@@ -238,8 +238,8 @@ const Dashboard = ({
       winner_id: match.winner_id,
       loser_id: match.loser_id,
       entered_by: match.entered_by,
-      player1_confirmed: (match.player1_email == email ? email: match.player1_email),
-      player2_confirmed: (match.player2_email == email ? email: match.player2_email)
+      player1_confirmed: (match.player1_email == email ? email: match.player1_confirmed),
+      player2_confirmed: (match.player2_email == email ? email: match.player2_confirmed)
     });
   
     setIsScoreConfirmed(true);
@@ -396,10 +396,10 @@ const Dashboard = ({
                             ) : (match.player1_confirmed == null || match.player2_confirmed == null) ? (
                               <Button 
                                 variant="contained" 
-                                sx={{ width: '60px', height: '30px', fontSize: '9px' }}
+                                sx={{ width: '60px', height: '60px', fontSize: '9px' }}
                                 disabled
                                 >
-                                Pending confirm
+                                Pending confirm player 2
                               </Button>
                             ) : null
                             }

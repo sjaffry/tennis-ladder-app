@@ -65,7 +65,7 @@ SET
 WHERE
     `match_id` = v_match_id;
     
--- Update ladder only if the score is being entered an not confirmed
+-- Update ladder only once both players have confirmed
 IF (p_p1_confirmed is NOT NULL) AND (p_p2_confirmed is NOT NULL) THEN
     -- Update the ladder for a single WIN
     INSERT INTO `tennis_ladder`.`singles_ladder`
