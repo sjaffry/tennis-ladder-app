@@ -99,7 +99,7 @@ WHERE
 	COMMIT;
     
 	-- Retrieve and return all data for the updated match
-    SELECT "doubles" as Match_type, 
+SELECT "doubles" as Match_type, 
 		dm.match_id,
 		dm.team1_id, 
 		dm.team2_id,
@@ -107,6 +107,7 @@ WHERE
         dm.team1_confirmed,
         dm.team2_confirmed,
         dm.league_id,
+        l.league_name,
 		dm.winner_team_id,
 		dm.loser_team_id,
 		dm.set1_t1,
@@ -115,8 +116,9 @@ WHERE
 		dm.set2_t2,
 		dm.set3_t1,
 		dm.set3_t2
-    FROM `tennis_ladder`.`doubles_match` dm
-    WHERE `match_id` = v_match_id;
+    FROM `tennis_ladder`.`doubles_match` dm, `tennis_ladder`.`league` l
+    WHERE `match_id` = v_match_id
+    AND dm.league_id = l.league_id;
     
 END $$
 

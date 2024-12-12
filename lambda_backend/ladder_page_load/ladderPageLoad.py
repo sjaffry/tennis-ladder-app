@@ -46,7 +46,7 @@ def lambda_handler(event, context):
     try:
         with connection.cursor() as cursor:
             # Define the SQL query
-            sql_query = """SELECT DISTINCT l.league_id as "league_id", l.league_name as "league_name" 
+            sql_query = """SELECT DISTINCT l.league_id as "league_id", l.league_type as "league_type", l.league_name as "league_name" 
                         FROM league l, player_league pl, player p
                         WHERE l.league_id = pl.league_id
                         AND p.player_id = pl.player_id

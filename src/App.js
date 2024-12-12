@@ -9,6 +9,7 @@ import { List, ListItem, ListItemIcon, Box, Paper, TextField, Typography, Button
 import { Link } from "react-router-dom";
 import Dashboard from './components/Dashboard';
 import foothillslogo from './images/FTSC-logo.jpeg';
+import { useNavigate } from "react-router-dom";
 Amplify.configure(awsExports);
 
 
@@ -29,24 +30,26 @@ const App = ({ signOut, user }) => {
   const [externalData, setExternalData] = useState(null);
   const [matchData, setMatchData] = useState(null);
   const [ladderData, setLadderData] = useState(null);
-  const business_name = user.signInUserSession.idToken.payload['cognito:groups'];
+  const user_groups = user.signInUserSession.idToken.payload['cognito:groups'];
   const email = user.signInUserSession.idToken.payload['email'];
   const jwtToken = user.signInUserSession.idToken.jwtToken;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));  
+  const AdminPage = `/AdminPage`;
+  const navigate = useNavigate();
 
 
   // Call page load API
   useEffect(() => {
   }, []); 
 
-  const handleLeagueClick = async (index, league_id, email) => {
+  const handleLeagueClick = async (index, league_id, league_type, email) => {
     setSelectedTile(index);
-    loadMyMatches(email, league_id);
+    loadMyMatches(email, league_id, league_type);
     loadLadder(league_id);
   }
 
-  const loadMyMatches = async (email, league_id) => {
+  const loadMyMatches = async (email, league_id, league_type) => {
     setPageLoading(true);
     setDataLoading(true);
     const url1 = 'https://35t1hlnog6.execute-api.us-west-2.amazonaws.com/Prod';
@@ -54,6 +57,7 @@ const App = ({ signOut, user }) => {
     axios.get(url1, {
       params: {
         league_id: league_id,
+        league_type: league_type,
         email: email
       },
       headers: {
@@ -127,21 +131,47 @@ const App = ({ signOut, user }) => {
 
   }
 
+  const launchAdminPage = async (event) => {
+    navigate(AdminPage);
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', bgcolor: 'white', height: '100vh' }}>
         {!isMobile && (
-          <Button variant="contained" 
-            sx={{ 
-              position: 'absolute', 
-              top: 2, 
-              right: 2, 
-              backgroundColor: '#1d2636',
-              '&:hover': {
+          <Box sx={{ position: 'absolute', top: 2, right: 2, display: 'flex', alignItems: 'center' }}>
+            {user_groups.includes('tennis-admin') && (
+              <Button
+                variant="contained"
+                sx={{
+                  minWidth: 100,
+                  height: 40,
+                  marginRight: 1,
+                  backgroundColor: '#1d2636',
+                  '&:hover': {
+                    backgroundColor: '#1d2636',
+                  },
+                }}
+                onClick={launchAdminPage}
+              >
+                Admin
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              sx={{
+                minWidth: 100,
+                height: 40,
                 backgroundColor: '#1d2636',
-            }}} onClick={signOut}>
-            Logout
-          </Button>
+                '&:hover': {
+                  backgroundColor: '#1d2636',
+                },
+              }}
+              onClick={signOut}
+            >
+              Logout
+            </Button>
+          </Box>
         )}
         <Box sx={{ width: '100%', p: 2, overflow: 'auto' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
@@ -208,7 +238,7 @@ const App = ({ signOut, user }) => {
                             backgroundColor: selectedTile === index ? '#1d2636' : 'white',
                         },
                     }}
-                    onClick={() => handleLeagueClick(index, league["league_id"], email)}
+                    onClick={() => handleLeagueClick(index, league["league_id"], league["league_type"], email)}
                 >
                     {league["league_name"]}
                 </Button>

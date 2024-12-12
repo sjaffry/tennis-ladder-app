@@ -15,7 +15,6 @@ SET
 `player2_confirmed` = null
 WHERE `match_id` = 1;
 
-
 UPDATE `tennis_ladder`.`doubles_match`
 SET
 `match_date` = '2024-01-01',
@@ -52,9 +51,6 @@ WHERE `match_id` = 1;
 
 UPDATE league
 SET
-category = 'Tennis'
-WHERE league_id in (1,2);
+league_name = "mix doubles flex league OCT-DEC"
+WHERE league_id in (2);
 
-UPDATE singles_match
-SET player1_confirmed = null
-WHERE match_id = 10;

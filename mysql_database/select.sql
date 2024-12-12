@@ -26,7 +26,7 @@ AND sm.player2_id = p2.player_id
 AND sm.league_id = 2)
 SELECT m.* 
 FROM player p, matches m
-WHERE p.email = "annieraza@gmail.com"
+WHERE p.email = "sajaffry@gmail.com"
 AND (p.player_id = m.player1_id OR p.player_id = m.player2_id);
 
 SELECT * from player;
@@ -44,5 +44,37 @@ SELECT * from league;
 	FROM singles_ladder as sl, player p
 	WHERE sl.`league_id` = 2
 	AND sl.player_id = p.player_id
-	ORDER BY sl.`points` DESC
-
+	ORDER BY sl.`points` DESC;
+    
+-- Get doubles match
+WITH matches AS (
+	SELECT
+	dm.match_id,
+	p1.first_name as p1_firstname,
+	p2.first_name as p2_firstname,
+	p3.first_name as p3_firstname,
+	p4.first_name as p4_firstname,
+	p1.player_id as player1_id,
+    p2.player_id as player2_id,
+    p3.player_id as player3_id,
+    p4.player_id as player4_id,
+	dm.team1_id,
+	dm.team2_id,
+	set1_t1,
+	set1_t2,
+	set2_t1,
+	set2_t2,
+	set3_t1,
+	set3_t2
+	FROM doubles_match dm, doubles_team dt1, doubles_team dt2, player p1, player p2, player p3, player p4
+	WHERE dm.team1_id = dt1.team_id
+	AND dt1.player1_id = p1.player_id
+	AND dt1.player2_id = p2.player_id
+	AND dt2.player1_id = p3.player_id
+	AND dt2.player2_id = p4.player_id
+	AND dm.team2_id = dt2.team_id
+	AND dm.league_id = 2)
+SELECT m.* 
+FROM player p, matches m
+WHERE p.email = "syejaffr@amazon.com"
+AND (p.player_id = m.player1_id OR p.player_id = m.player2_id OR p.player_id = m.player3_id OR p.player_id = m.player4_id);

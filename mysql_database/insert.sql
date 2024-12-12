@@ -1,11 +1,15 @@
 INSERT INTO `tennis_ladder`.`league`
 (`league_name`,
 `end_date`,
-`business_name`)
+`business_name`,
+`category`,
+`league_type`)
 VALUES
 ('mens 3.0 flex league JAN-MAR',
 '2025-03-31 12:00:00',
-'FTSC'
+'FTSC',
+'Tennis',
+'singles'
 );
 
 SELECT * FROM league;
@@ -34,9 +38,9 @@ INSERT INTO `tennis_ladder`.`doubles_team`
 `player1_id`,
 `player2_id`)
 VALUES
-(2,
+(3,
 3,
-4);
+5);
 
 SELECT * FROM doubles_team;
 
@@ -45,7 +49,7 @@ INSERT INTO `tennis_ladder`.`player_league`
 `player_id`)
 VALUES
 (2,
-5);
+1);
 
 SELECT * FROM player_league;
 
@@ -54,7 +58,7 @@ INSERT INTO `tennis_ladder`.`team_league`
 `team_id`)
 VALUES
 (2,
-2);
+3);
 
 SELECT * FROM team_league;
 
@@ -64,9 +68,9 @@ INSERT INTO `tennis_ladder`.`singles_match`
 `player2_id`,
 `league_id`)
 VALUES
-(5,
+(2,
 1,
-2);
+1);
 
 SELECT * FROM singles_match;
 
@@ -76,8 +80,8 @@ INSERT INTO `tennis_ladder`.`doubles_match`
 `team2_id`,
 `league_id`)
 VALUES
-(1,
-2,
+(3,
+1,
 2);
 
 SELECT * FROM doubles_match;

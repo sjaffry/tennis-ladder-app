@@ -14,6 +14,7 @@ CREATE TABLE league (
     league_id INT AUTO_INCREMENT PRIMARY KEY,
     league_name VARCHAR(100) NOT NULL,
     category VARCHAR(100) NOT NULL,
+    league_type VARCHAR(100) NOT NULL,
     end_date DATE,
     business_name VARCHAR(100) NOT NULL
 );
@@ -109,6 +110,19 @@ CREATE TABLE singles_ladder (
     losses INT NOT NULL DEFAULT 0,
     PRIMARY KEY (player_id, league_id),
     FOREIGN KEY (player_id) REFERENCES player(player_id),
+    FOREIGN KEY (league_id) REFERENCES league(league_id)
+);
+
+DROP TABLE IF EXISTS doubles_ladder;
+CREATE TABLE doubles_ladder (
+	team_id INT NOT NULL,
+    league_id INT NOT NULL,
+    matches INT NOT NULL DEFAULT 0,
+    points INT NOT NULL DEFAULT 0,
+    wins INT NOT NULL DEFAULT 0,
+    losses INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (team_id, league_id),
+    FOREIGN KEY (team_id) REFERENCES doubles_team(team_id),
     FOREIGN KEY (league_id) REFERENCES league(league_id)
 );
  

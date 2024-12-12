@@ -96,6 +96,7 @@ WHERE
         sm.player1_confirmed,
         sm.player2_confirmed,
         sm.league_id,
+        l.league_name,
 		sm.winner_id,
 		sm.loser_id,
 		sm.set1_p1,
@@ -104,8 +105,9 @@ WHERE
 		sm.set2_p2,
 		sm.set3_p1,
 		sm.set3_p2
-    FROM `tennis_ladder`.`singles_match` sm
-    WHERE `match_id` = v_match_id;
+    FROM `tennis_ladder`.`singles_match` sm, `tennis_ladder`.`league` l
+    WHERE `match_id` = v_match_id
+    AND sm.league_id = l.league_id;
     
 END $$
 

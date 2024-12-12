@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
+import MatchTableRowSingles from './MatchTableRowSingles';
+import MatchTableRowDoubles from './MatchTableRowDoubles';
 import { 
   Box, 
   Button, 
@@ -298,115 +300,13 @@ const Dashboard = ({
                 </TableHead>
                 <TableBody>
                   {matchData.map((match, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{match.player1_fname} {match.player1_lname}</TableCell>
-                      <TableCell> vs </TableCell>
-                      <TableCell>{match.player2_fname} {match.player2_lname}</TableCell>
-                      <TableCell>
-                        <TableRow>
-                          <TableCell 
-                                sx={{ 
-                                  textAlign: 'center',
-                                  width: '40px', 
-                                  height: '30px',
-                                  backgroundColor: '#454746', 
-                                  color: 'white', 
-                                  padding: '4px',
-                                  border: '1px solid black'
-                                }}>
-                          {match.set1_p1}
-                          </TableCell>
-                          <TableCell 
-                            sx={{ 
-                              textAlign: 'center',
-                              width: '40px', 
-                              height: '30px',
-                              backgroundColor: '#454746', 
-                              color: 'white', 
-                              padding: '4px',
-                              border: '1px solid black'
-                            }}>
-                          {match.set1_p2}
-                          </TableCell>
-                          <TableCell 
-                            sx={{
-                              textAlign: 'center', 
-                              width: '40px', 
-                              height: '30px',
-                              backgroundColor: 'white', 
-                              color: 'black', 
-                              padding: '4px',
-                              border: '1px solid black'
-                            }}>
-                          {match.set2_p1}
-                          </TableCell>
-                          <TableCell 
-                            sx={{ 
-                              textAlign: 'center',
-                              width: '40px', 
-                              height: '30px',
-                              backgroundColor: 'white', 
-                              color: 'black', 
-                              padding: '4px',
-                              border: '1px solid black'
-                            }}>
-                          {match.set2_p2}
-                          </TableCell>
-                          <TableCell 
-                            sx={{ 
-                              textAlign: 'center',
-                              width: '40px', 
-                              height: '30px',
-                              backgroundColor: '#454746', 
-                              color: 'white', 
-                              padding: '4px',
-                              border: '1px solid black'
-                            }}>
-                          {match.set3_p1}
-                          </TableCell>
-                          <TableCell 
-                            sx={{ 
-                              textAlign: 'center',
-                              width: '40px', 
-                              height: '30px',
-                              backgroundColor: '#454746', 
-                              color: 'white', 
-                              padding: '4px',
-                              border: '1px solid black'
-                            }}>
-                          {match.set3_p2}
-                          </TableCell>
-                          <TableCell>
-                            {match.entered_by === null ? (
-                              <Button 
-                                variant="contained" 
-                                color="primary"
-                                onClick={() => handleClickOpen({...match})}
-                                sx={{ width: '60px', height: '30px', fontSize: '9px' }}>
-                                Add score
-                              </Button>
-                            ) : (match.entered_by !== email && (match.player1_confirmed !== email && match.player2_confirmed !== email)) ? (
-                              <Button 
-                                variant="contained" 
-                                color="secondary"
-                                onClick={() => handleConfirmScoreClick({...match})}
-                                sx={{ width: '60px', height: '30px', fontSize: '9px' }}>
-                                Confirm score
-                              </Button>
-                            ) : (match.player1_confirmed == null || match.player2_confirmed == null) ? (
-                              <Button 
-                                variant="contained" 
-                                sx={{ width: '60px', height: '60px', fontSize: '9px' }}
-                                disabled
-                                >
-                                Pending confirm player 2
-                              </Button>
-                            ) : null
-                            }
-                          </TableCell>
-                        </TableRow>
-                      </TableCell>
-                    </TableRow>
+                    <MatchTableRowSingles
+                    key={index}
+                    match={match}
+                    email={email}
+                    handleClickOpen={handleClickOpen}
+                    handleConfirmScoreClick={handleConfirmScoreClick}
+                  />
                   ))}
                 </TableBody>
               </Table>
