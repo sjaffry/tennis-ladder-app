@@ -31,8 +31,12 @@ def lambda_handler(event, context):
     token = event['headers']['Authorization']
     category = event["queryStringParameters"]['category']
     decoded = decode_jwt(token)
-    # We only ever expect the user to be in one group only - business rule
-    business_name = decoded['cognito:groups'][0]
+ 
+    # Since a user could also be in a tennis-admin group, we want to filter that out
+    filtered_values = [value for value in decoded['cognito:groups'] if value != 'tennis-admin']
+
+    # Assign the first remaining value to a variable (if there's at least one remaining value)
+    business_name = filtered_values[0] if filtered_values else None
     
     # Connect to the RDS MySQL database
     connection = pymysql.connect(

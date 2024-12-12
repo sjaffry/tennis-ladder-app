@@ -139,11 +139,11 @@ return (
       </Button>
       <Box sx={{ width: '80%', p: 2, overflow: 'auto' }}>
         <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>Welcome {user.signInUserSession.idToken.payload.given_name}</Typography>
-        <Typography sx={{ mb: 5 }} variant="h5" gutterBottom>Create or Update League & Matches</Typography>
+        <Typography sx={{ mb: 5 }} variant="h5" gutterBottom>Setup League & Matches</Typography>
         <Box sx={{ mb: 2, display: 'flex', gap: 2, width: '50%' }}>
           {pageLoading && <CircularProgress color="inherit"/>}
           <TextField
-            label="New Event Name"
+            label="New league name"
             variant="outlined"
             value={newEventName}
             onChange={handleNewEventNameChange}
