@@ -40,14 +40,19 @@ const AdminPage = ({ signOut, user }) => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [newEventName, setNewEventName] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addPlayersDialogOpen, setAddPlayersDialogOpen] = useState(false);
+  const [playerData, setPlayerData] = useState([]);
   const [editLeague, setEditLeague] = useState(false);
   const [newLeagueAdded, setNewLeagueAdded] = useState(false);
   const [leagueId, setLeagueId] = useState('');
+  const [leagueIdForAddPlayers, setLeagueIdForAddPlayers] = useState('');
   const [leagueName, setLeagueName] = useState('');
   const [endDate, setEndDate] = useState('');
   const [category, setCategory] = useState('');
   const [leagueType, setLeagueType] = useState('');
   const [leagueData, setLeagueData] = useState([]);
+  const [responseDialogOpen, setResponseDialogOpen] = useState(false);
+  const [responseData, setResponseData] = useState(null);
 
   // Load data on component mount
   useEffect(() => {
@@ -184,6 +189,61 @@ const AdminPage = ({ signOut, user }) => {
       });
   };  
 
+  const handleAddPlayers = (league_id) => {
+    setLeagueIdForAddPlayers(league_id);
+    // Open dialog to upload CSV
+    setAddPlayersDialogOpen(true);
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const rows = text.split('\n').slice(1); // Skip the header row
+
+      const parsedData = rows.map((row) => {
+        const [firstName, middleName, lastName, email, gender, usta_rating] = row.split(',').map((col) => col.trim());
+        return { firstName, middleName, lastName, email, gender, usta_rating };
+      });
+
+      setPlayerData(parsedData);
+    };
+
+    reader.readAsText(file);
+  };
+
+  const handleSavePlayers = () => {
+    console.log('Players saved:', playerData);
+
+    const url1 = 'https://pp4mlclo8a.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.put(
+      url1,
+      {
+        player_data: playerData,
+        league_id: leagueIdForAddPlayers
+      },
+      {
+        headers: {
+          Authorization: jwtToken,
+        },
+      }
+    )
+      .then(response => {
+        // Handle success
+        setResponseData(response.data);
+        setResponseDialogOpen(true);
+        setAddPlayersDialogOpen(false);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Cannot save new league: ' + error.message);
+      });
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', bgcolor: 'white', height: '100vh' }}>
@@ -251,6 +311,11 @@ const AdminPage = ({ signOut, user }) => {
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
+                  <TableCell>
+                  <Button variant="contained" sx={{ backgroundColor: '#1d2636' }} onClick={() => handleAddPlayers(league.league_id)}>
+                    Add players
+                  </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -308,6 +373,94 @@ const AdminPage = ({ signOut, user }) => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Dialog for Adding Players */}
+        <Dialog open={addPlayersDialogOpen} onClose={() => setAddPlayersDialogOpen(false)}>
+          <DialogTitle>Upload Players</DialogTitle>
+          <DialogContent>
+            <input type="file" accept=".csv" onChange={handleFileUpload} />
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>First Name</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Middle Name</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Last Name</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Email</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {playerData.map((player, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{player.firstName}</TableCell>
+                      <TableCell>{player.middleName}</TableCell>
+                      <TableCell>{player.lastName}</TableCell>
+                      <TableCell>{player.email}</TableCell>
+                      <TableCell>{player.gender}</TableCell>
+                      <TableCell>{player.usta_rating}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setAddPlayersDialogOpen(false)}>Cancel</Button>
+            <Button variant="contained" onClick={handleSavePlayers}>
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+        
+        {/* Dialog to display add Players response */}
+        {responseData && (
+        <Dialog open={responseDialogOpen} onClose={() => setResponseDialogOpen(false)}>
+          <DialogTitle>System Response</DialogTitle>
+          <DialogContent>
+          <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>First Name</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Last Name</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Status</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>League Name</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {responseData.map((player, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{player.first_name}</TableCell>
+                      <TableCell>{player.last_name}</TableCell>
+                      <TableCell>{player.status}</TableCell>
+                      <TableCell>{player.league_name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setResponseDialogOpen(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+        )}
       </Box>
     </ThemeProvider>
   );
