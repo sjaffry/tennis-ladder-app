@@ -52,7 +52,11 @@ const AdminPage = ({ signOut, user }) => {
   const [leagueType, setLeagueType] = useState('');
   const [leagueData, setLeagueData] = useState([]);
   const [responseDialogOpen, setResponseDialogOpen] = useState(false);
-  const [responseData, setResponseData] = useState(null);
+  const [leagueMatches, setLeagueMatches] = useState('');
+  const [leagueMatchesDialogOpen, setLeagueMatchesDialogOpen] = useState(false);
+  const [savedPlayers, setSavedPlayers] = useState(null);
+  const [leagueTypeForSetupMatches, setLeagueTypeForSetupMatches] = useState('');
+  const [leagueIdForSetupMatches, setLeagueIdForSetupMatches] = useState('');
 
   // Load data on component mount
   useEffect(() => {
@@ -189,10 +193,31 @@ const AdminPage = ({ signOut, user }) => {
       });
   };  
 
-  const handleAddPlayers = (league_id) => {
+  const handleAddPlayers = (league_id, league_type) => {
     setLeagueIdForAddPlayers(league_id);
     // Open dialog to upload CSV
     setAddPlayersDialogOpen(true);
+
+    const url1 = 'https://h4p9gmdgy7.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.get(url1, {
+      params: {
+        league_id: league_id,
+        league_type: league_type
+      },
+      headers: {
+        Authorization: jwtToken
+      }
+    })
+    .then(response => {
+      const players = response.data["players"];
+      setPlayerData(players);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setErrorMsg(error.message);
+      alert('Session expired! Please refresh the page and try again.');
+    });
   };
 
   const handleFileUpload = (event) => {
@@ -215,6 +240,61 @@ const AdminPage = ({ signOut, user }) => {
     reader.readAsText(file);
   };
 
+  const setupMatches = (matchData) => {
+    console.log('setting up matches');
+
+    const url1 = 'https://l17i2rojs0.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.put(
+      url1,
+      {
+        match_data: matchData
+      },
+      {
+        headers: {
+          Authorization: jwtToken,
+        },
+      }
+    )
+      .then(response => {
+        // Handle success
+        const matches = response.data["matchups"];
+        setLeagueMatches(matches);
+        setResponseDialogOpen(false);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Cannot setup matches: ' + error.message);
+      });
+  }
+
+  const handleViewMatches = (league_id, league_type) => {
+    setLeagueMatchesDialogOpen(true);
+    const url1 = 'https://je5gamcl26.execute-api.us-west-2.amazonaws.com/Prod';
+    setLeagueIdForSetupMatches(league_id);
+    setLeagueTypeForSetupMatches(league_type);
+
+    axios.get(url1, {
+      params: {
+        league_id: league_id,
+        league_type: league_type
+      },
+      headers: {
+        Authorization: jwtToken
+      }
+    })
+    .then(response => {
+      const matches = response.data["matchups"];
+      setLeagueMatches(matches);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setErrorMsg(error.message);
+      alert('Session expired! Please refresh the page and try again.');
+    });
+
+  }
+  
   const handleSavePlayers = () => {
     console.log('Players saved:', playerData);
 
@@ -234,7 +314,7 @@ const AdminPage = ({ signOut, user }) => {
     )
       .then(response => {
         // Handle success
-        setResponseData(response.data);
+        setSavedPlayers(response.data);
         setResponseDialogOpen(true);
         setAddPlayersDialogOpen(false);
       })
@@ -312,8 +392,11 @@ const AdminPage = ({ signOut, user }) => {
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                  <Button variant="contained" sx={{ backgroundColor: '#1d2636' }} onClick={() => handleAddPlayers(league.league_id)}>
+                  <Button variant="contained" sx={{ backgroundColor: '#1d2636', marginRight: 1 }} onClick={() => handleAddPlayers(league.league_id, league.league_type)}>
                     Add players
+                  </Button>
+                  <Button variant="contained" sx={{ backgroundColor: '#1d2636' }} onClick={() => handleViewMatches(league.league_id, league.league_type)}>
+                    View Matches
                   </Button>
                   </TableCell>
                 </TableRow>
@@ -376,7 +459,7 @@ const AdminPage = ({ signOut, user }) => {
 
         {/* Dialog for Adding Players */}
         <Dialog open={addPlayersDialogOpen} onClose={() => setAddPlayersDialogOpen(false)}>
-          <DialogTitle>Upload Players</DialogTitle>
+          <DialogTitle>Confirm or upload players to create matches</DialogTitle>
           <DialogContent>
             <input type="file" accept=".csv" onChange={handleFileUpload} />
             <TableContainer component={Paper} sx={{ mt: 2 }}>
@@ -394,6 +477,12 @@ const AdminPage = ({ signOut, user }) => {
                     </TableCell>
                     <TableCell>
                       <strong>Email</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Gender</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>USTA rating</strong>
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -421,7 +510,7 @@ const AdminPage = ({ signOut, user }) => {
         </Dialog>
         
         {/* Dialog to display add Players response */}
-        {responseData && (
+        {savedPlayers && (
         <Dialog open={responseDialogOpen} onClose={() => setResponseDialogOpen(false)}>
           <DialogTitle>System Response</DialogTitle>
           <DialogContent>
@@ -444,7 +533,7 @@ const AdminPage = ({ signOut, user }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {responseData.map((player, index) => (
+                  {savedPlayers.map((player, index) => (
                     <TableRow key={index}>
                       <TableCell>{player.first_name}</TableCell>
                       <TableCell>{player.last_name}</TableCell>
@@ -458,6 +547,52 @@ const AdminPage = ({ signOut, user }) => {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setResponseDialogOpen(false)}>Close</Button>
+            <Button onClick={() => setupMatches(savedPlayers)}>Setup matches</Button>
+          </DialogActions>
+        </Dialog>
+        )}
+
+        {/* Dialog to display league matches */}
+        {leagueMatches && (
+        <Dialog open={leagueMatchesDialogOpen} onClose={() => setLeagueMatchesDialogOpen(false)}>
+          <DialogTitle>Matches</DialogTitle>
+          <DialogContent>
+          <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                  <TableCell>
+                      <strong>Match number</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Player 1</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong></strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Player 2</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {leagueMatches.map((match, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index+1}</TableCell>
+                      <TableCell>{match.player1_name}</TableCell>
+                      <TableCell>vs</TableCell>
+                      <TableCell>{match.player2_name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setLeagueMatchesDialogOpen(false)}>Close</Button>
+            {leagueMatches.length === 0 && (
+              <Button onClick={() => handleAddPlayers(leagueIdForSetupMatches, leagueTypeForSetupMatches)}>Setup Matches</Button>
+            )}
           </DialogActions>
         </Dialog>
         )}

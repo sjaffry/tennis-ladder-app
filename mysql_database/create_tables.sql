@@ -3,6 +3,7 @@ CREATE TABLE player (
     email VARCHAR(255) NOT NULL UNIQUE,
     player_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     gender CHAR(1) NOT NULL,
     usta_rating VARCHAR(10),

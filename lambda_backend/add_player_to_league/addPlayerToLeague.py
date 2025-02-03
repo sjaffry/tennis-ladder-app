@@ -47,19 +47,20 @@ def addOrUpdatePlayerToLeague(player, business_name, league_id):
         usta_rating = player['usta_rating']
         with connection.cursor() as cursor:
             sql_query = """
-                    CALL `tennis_ladder`.`AddPlayerToLeague`(%s,%s,%s,%s,%s,%s,%s);
+                    CALL `tennis_ladder`.`AddPlayerToLeague`(%s,%s,%s,%s,%s,%s,%s,%s);
                     """
             # Execute the query
-            cursor.execute(sql_query, (email, first_name, last_name, league_id, usta_rating, gender, business_name))
+            cursor.execute(sql_query, (email, first_name, middle_name, last_name, league_id, usta_rating, gender, business_name))
             result = cursor.fetchall()
             league_name = result[0]["league_name"]
+            player_id = result[0]["player_id"]
 
     except Exception as e:
         print('Error adding players into database:', e)
-        return {"first_name": first_name, "last_name": last_name, "league_name": league_name, "status": "Not Added -"+str(e)}
+        return {"player_id": player_id, "first_name": first_name, "last_name": last_name, "league_name": league_name, "league_id": league_id, "status": "Not Added -"+str(e)}
 
     finally:
-        return {"first_name": first_name, "last_name": last_name, "league_name": league_name, "status": "Added"}
+        return {"player_id": player_id, "middle_name": middle_name, "first_name": first_name, "last_name": last_name, "league_name": league_name, "league_id": league_id, "status": "Added"}
 
 def lambda_handler(event, context):
     token = event['headers']['Authorization']

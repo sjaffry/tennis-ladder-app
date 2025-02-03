@@ -4,7 +4,11 @@ AND p.player_id = pl.player_id
 AND l.business_name = 'FTSC'
 AND l.category = 'Tennis';
 
-SELECT * FROM league;
+SELECT concat(p1.first_name, ' ', p1.last_name) as 'player1', concat(p2.first_name, ' ', p2.last_name) as 'player2'
+FROM `tennis_ladder`.`singles_match` sm, `tennis_ladder`.`player` p1, `tennis_ladder`.`player` p2
+WHERE sm.league_id = 1
+AND sm.player1_id = p1.player_id
+AND sm.player2_id = p2.player_id;
 
 WITH matches AS (
 SELECT
@@ -29,11 +33,23 @@ FROM player p, matches m
 WHERE p.email = "sajaffry@gmail.com"
 AND (p.player_id = m.player1_id OR p.player_id = m.player2_id);
 
-SELECT * from player;
+SELECT count(*) from player;
 
-SELECT * from league;
+DELETE from player_league WHERE league_id in (2,3);
 
- SELECT ROW_NUMBER() OVER() AS "rank",
+delete from player where player_id > 5;
+
+delete from team_league where league_id = 2;
+
+select * from team_league where league_id = 2;
+
+DELETE from doubles_ladder where league_id = 2;
+
+SELECT * from doubles_ladder where league_id in (2,3);
+
+DELETE from doubles_match where league_id=2;
+
+ 
 		p.`first_name`,
 		p.`last_name`,
 		sl.`points`,
@@ -78,3 +94,11 @@ SELECT m.*
 FROM player p, matches m
 WHERE p.email = "syejaffr@amazon.com"
 AND (p.player_id = m.player1_id OR p.player_id = m.player2_id OR p.player_id = m.player3_id OR p.player_id = m.player4_id);
+
+
+	SELECT
+	p.first_name, p.middle_name, p.last_name, p.gender, p.email, p.usta_rating, l.league_name
+	FROM league l, player p, player_league pl
+	WHERE pl.player_id = p.player_id
+	AND l.league_id = pl.league_id
+	AND l.league_id = 1;
