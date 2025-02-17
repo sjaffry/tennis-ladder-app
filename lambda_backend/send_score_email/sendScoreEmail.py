@@ -53,9 +53,6 @@ def send_email (score_data, url, recipient_email):
                         Verify score here: {url}
                 '''
 
-    # Initialize the SES client
-    ses_client = boto3.client('ses', region_name='us-west-2')
-
     try:
         # Send the email
         print('sending email to:' + recipient_email)

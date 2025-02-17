@@ -29,10 +29,11 @@ def lambda_handler(event, context):
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
+    player_id = event["queryStringParameters"]['player_id']
+    opponent_id = event["queryStringParameters"]['opponent_id']
     decoded = decode_jwt(token)
     # We only ever expect the user to be in one group only - business rule
     business_name = decoded['cognito:groups'][0]
-
 
     
     # Connect to the RDS MySQL database
@@ -47,28 +48,26 @@ def lambda_handler(event, context):
         with connection.cursor() as cursor:
             # Define the SQL query
             sql_query = """
-                    SELECT league.league_id,
-                    league.league_name,
-                    league.end_date,
-                    league.business_name,
-                    league.category,
-                    league.league_type
-                    FROM tennis_ladder.league
-                    WHERE business_name = %s;
-
-                    """
+                SELECT p.player_id, a.available_date, a.morning, a.afternoon, a.evening
+                FROM availability a, player p
+                WHERE a.player_id = p.player_id
+                AND p.player_id=%s
+                UNION
+                SELECT p.player_id, a.available_date, a.morning, a.afternoon, a.evening
+                FROM availability a, player p
+                WHERE a.player_id = p.player_id
+                AND p.player_id=%s;
+                """
         
             # Execute the query with 'FTSC' as the parameter  
-            cursor.execute(sql_query, (business_name,))
-
+            cursor.execute(sql_query, (player_id,opponent_id))
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall()  
-            print(resp)
 
         result = {
             "Business_name": business_name,
-            "Leagues": resp
+            "Availability": resp
         }
 
     except Exception as e:

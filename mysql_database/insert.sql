@@ -5,7 +5,7 @@ INSERT INTO `tennis_ladder`.`league`
 `category`,
 `league_type`)
 VALUES
-('mens 3.0 flex league JAN-MAR',
+('mens 4.0 flex league MAR-JUN',
 '2025-03-31 12:00:00',
 'FTSC',
 'Tennis',
@@ -62,13 +62,15 @@ VALUES
 
 SELECT * FROM team_league;
 
-INSERT INTO `tennis_ladder`.`singles_match`
+INSERT IGNORE INTO `tennis_ladder`.`singles_match`
 (
+`match_id`,
 `player1_id`,
 `player2_id`,
 `league_id`)
 VALUES
-(2,
+(12,
+2,
 1,
 1);
 
@@ -137,3 +139,10 @@ VALUES
 1)
 ON DUPLICATE KEY UPDATE
 matches = matches + 1, losses = losses + 1;
+
+-- Add availability
+INSERT INTO availability (player_id, available_date, morning, afternoon, evening) 
+VALUES (1, '2025-02-18', TRUE, TRUE, FALSE);
+
+
+

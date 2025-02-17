@@ -1,3 +1,14 @@
+DROP TABLE IF EXISTS availability;
+CREATE TABLE availability (
+    availability_id INT AUTO_INCREMENT PRIMARY KEY,
+    player_id INT REFERENCES player(player_id),
+    available_date DATE NOT NULL,
+    morning BOOLEAN DEFAULT FALSE,
+    afternoon BOOLEAN DEFAULT FALSE,
+    evening BOOLEAN DEFAULT FALSE,
+    UNIQUE (player_id, available_date)
+);
+
 DROP TABLE IF EXISTS player;
 CREATE TABLE player (
     email VARCHAR(255) NOT NULL UNIQUE,

@@ -7,6 +7,6 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-COPY sendEmail.py ./
+COPY getMatchAvailability.py ./
 
-CMD ["sendEmail.lambda_handler"]
+CMD ["getMatchAvailability.lambda_handler"]

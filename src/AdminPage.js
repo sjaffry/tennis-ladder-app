@@ -89,7 +89,7 @@ const AdminPage = ({ signOut, user }) => {
       }
     })
     .then(response => {
-      const leagues = response.data["leagues"];
+      const leagues = response.data["Leagues"];
       setLeagueData(leagues);
     })
     .catch(error => {

@@ -30,6 +30,7 @@ const App = ({ signOut, user }) => {
   const [externalData, setExternalData] = useState(null);
   const [matchData, setMatchData] = useState(null);
   const [ladderData, setLadderData] = useState(null);
+  const [leagueName, setLeagueName] = useState(null);
   const user_groups = user.signInUserSession.idToken.payload['cognito:groups'];
   const email = user.signInUserSession.idToken.payload['email'];
   const jwtToken = user.signInUserSession.idToken.jwtToken;
@@ -43,10 +44,11 @@ const App = ({ signOut, user }) => {
   useEffect(() => {
   }, []); 
 
-  const handleLeagueClick = async (index, league_id, league_type, email) => {
+  const handleLeagueClick = async (index, league_id, league_name, league_type, email) => {
     setSelectedTile(index);
     loadMyMatches(email, league_id, league_type);
     loadLadder(league_id);
+    setLeagueName(league_name);
   }
 
   const loadMyMatches = async (email, league_id, league_type) => {
@@ -238,7 +240,7 @@ const App = ({ signOut, user }) => {
                             backgroundColor: selectedTile === index ? '#1d2636' : 'white',
                         },
                     }}
-                    onClick={() => handleLeagueClick(index, league["league_id"], league["league_type"], email)}
+                    onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}
                 >
                     {league["league_name"]}
                 </Button>
@@ -252,6 +254,8 @@ const App = ({ signOut, user }) => {
             dataLoading={dataLoading}
             jwtToken={jwtToken}
             email={email}
+            leagueName={leagueName}
+            myName={user.signInUserSession.idToken.payload.given_name}
           />
         </Box>
       </Box>

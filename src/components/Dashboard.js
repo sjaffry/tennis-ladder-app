@@ -30,7 +30,9 @@ const Dashboard = ({
   ladderData,
   dataLoading,
   jwtToken,
-  email
+  email,
+  leagueName,
+  myName
 }) => {
 
   const theme = useTheme();
@@ -306,6 +308,9 @@ const Dashboard = ({
                     email={email}
                     handleClickOpen={handleClickOpen}
                     handleConfirmScoreClick={handleConfirmScoreClick}
+                    jwtToken={jwtToken}
+                    leagueName={leagueName}
+                    myName={myName}
                   />
                   ))}
                 </TableBody>

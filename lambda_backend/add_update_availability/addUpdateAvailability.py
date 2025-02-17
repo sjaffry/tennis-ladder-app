@@ -1,8 +1,8 @@
 import json
-import boto3
-import base64
 import os
 import pymysql
+import boto3
+import base64
 
 def decode_base64_url(data):
     """Add padding to the input and decode base64 url"""
@@ -29,11 +29,17 @@ def lambda_handler(event, context):
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
+
+    payload = json.loads(event["body"])
+    availability = payload["availability_data"]
+    player_id = availability['player_id']
+    date_available = availability['date']
+    morning = availability['morning']
+    afternoon = availability['afternoon']
+    evening = availability['evening']
     decoded = decode_jwt(token)
     # We only ever expect the user to be in one group only - business rule
     business_name = decoded['cognito:groups'][0]
-
-
     
     # Connect to the RDS MySQL database
     connection = pymysql.connect(
@@ -43,38 +49,34 @@ def lambda_handler(event, context):
         database=db_name,
         cursorclass=pymysql.cursors.DictCursor
     )
-    try:
-        with connection.cursor() as cursor:
-            # Define the SQL query
-            sql_query = """
-                    SELECT league.league_id,
-                    league.league_name,
-                    league.end_date,
-                    league.business_name,
-                    league.category,
-                    league.league_type
-                    FROM tennis_ladder.league
-                    WHERE business_name = %s;
 
-                    """
-        
-            # Execute the query with 'FTSC' as the parameter  
-            cursor.execute(sql_query, (business_name,))
+    with connection.cursor() as cursor:
+        sql_query = """
+                INSERT INTO `tennis_ladder`.`availability`
+                (`player_id`,
+                `available_date`,
+                `morning`,
+                `afternoon`,
+                `evening`)
+                VALUES
+                (%s,
+                %s,
+                %s,
+                %s,
+                %s
+                )
+                ON DUPLICATE KEY UPDATE
+                available_date = %s, 
+                morning = %s,
+                afternoon = %s,
+                evening = %s;
+                """
 
-            
-            # Fetch all the rows that match the condition
-            resp = cursor.fetchall()  
-            print(resp)
+        # Execute the query
+        cursor.execute(sql_query, (player_id, date_available, morning, afternoon, evening, date_available, morning, afternoon, evening))
+        connection.commit()
 
-        result = {
-            "Business_name": business_name,
-            "Leagues": resp
-        }
-
-    except Exception as e:
-        print('Error querying items from MySQL:', e)
-        raise e
-        
+        result = "ok"
 
     return {
         'statusCode': 200,
@@ -82,7 +84,6 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "https://onreaction.com",
             "Access-Control-Allow-Methods": "OPTIONS,PUT,POST,GET"
-    },    
-        'body': json.dumps(result, default=str)
-
-    } 
+    }, 
+        'body': json.dumps(result)
+    }
