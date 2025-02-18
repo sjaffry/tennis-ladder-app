@@ -13,7 +13,7 @@ SET
 `entered_by` = null,
 `player1_confirmed` = null,
 `player2_confirmed` = null
-WHERE `match_id` = 1;
+WHERE `match_id` = 53;
 
 UPDATE `tennis_ladder`.`doubles_match`
 SET

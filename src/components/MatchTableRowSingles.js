@@ -249,6 +249,11 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
               minDate={new Date()} 
             />
           </Box>
+          {/* Legend */}
+          <Box display="flex" alignItems="center" justifyContent="center" mt={2} gap={1}>
+            <Box width={16} height={16} bgcolor="#4caf50" borderRadius="50%" />
+            <span>Available</span>
+          </Box>
         </DialogContent>
 
         <DialogActions>

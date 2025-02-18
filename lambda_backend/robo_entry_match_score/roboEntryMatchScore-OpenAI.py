@@ -1,16 +1,34 @@
-import logging
-import boto3
 import json
+from openai import OpenAI
 import os
 import pymysql
 import base64
-from botocore.exceptions import ClientError
+
+def decode_base64_url(data):
+    """Add padding to the input and decode base64 url"""
+    missing_padding = len(data) % 4
+    if missing_padding:
+        data += '=' * (4 - missing_padding)
+    return base64.urlsafe_b64decode(data)
+
+def decode_jwt(token):
+    """Split the token and decode each part"""
+    parts = token.split('.')
+    if len(parts) != 3:  # a valid JWT has 3 parts
+        raise ValueError('Token is not valid')
+
+    header = decode_base64_url(parts[0])
+    payload = decode_base64_url(parts[1])
+    signature = decode_base64_url(parts[2])
+
+    return json.loads(payload)
 
 def lambda_handler(event, context):
     db_host = os.environ['DB_HOST']
     db_user = os.environ['DB_USER']
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
+    openai_api_key = os.environ['OPENAI_API_KEY']
 
     # Remove any single quotes around the Message field
     sns_message = event['Records'][0]['Sns']['Message']
@@ -51,9 +69,7 @@ def lambda_handler(event, context):
                     }
                 }
             }
-            '''    
-    
-    model_id = "meta.llama3-1-8b-instruct-v1:0"
+'''
 
     prompt = f'''Your task is to take the email provided representing the outcome of a tennis match and convert it into a well-organized table format using JSON. The email is addressed to the coach, who is not a player in the match so do not identify them as a player. Here's the email content: 
             <email>
@@ -68,82 +84,71 @@ def lambda_handler(event, context):
             </JSON>
             '''
 
-    formatted_prompt = f"""
-    <|begin_of_text|><|start_header_id|>user<|end_header_id|>
-    {prompt}
-    <|eot_id|>
-    <|start_header_id|>assistant<|end_header_id|>
-    """
+    client = OpenAI(
+        api_key=openai_api_key
+    )
 
-    # Format the request payload using the model's native structure.
-    native_request = {
-        "prompt": formatted_prompt,
-        "max_gen_len": 512,
-        "temperature": 0.5,
-    }
-
-    # Convert the native request to JSON.
-    request = json.dumps(native_request)
-
-    client = boto3.client("bedrock-runtime", region_name="us-west-2")
-    
     try:
-        # Invoke the model with the request.
-        response = client.invoke_model(modelId=model_id, body=request)
+        completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model="gpt-4o-mini",
+        )
 
-    except (ClientError, Exception) as e:
-        print(f"ERROR: Can't invoke '{model_id}'. Reason: {e}")
-        exit(1)
-
-    # Decode the response body.
-    model_response = json.loads(response["body"].read())
-
-    # Extract and print the response text.
-    response_text = model_response["generation"]
-    jsonFormatted = json.loads(response_text)
+        llmresult = completion.choices[0].message.content
+        cleanResult = llmresult.replace('json','')
+        cleanResult = cleanResult.replace('`','')
+        jsonresult = json.loads(cleanResult)
 
 
-    # Now load the data into the database
-    match_type = jsonFormatted['match_type']
-    league_name = jsonFormatted['league_name']
-    winner_player1_fname = jsonFormatted['players']['winner_player1_firstName']
-    winner_player1_lname = jsonFormatted['players']['winner_player1_lastName']
-    winner_player2_fname = jsonFormatted['players']['winner_player2_firstName']
-    winner_player2_lname = jsonFormatted['players']['winner_player2_lastName']
-    loser_player1_fname = jsonFormatted['players']['loser_player1_firstName']
-    loser_player1_lname = jsonFormatted['players']['loser_player1_lastName']
-    loser_player2_fname = jsonFormatted['players']['loser_player2_firstName']
-    loser_player2_lname = jsonFormatted['players']['loser_player2_lastName']
-    set1_w = jsonFormatted['score']['set_1']['winner_score']
-    set1_l = jsonFormatted['score']['set_1']['loser_score']
-    set2_w = jsonFormatted['score']['set_2']['winner_score']
-    set2_l = jsonFormatted['score']['set_2']['loser_score']
-    set3_w = jsonFormatted['score']['set_3']['winner_score']
-    set3_l = jsonFormatted['score']['set_3']['loser_score']
+        match_type = jsonresult['match_type']
+        league_name = jsonresult['league_name']
+        winner_player1_fname = jsonresult['players']['winner_player1_firstName']
+        winner_player1_lname = jsonresult['players']['winner_player1_lastName']
+        winner_player2_fname = jsonresult['players']['winner_player2_firstName']
+        winner_player2_lname = jsonresult['players']['winner_player2_lastName']
+        loser_player1_fname = jsonresult['players']['loser_player1_firstName']
+        loser_player1_lname = jsonresult['players']['loser_player1_lastName']
+        loser_player2_fname = jsonresult['players']['loser_player2_firstName']
+        loser_player2_lname = jsonresult['players']['loser_player2_lastName']
+        set1_w = jsonresult['score']['set_1']['winner_score']
+        set1_l = jsonresult['score']['set_1']['loser_score']
+        set2_w = jsonresult['score']['set_2']['winner_score']
+        set2_l = jsonresult['score']['set_2']['loser_score']
+        set3_w = jsonresult['score']['set_3']['winner_score']
+        set3_l = jsonresult['score']['set_3']['loser_score']
 
-    # Let's make sure all mandatory data is in the Json
-    if match_type == '':
-        raise Exception('League name cannot be null') 
-    if league_name == '':
-        raise Exception('League name cannot be null')        
-    if winner_player1_fname == '':
-        raise Exception('Winner firstname cannot be null')
-    if winner_player1_lname == '':
-        raise Exception('Winner lastname cannot be null')
-    if loser_player1_fname == '':
-        raise Exception('Loser firstname cannot be null')
-    if loser_player1_lname == '':
-        raise Exception('Loser lastname cannot be null')
-    if set1_w == '':
-        raise Exception('1st set loser score cannot be null')
-    if set1_l == '':
-        raise Exception('1st set winner score cannot be null')
-    if set2_w == '':
-        raise Exception('1st set loser score cannot be null')
-    if set2_l == '':
-        raise Exception('2nd set winner score cannot be null')
+        # Let's make sure all mandatory data is in the Json
+        if match_type == '':
+            raise Exception('League name cannot be null') 
+        if league_name == '':
+            raise Exception('League name cannot be null')        
+        if winner_player1_fname == '':
+            raise Exception('Winner firstname cannot be null')
+        if winner_player1_lname == '':
+            raise Exception('Winner lastname cannot be null')
+        if loser_player1_fname == '':
+            raise Exception('Loser firstname cannot be null')
+        if loser_player1_lname == '':
+            raise Exception('Loser lastname cannot be null')
+        if set1_w == '':
+            raise Exception('1st set loser score cannot be null')
+        if set1_l == '':
+            raise Exception('1st set winner score cannot be null')
+        if set2_w == '':
+            raise Exception('1st set loser score cannot be null')
+        if set2_l == '':
+            raise Exception('2nd set winner score cannot be null')
 
-    # # Connect to the RDS MySQL database
+    except Exception as e:
+        print("Error during OpenAI API call:", e)
+        raise e
+
+    # Connect to the RDS MySQL database
     connection = pymysql.connect(
         host=db_host,
         user=db_user,
@@ -181,5 +186,10 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
+        'headers': {
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Origin": "http://localhost:3000",
+            "Access-Control-Allow-Methods": "OPTIONS,PUT,POST,GET"
+        },
         'body': result
     }

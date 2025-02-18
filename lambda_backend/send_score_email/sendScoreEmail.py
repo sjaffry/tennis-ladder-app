@@ -14,6 +14,7 @@ def send_email (score_data, url, recipient_email):
         set3_1 = score_data["set3_p1"]
         set3_2 = score_data["set3_p2"]
         winner_name_1 = score_data["winner_name"]
+        winner_name_2 = '' # Not applicable in singles match
     elif score_data['match_type'] == "doubles":
         set1_1 = score_data["set1_t1"]
         set1_2 = score_data["set1_t2"]
@@ -31,14 +32,14 @@ def send_email (score_data, url, recipient_email):
     league_name = score_data["league_name"]
     body_html = f'''<html>
             <body>
-            <h2>Robot has auto entered the scores</h2>
-            <h3>
+            <h3>Robot has auto entered the scores</h3>
+            <p>
             {set1_1}-{set1_2}
             {set2_1}-{set2_2}
             {set3_1}-{set3_2}
             (Winner: {winner_name_1} {winner_name_2})
-            </h3>
-            <h3>{league_name}</h3>
+            </p>
+            <p>{league_name}</p>
             <a href="{url}" target="_blank" style="text-decoration: none;">
                 <button style="background-color: #2586f5; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Click to verify</button>
             </a>

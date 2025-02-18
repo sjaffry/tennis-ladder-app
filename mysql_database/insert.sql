@@ -64,14 +64,13 @@ SELECT * FROM team_league;
 
 INSERT IGNORE INTO `tennis_ladder`.`singles_match`
 (
-`match_id`,
 `player1_id`,
 `player2_id`,
 `league_id`)
 VALUES
-(12,
-2,
+(
 1,
+5,
 1);
 
 SELECT * FROM singles_match;

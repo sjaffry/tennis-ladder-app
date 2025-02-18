@@ -33,7 +33,9 @@ FROM player p, matches m
 WHERE p.email = "sajaffry@gmail.com"
 AND (p.player_id = m.player1_id OR p.player_id = m.player2_id);
 
-SELECT count(*) from player;
+SELECT * from player;
+
+SELECT * FROM availability;
 
 DELETE from player_league WHERE league_id in (2,3);
 
@@ -41,14 +43,13 @@ delete from player where player_id > 5;
 
 delete from team_league where league_id = 2;
 
-select * from team_league where league_id = 2;
+select * from team_league;
 
 DELETE from doubles_ladder where league_id = 2;
 
 SELECT * from doubles_ladder where league_id in (2,3);
 
 DELETE from doubles_match where league_id=2;
-
  
 		p.`first_name`,
 		p.`last_name`,
@@ -102,3 +103,17 @@ AND (p.player_id = m.player1_id OR p.player_id = m.player2_id OR p.player_id = m
 	WHERE pl.player_id = p.player_id
 	AND l.league_id = pl.league_id
 	AND l.league_id = 1;
+    
+SELECT p.player_id, a.available_date, a.morning, a.afternoon, a.evening
+FROM availability a, player p
+WHERE a.player_id = p.player_id
+AND p.player_id=1
+UNION
+SELECT p.player_id, a.available_date, a.morning, a.afternoon, a.evening
+FROM availability a, player p
+WHERE a.player_id = p.player_id
+AND p.player_id=2;
+
+
+SELECT * FROM availability;
+
