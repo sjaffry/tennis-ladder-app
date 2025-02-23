@@ -240,6 +240,35 @@ const AdminPage = ({ signOut, user }) => {
     reader.readAsText(file);
   };
 
+  const handleSavePlayers = () => {
+    console.log('Players saved:', playerData);
+
+    const url1 = 'https://pp4mlclo8a.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.put(
+      url1,
+      {
+        player_data: playerData,
+        league_id: leagueIdForAddPlayers
+      },
+      {
+        headers: {
+          Authorization: jwtToken,
+        },
+      }
+    )
+      .then(response => {
+        // Handle success
+        setSavedPlayers(response.data);
+        setResponseDialogOpen(true);
+        setAddPlayersDialogOpen(false);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Cannot save new league: ' + error.message);
+      });
+  };
+
   const setupMatches = (matchData) => {
     console.log('setting up matches');
 
@@ -294,35 +323,6 @@ const AdminPage = ({ signOut, user }) => {
     });
 
   }
-  
-  const handleSavePlayers = () => {
-    console.log('Players saved:', playerData);
-
-    const url1 = 'https://pp4mlclo8a.execute-api.us-west-2.amazonaws.com/Prod';
-
-    axios.put(
-      url1,
-      {
-        player_data: playerData,
-        league_id: leagueIdForAddPlayers
-      },
-      {
-        headers: {
-          Authorization: jwtToken,
-        },
-      }
-    )
-      .then(response => {
-        // Handle success
-        setSavedPlayers(response.data);
-        setResponseDialogOpen(true);
-        setAddPlayersDialogOpen(false);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Cannot save new league: ' + error.message);
-      });
-  };
 
   return (
     <ThemeProvider theme={theme}>

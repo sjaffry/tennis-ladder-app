@@ -59,28 +59,16 @@ def send_email (business_name, organizer_email, organizer_name, organizer_messag
                 
         message.reply_to = organizer_email
 
-        try:
-            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-            response = sg.send(message)
-            print(response.status_code)
-            print(response.body)
-            print(response.headers)
-        except Exception as e:
-            print(e.message)
-
-        # Return success response
-        return {
-            'statusCode': 200,
-            'body': {
-                'message': 'Email sent successfully!',
-                'response': "response"
-            }
-        }
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
 
     except Exception as e:
         # Handle exceptions
         print(f"Error sending email: {str(e)}")
         raise(e)
+
+    # Return success response
+    return 'Email sent successfully to opponent!'
 
 def lambda_handler(event, context):
     organizer_email = event["queryStringParameters"]['player_email']
@@ -96,15 +84,17 @@ def lambda_handler(event, context):
 
     resp = send_email(business_name, organizer_email, organizer_name, organizer_message, opponent_email, match_date, league_name)
 
+    result = {
+        "Business_name": business_name,
+        "email_result": resp
+    }
+
     return {
         'statusCode': 200,
         'headers': {
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "https://onreaction.com",
             "Access-Control-Allow-Methods": "OPTIONS,PUT,POST,GET"
-        }, 
-        'body': {
-            'message': 'Email sent successfully!',
-            'response': "response"
-        }
-    }
+    },    
+        'body': json.dumps(result)
+    } 

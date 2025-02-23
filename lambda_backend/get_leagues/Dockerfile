@@ -7,6 +7,6 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-COPY getLeague.py ./
+COPY getLeagues.py ./
 
-CMD ["getLeague.lambda_handler"]
+CMD ["getLeagues.lambda_handler"]

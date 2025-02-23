@@ -7,6 +7,6 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-COPY sendConfirmScore.py ./
+COPY viewLeaguePlayers.py ./
 
-CMD ["sendConfirmScore.lambda_handler"]
+CMD ["viewLeaguePlayers.lambda_handler"]

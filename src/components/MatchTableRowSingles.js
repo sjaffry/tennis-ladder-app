@@ -164,12 +164,31 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   };
 
   const handleSendMessage = () => {
-    alert("Email sent to opponent for "+ leagueName);
-    alert(opponentPlayerEmail);
-    alert(myName);
     setOpenMessageDialog(false);
     setOpenCalendar(false);
     setOpenTimeSlotDialog(false);
+    const url1 = 'https://7vhzcxuhc8.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.get(url1, {
+      params: {
+        player_email: email,
+        opponent_email: opponentPlayerEmail,
+        player_name: myName,
+        match_date: '2004-01-01',
+        league_name: leagueName,
+        organizer_message: message
+      },
+      headers: {
+        Authorization: jwtToken
+      }
+    })
+    .then(response => {
+      alert("Email successfully sent to opponent!");
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error sending email to reciepients. Please try again!');
+    });
   };
 
   return (

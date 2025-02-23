@@ -7,6 +7,6 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-COPY insertMarchScore.py ./
+COPY insertMatchScore.py ./
 
-CMD ["insertMarchScore.lambda_handler"]
+CMD ["insertMatchScore.lambda_handler"]
