@@ -7,11 +7,9 @@ amplify/backend/amplify-meta.json
 amplify/backend/.temp
 build/
 dist/
-Ad_hoc_summary-Test.js
-Ad_hoc_summary-Prod.js
-Conversational_qna-Test.js
-Conversational_qna-Prod.js
-Court_checkins-Test.js
+MatchTableRowSingles-TEST.js
+App-TEST.js
+Dashboard-TEST.js
 node_modules/
 material-ui/
 scratch

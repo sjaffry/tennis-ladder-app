@@ -79,7 +79,7 @@ const AdminPage = ({ signOut, user }) => {
 
   const getLeaguesFromDB = () => {
     // fetching leagues
-    const url1 = 'https://5jvbv6vy1j.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://lt9y1cwocf.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {
@@ -138,7 +138,7 @@ const AdminPage = ({ signOut, user }) => {
       return;
     }
     
-    const url1 = 'https://qawpduxn85.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://rg0ce6nxv3.execute-api.us-west-2.amazonaws.com/Prod';
     setNewLeagueAdded(false);
 
     axios.delete(url1, {
@@ -163,7 +163,7 @@ const AdminPage = ({ signOut, user }) => {
 
   const handleSave = () => {
     // Logic to save the league data
-    const url1 = 'https://qawpduxn85.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://rg0ce6nxv3.execute-api.us-west-2.amazonaws.com/Prod';
     setNewLeagueAdded(false);
 
     axios.put(
@@ -198,7 +198,7 @@ const AdminPage = ({ signOut, user }) => {
     // Open dialog to upload CSV
     setAddPlayersDialogOpen(true);
 
-    const url1 = 'https://h4p9gmdgy7.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://5oyljtufgj.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {
@@ -243,7 +243,7 @@ const AdminPage = ({ signOut, user }) => {
   const handleSavePlayers = () => {
     console.log('Players saved:', playerData);
 
-    const url1 = 'https://pp4mlclo8a.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://9yyvdaov8c.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.put(
       url1,
@@ -272,7 +272,7 @@ const AdminPage = ({ signOut, user }) => {
   const setupMatches = (matchData) => {
     console.log('setting up matches');
 
-    const url1 = 'https://l17i2rojs0.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://yfpd6gmpih.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.put(
       url1,
@@ -299,7 +299,7 @@ const AdminPage = ({ signOut, user }) => {
 
   const handleViewMatches = (league_id, league_type) => {
     setLeagueMatchesDialogOpen(true);
-    const url1 = 'https://je5gamcl26.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://2aj7vd0evc.execute-api.us-west-2.amazonaws.com/Prod';
     setLeagueIdForSetupMatches(league_id);
     setLeagueTypeForSetupMatches(league_type);
 

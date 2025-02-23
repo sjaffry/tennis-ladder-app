@@ -54,7 +54,7 @@ const App = ({ signOut, user }) => {
   const loadMyMatches = async (email, league_id, league_type) => {
     setPageLoading(true);
     setDataLoading(true);
-    const url1 = 'https://35t1hlnog6.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://f1nvxevu13.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {
@@ -82,7 +82,7 @@ const App = ({ signOut, user }) => {
   const loadLadder = async (league_id) => {
     setPageLoading(true);
     setDataLoading(true);
-    const url1 = 'https://30q2ey80ni.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://ce7l3xzwm3.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {
@@ -111,7 +111,7 @@ const App = ({ signOut, user }) => {
     setSelectedTile(null);
     setSelectedCategoryTile(index);
     setPageLoading(true);
-    const url1 = 'https://35qu1lc1ie.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://q03k4ombrd.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {

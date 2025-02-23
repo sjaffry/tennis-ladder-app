@@ -174,7 +174,7 @@ const Dashboard = ({
   };
 
   const handleSubmitScore = async () => {
-    const url = 'https://24kq9qsqak.execute-api.us-west-2.amazonaws.com/Prod';
+    const url = 'https://m4nit5u1x3.execute-api.us-west-2.amazonaws.com/Prod';
   
     // Perform the API call with updatedFormData
     const response = await fetch(url, {

@@ -64,7 +64,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     setOpponentPlayerId(opponent_player_id);
     setOpponentPlayerEmail(opponent_player_email);
 
-    const url1 = 'https://r8jma7j64l.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://2ooucvpwb3.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {
@@ -135,7 +135,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
       player_id: myPlayerId
     };
 
-    const url1 = 'https://m2uxaou13f.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://lodf29a5ki.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.put(
       url1,
@@ -167,7 +167,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     setOpenMessageDialog(false);
     setOpenCalendar(false);
     setOpenTimeSlotDialog(false);
-    const url1 = 'https://7vhzcxuhc8.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://f6f3hiboo3.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {
