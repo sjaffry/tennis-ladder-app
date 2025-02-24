@@ -149,9 +149,9 @@ const App = ({ signOut, user }) => {
                   minWidth: 100,
                   height: 40,
                   marginRight: 1,
-                  backgroundColor: '#1d2636',
+                  backgroundColor: '#22598f',
                   '&:hover': {
-                    backgroundColor: '#1d2636',
+                    backgroundColor: '#22598f',
                   },
                 }}
                 onClick={launchAdminPage}
@@ -164,9 +164,9 @@ const App = ({ signOut, user }) => {
               sx={{
                 minWidth: 100,
                 height: 40,
-                backgroundColor: '#1d2636',
+                backgroundColor: '#22598f',
                 '&:hover': {
-                  backgroundColor: '#1d2636',
+                  backgroundColor: '#22598f',
                 },
               }}
               onClick={signOut}
@@ -194,10 +194,10 @@ const App = ({ signOut, user }) => {
                   width: '30%',
                   p: 2,
                   m: 0.5,
-                  backgroundColor: selectedCategoryTile === "1" ? '#1d2636' : 'white',
-                  color: selectedCategoryTile === "1" ? 'white' : '#1d2636',
+                  backgroundColor: selectedCategoryTile === "1" ? '#22598f' : 'white',
+                  color: selectedCategoryTile === "1" ? 'white' : 'black',
                   '&:hover': {
-                      backgroundColor: selectedCategoryTile === "1" ? '#1d2636' : 'white',
+                      backgroundColor: selectedCategoryTile === "1" ? '#22598f' : 'white',
                   },
               }}
               onClick={() => handleCategoryClick("1", "Tennis")}
@@ -211,10 +211,10 @@ const App = ({ signOut, user }) => {
                   width: '30%',
                   p: 2,
                   m: 0.5,
-                  backgroundColor: selectedCategoryTile === "2" ? '#1d2636' : 'white',
-                  color: selectedCategoryTile === "2" ? 'white' : '#1d2636',
+                  backgroundColor: selectedCategoryTile === "2" ? '#22598f' : 'white',
+                  color: selectedCategoryTile === "2" ? 'white' : 'black',
                   '&:hover': {
-                      backgroundColor: selectedCategoryTile === "2" ? '#1d2636' : 'white',
+                      backgroundColor: selectedCategoryTile === "2" ? '#22598f' : 'white',
                   },
               }}
               onClick={() => handleCategoryClick("2", "Pickleball")}
@@ -234,10 +234,10 @@ const App = ({ signOut, user }) => {
                         width: '30%',
                         p: 2,
                         m: 0.5,
-                        backgroundColor: selectedTile === index ? '#1d2636' : 'white',
-                        color: selectedTile === index ? 'white' : '#1d2636',
+                        backgroundColor: selectedTile === index ? '#22598f' : 'white',
+                        color: selectedTile === index ? 'white' : 'black',
                         '&:hover': {
-                            backgroundColor: selectedTile === index ? '#1d2636' : 'white',
+                            backgroundColor: selectedTile === index ? '#22598f' : 'white',
                         },
                     }}
                     onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}

@@ -329,14 +329,14 @@ const AdminPage = ({ signOut, user }) => {
       <Box sx={{ display: 'flex', bgcolor: 'white', height: '100vh' }}>
         <Button
           variant="contained"
-          sx={{ position: 'absolute', top: 2, right: 102, backgroundColor: '#1d2636' }}
+          sx={{ position: 'absolute', top: 2, right: 102, backgroundColor: '#22598f' }}
           onClick={() => navigate('/')}
         >
           Back to Ladder
         </Button>
         <Button
           variant="contained"
-          sx={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#1d2636' }}
+          sx={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#22598f' }}
           onClick={signOut}
         >
           Logout
@@ -356,7 +356,7 @@ const AdminPage = ({ signOut, user }) => {
               onChange={handleNewEventNameChange}
               sx={{ flexGrow: 1 }}
             />
-            <Button variant="contained" sx={{ backgroundColor: '#1d2636' }} onClick={handleCreateClick}>
+            <Button variant="contained" sx={{ backgroundColor: '#22598f' }} onClick={handleCreateClick}>
               Create
             </Button>
           </Box>
@@ -380,22 +380,22 @@ const AdminPage = ({ signOut, user }) => {
                   <TableCell>
                     <IconButton
                       onClick={() => handleEdit(league)}
-                      sx={{ color: '#1d2636' }}
+                      sx={{ color: '#22598f' }}
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
                       onClick={() => handleDelete(league)}
-                      sx={{ color: '#1d2636' }}
+                      sx={{ color: '#22598f' }}
                     >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                  <Button variant="contained" sx={{ backgroundColor: '#1d2636', marginRight: 1 }} onClick={() => handleAddPlayers(league.league_id, league.league_type)}>
+                  <Button variant="contained" sx={{ backgroundColor: '#22598f', marginRight: 1 }} onClick={() => handleAddPlayers(league.league_id, league.league_type)}>
                     Add players
                   </Button>
-                  <Button variant="contained" sx={{ backgroundColor: '#1d2636' }} onClick={() => handleViewMatches(league.league_id, league.league_type)}>
+                  <Button variant="contained" sx={{ backgroundColor: '#22598f' }} onClick={() => handleViewMatches(league.league_id, league.league_type)}>
                     View Matches
                   </Button>
                   </TableCell>
