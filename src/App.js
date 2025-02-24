@@ -139,115 +139,140 @@ const App = ({ signOut, user }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', bgcolor: 'white', height: '100vh' }}>
-        {!isMobile && (
-          <Box sx={{ position: 'absolute', top: 2, right: 2, display: 'flex', alignItems: 'center' }}>
-            {user_groups.includes('tennis-admin') && (
+      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: 'white', height: '100vh' }}>
+        
+        {/* White Banner at the Top */}
+        <Box sx={{ 
+          width: '100%', 
+          bgcolor: 'white', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          py: 1, 
+          px: 2, 
+          boxShadow: 1 
+        }}>
+          {/* Left: Logo and Title */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <img src={foothillslogo} alt="Logo" style={{ height: '50px', marginRight: '10px' }} />
+            <Typography 
+              fontFamily="Copperplate, Papyrus, fantasy" 
+              variant="h5"
+              sx={{ fontWeight: 'bold', color: "#20633f" }}
+            >
+              Tennis & Pickleball Leagues
+            </Typography>
+          </Box>
+  
+          {/* Right: Admin and Logout Buttons */}
+          {!isMobile && (
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              {user_groups.includes('tennis-admin') && (
+                <Button
+                  variant="contained"
+                  sx={{
+                    minWidth: 100,
+                    height: 40,
+                    marginRight: 1,
+                    backgroundColor: '#20633f',
+                    '&:hover': {
+                      backgroundColor: '#1d456e',
+                    },
+                  }}
+                  onClick={launchAdminPage}
+                >
+                  Admin
+                </Button>
+              )}
               <Button
                 variant="contained"
                 sx={{
                   minWidth: 100,
                   height: 40,
-                  marginRight: 1,
-                  backgroundColor: '#22598f',
+                  backgroundColor: '#20633f',
                   '&:hover': {
-                    backgroundColor: '#22598f',
+                    backgroundColor: '#1d456e',
                   },
                 }}
-                onClick={launchAdminPage}
+                onClick={signOut}
               >
-                Admin
+                Logout
               </Button>
-            )}
-            <Button
-              variant="contained"
-              sx={{
-                minWidth: 100,
-                height: 40,
-                backgroundColor: '#22598f',
-                '&:hover': {
-                  backgroundColor: '#22598f',
-                },
-              }}
-              onClick={signOut}
-            >
-              Logout
-            </Button>
-          </Box>
-        )}
-        <Box sx={{ width: '100%', p: 2, overflow: 'auto' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-            <img src={foothillslogo} alt="Logo" style={{ width: '150px', height: 'auto' }} />
-            <Typography variant="h4" gutterBottom sx={{}}>
-                Tennis & Pickleball Leagues
-            </Typography>
-          </Box>
-          <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>Welcome {user.signInUserSession.idToken.payload.given_name}</Typography>
-          {errorMsg && (
-          <p style={{ color: 'red' }}>{errorMsg}</p>
+            </Box>
           )}
+        </Box>
+  
+        {/* Main Content */}
+        <Box sx={{ flex: 1, width: '100%', p: 2, overflow: 'auto' }}>
+          <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom sx={{ mb: 4 }}>
+            Hello {user.signInUserSession.idToken.payload.given_name}!
+          </Typography>
+  
+          {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
+  
           <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 6 }}>
             <Button
               key="1"
               variant="contained"
               sx={{
-                  width: '30%',
-                  p: 2,
-                  m: 0.5,
-                  backgroundColor: selectedCategoryTile === "1" ? '#22598f' : 'white',
-                  color: selectedCategoryTile === "1" ? 'white' : 'black',
-                  '&:hover': {
-                      backgroundColor: selectedCategoryTile === "1" ? '#22598f' : 'white',
-                  },
+                width: '30%',
+                p: 2,
+                m: 0.5,
+                backgroundColor: selectedCategoryTile === "1" ? '#20633f' : 'white',
+                color: selectedCategoryTile === "1" ? 'white' : 'black',
+                '&:hover': {
+                  backgroundColor: selectedCategoryTile === "1" ? '#20633f' : 'white',
+                },
               }}
               onClick={() => handleCategoryClick("1", "Tennis")}
-              >
+            >
               Tennis    
             </Button>
             <Button
               key="2"
               variant="contained"
               sx={{
-                  width: '30%',
-                  p: 2,
-                  m: 0.5,
-                  backgroundColor: selectedCategoryTile === "2" ? '#22598f' : 'white',
-                  color: selectedCategoryTile === "2" ? 'white' : 'black',
-                  '&:hover': {
-                      backgroundColor: selectedCategoryTile === "2" ? '#22598f' : 'white',
-                  },
+                width: '30%',
+                p: 2,
+                m: 0.5,
+                backgroundColor: selectedCategoryTile === "2" ? '#20633f' : 'white',
+                color: selectedCategoryTile === "2" ? 'white' : 'black',
+                '&:hover': {
+                  backgroundColor: selectedCategoryTile === "2" ? '#20633f' : 'white',
+                },
               }}
               onClick={() => handleCategoryClick("2", "Pickleball")}
-              >
+            >
               Pickleball    
             </Button>
           </Box>
-          {pageLoading && <CircularProgress color="inherit"/>}
+  
+          {pageLoading && <CircularProgress color="inherit" />}
+          
           {externalData && (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 6 }}>
-            {externalData["Leagues"].map((league, index) => {
-              return (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 6 }}>
+              {externalData["Leagues"].map((league, index) => (
                 <Button
-                    key={index}
-                    variant="contained"
-                    sx={{
-                        width: '30%',
-                        p: 2,
-                        m: 0.5,
-                        backgroundColor: selectedTile === index ? '#22598f' : 'white',
-                        color: selectedTile === index ? 'white' : 'black',
-                        '&:hover': {
-                            backgroundColor: selectedTile === index ? '#22598f' : 'white',
-                        },
-                    }}
-                    onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}
+                  key={index}
+                  variant="contained"
+                  sx={{
+                    width: '30%',
+                    p: 2,
+                    m: 0.5,
+                    backgroundColor: selectedTile === index ? '#20633f' : 'white',
+                    color: selectedTile === index ? 'white' : 'black',
+                    '&:hover': {
+                      backgroundColor: selectedTile === index ? '#20633f' : 'white',
+                    },
+                  }}
+                  onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}
                 >
-                    {league["league_name"]}
+                  {league["league_name"]}
                 </Button>
-              );
-            })}
-          </Box>
+              ))}
+            </Box>
           )}
+  
           <Dashboard
             matchData={matchData}
             ladderData={ladderData}
@@ -260,7 +285,7 @@ const App = ({ signOut, user }) => {
         </Box>
       </Box>
     </ThemeProvider>
-  );
-}
+  )
+}  
 
 export default withAuthenticator(App);

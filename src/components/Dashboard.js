@@ -254,7 +254,7 @@ const Dashboard = ({
       <Grid container spacing={isMobile ? 1 : 3} mb={6}>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-            <Typography variant="h5" gutterBottom>Ladder results</Typography>
+            <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>Ladder results</Typography>
             {dataLoading && <CircularProgress color="inherit"/>}
             {ladderData && (
             <TableContainer component={Paper}>
@@ -293,7 +293,7 @@ const Dashboard = ({
         </Grid>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-            <Typography variant="h5" gutterBottom>My matches</Typography>
+            <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>My matches</Typography>
             {dataLoading && <CircularProgress color="inherit"/>}
             {matchData && (
             <TableContainer component={Paper}>

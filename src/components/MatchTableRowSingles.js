@@ -211,9 +211,8 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                 <Box display="flex" gap={1}>
                   <Button
                     variant="contained"
-                    color="primary"
                     onClick={() => handleClickOpen({ ...match })}
-                    sx={{ width: '60px', height: '30px', fontSize: '9px' }}
+                    sx={{ backgroundColor: '#20633f', width: '60px', height: '30px', fontSize: '9px' }}
                   >
                     Add Score
                   </Button>
@@ -221,7 +220,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                     variant="contained"
                     color="secondary"
                     onClick={() => setOpenCalendar(true)}
-                    sx={{ width: '60px', height: '30px', fontSize: '9px' }}
+                    sx={{ backgroundColor: '#bf7315', width: '60px', height: '30px', fontSize: '9px' }}
                   >
                     Setup Match
                   </Button>
