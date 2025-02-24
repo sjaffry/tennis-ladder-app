@@ -10,6 +10,7 @@ dist/
 MatchTableRowSingles-TEST.js
 App-TEST.js
 Dashboard-TEST.js
+AdminPage-TEST.js
 node_modules/
 material-ui/
 scratch

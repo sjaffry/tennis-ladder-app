@@ -46,6 +46,7 @@ const AdminPage = ({ signOut, user }) => {
   const [newLeagueAdded, setNewLeagueAdded] = useState(false);
   const [leagueId, setLeagueId] = useState('');
   const [leagueIdForAddPlayers, setLeagueIdForAddPlayers] = useState('');
+  const [leagueTypeForAddPlayers, setLeagueTypeForAddPlayers] = useState('');
   const [leagueName, setLeagueName] = useState('');
   const [endDate, setEndDate] = useState('');
   const [category, setCategory] = useState('');
@@ -290,6 +291,8 @@ const AdminPage = ({ signOut, user }) => {
         const matches = response.data["matchups"];
         setLeagueMatches(matches);
         setResponseDialogOpen(false);
+        alert("Matches have been setup!");
+        handleViewMatches(leagueIdForAddPlayers, leagueTypeForAddPlayers)
       })
       .catch(error => {
         console.error('Error:', error);
@@ -512,7 +515,7 @@ const AdminPage = ({ signOut, user }) => {
         {/* Dialog to display add Players response */}
         {savedPlayers && (
         <Dialog open={responseDialogOpen} onClose={() => setResponseDialogOpen(false)}>
-          <DialogTitle>System Response</DialogTitle>
+          <DialogTitle>Registered players</DialogTitle>
           <DialogContent>
           <TableContainer component={Paper} sx={{ mt: 2 }}>
               <Table>

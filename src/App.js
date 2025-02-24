@@ -178,10 +178,10 @@ const App = ({ signOut, user }) => {
         <Box sx={{ width: '100%', p: 2, overflow: 'auto' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
             <img src={foothillslogo} alt="Logo" style={{ width: '150px', height: 'auto' }} />
-          </Box>
-          <Typography variant="h4" gutterBottom sx={{}}>
-              Tennis & Pickleball Leagues
+            <Typography variant="h4" gutterBottom sx={{}}>
+                Tennis & Pickleball Leagues
             </Typography>
+          </Box>
           <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>Welcome {user.signInUserSession.idToken.payload.given_name}</Typography>
           {errorMsg && (
           <p style={{ color: 'red' }}>{errorMsg}</p>
