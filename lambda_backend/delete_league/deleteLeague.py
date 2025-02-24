@@ -58,7 +58,7 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'headers': {
             "Access-Control-Allow-Headers" : "Content-Type",
-            "Access-Control-Allow-Origin": "http://localhost:3000",
+            "Access-Control-Allow-Origin": "https://sports-ladder.onreaction.com",
             "Access-Control-Allow-Methods": "OPTIONS,DELETE,PUT,POST,GET"
     }, 
         'body': json.dumps(result)

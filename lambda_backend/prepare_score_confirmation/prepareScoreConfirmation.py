@@ -59,10 +59,10 @@ def send_confirm_email_doubles(score_data):
     player2_email = score_data['player2_email']
     player3_email = score_data['player3_email']
     player4_email = score_data['player4_email']
-    p1_url = f'https://or4sus8nuh.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p1}'
-    p2_url = f'https://or4sus8nuh.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p2}'
-    p3_url = f'https://or4sus8nuh.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p3}'
-    p4_url = f'https://or4sus8nuh.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p4}'
+    p1_url = f'https://r0s4c1vc8j.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p1}'
+    p2_url = f'https://r0s4c1vc8j.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p2}'
+    p3_url = f'https://r0s4c1vc8j.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p3}'
+    p4_url = f'https://r0s4c1vc8j.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p4}'
 
     return {
         "score_data": score_data,
@@ -99,8 +99,8 @@ def send_confirm_email_singles(score_data):
     b64_encoded_p2 = encode_b64(player2_data)
     player1_email = score_data['player1_email']
     player2_email = score_data['player2_email']
-    p1_url = f'https://or4sus8nuh.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p1}'
-    p2_url = f'https://or4sus8nuh.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p2}'
+    p1_url = f'https://r0s4c1vc8j.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p1}'
+    p2_url = f'https://r0s4c1vc8j.execute-api.us-west-2.amazonaws.com/Prod?payload={b64_encoded_p2}'
 
     return {
         "score_data": score_data,
