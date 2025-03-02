@@ -8,7 +8,10 @@ A cost efficient, completely serverless, AI powered application to organize and 
 
 
 ## Architecture
-### Flows 1 and 2 (CRUD flows)
+### Flow 1 (League admins)
+![crud flow](/src/images/admin-flow-sports-ladder.png)
+
+### Flow 2 (Players)
 ![crud flow](/src/images/crud-flow-sports-ladder.png)
 
 ### Flow 3 (Match robot flow)
