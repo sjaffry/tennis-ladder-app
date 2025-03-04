@@ -48,8 +48,8 @@ INSERT INTO `tennis_ladder`.`player_league`
 (`league_id`,
 `player_id`)
 VALUES
-(2,
-1);
+(1,
+5);
 
 SELECT * FROM player_league;
 
@@ -62,7 +62,7 @@ VALUES
 
 SELECT * FROM team_league;
 
-INSERT IGNORE INTO `tennis_ladder`.`singles_match`
+INSERT INTO `tennis_ladder`.`singles_match`
 (
 `player1_id`,
 `player2_id`,
@@ -70,7 +70,7 @@ INSERT IGNORE INTO `tennis_ladder`.`singles_match`
 VALUES
 (
 1,
-5,
+2,
 1);
 
 SELECT * FROM singles_match;

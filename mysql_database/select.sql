@@ -35,6 +35,8 @@ AND (p.player_id = m.player1_id OR p.player_id = m.player2_id);
 
 SELECT * from player;
 
+UPDATE player set email="shoutavouch33@gmail.com" where player_id=53;
+
 SELECT * FROM availability;
 
 DELETE from player_league WHERE league_id in (2,3);
@@ -115,5 +117,5 @@ WHERE a.player_id = p.player_id
 AND p.player_id=2;
 
 
-SELECT * FROM availability;
+UPDATE availability set player_id = 53 where player_id = 2;
 

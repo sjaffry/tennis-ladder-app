@@ -13,7 +13,27 @@ SET
 `entered_by` = null,
 `player1_confirmed` = null,
 `player2_confirmed` = null
-WHERE `match_id` = 53;
+WHERE `match_id` = 2;
+
+	UPDATE `tennis_ladder`.`singles_match` 
+SET 
+    `match_date` = '2024-01-01',
+    `set1_p1` = 6,
+    `set1_p2` = 3,
+    `set2_p1` = 4,
+    `set2_p2` = 6,
+    `set3_p1` = 6,
+    `set3_p2` = 4,
+    `completed` = 'Y',
+    `entered_by` = 'sajaffry@gmail.com',
+    `player1_confirmed` = 'sajaffry@gmail.com',
+    `player2_confirmed` = 'annieraza@gmail.com',
+    `winner_id` = 1,
+    `loser_id` = 2
+WHERE
+    `match_id` = 55;
+
+
 
 UPDATE `tennis_ladder`.`doubles_match`
 SET
