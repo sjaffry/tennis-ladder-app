@@ -6,6 +6,7 @@ import '@aws-amplify/ui-react/styles.css';
 import awsExports from './aws-exports';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { loadLadder } from './App';
 import {
   ThemeProvider,
   Box,
@@ -58,6 +59,10 @@ const AdminPage = ({ signOut, user }) => {
   const [savedPlayers, setSavedPlayers] = useState(null);
   const [leagueTypeForSetupMatches, setLeagueTypeForSetupMatches] = useState('');
   const [leagueIdForSetupMatches, setLeagueIdForSetupMatches] = useState('');
+  const [ladderData, setLadderData] = useState(null);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [viewLadderDialogOpen, setViewLadderDialogOpen] = useState(false);
 
   // Load data on component mount
   useEffect(() => {
@@ -327,6 +332,11 @@ const AdminPage = ({ signOut, user }) => {
     });
 
   }
+  
+  const handleViewLadder = (league_id) => {
+    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg);
+    setViewLadderDialogOpen(true);
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -395,13 +405,28 @@ const AdminPage = ({ signOut, user }) => {
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
-                  <TableCell>
-                  <Button variant="contained" sx={{ backgroundColor: '#20633f', marginRight: 1 }} onClick={() => handleAddPlayers(league.league_id, league.league_type)}>
-                    Add players
-                  </Button>
-                  <Button variant="contained" sx={{ backgroundColor: '#20633f' }} onClick={() => handleViewMatches(league.league_id, league.league_type)}>
-                    View Matches
-                  </Button>
+                  <TableCell sx={{ display: "flex", gap: 1 }}>
+                    <Button 
+                      variant="contained" 
+                      sx={{ backgroundColor: '#20633f', minWidth: 'auto', height: 32, padding: '4px 10px', fontSize: '12px' }} 
+                      onClick={() => handleAddPlayers(league.league_id, league.league_type)}
+                    >
+                      Add players
+                    </Button>
+                    <Button 
+                      variant="contained" 
+                      sx={{ backgroundColor: '#20633f', minWidth: 'auto', height: 32, padding: '4px 10px', fontSize: '12px' }} 
+                      onClick={() => handleViewMatches(league.league_id, league.league_type)}
+                    >
+                      View Matches
+                    </Button>
+                    <Button 
+                      variant="contained" 
+                      sx={{ backgroundColor: '#20633f', minWidth: 'auto', height: 32, padding: '4px 10px', fontSize: '12px' }} 
+                      onClick={() => handleViewLadder(league.league_id)}
+                    >
+                      View Ladder
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -510,6 +535,50 @@ const AdminPage = ({ signOut, user }) => {
             <Button variant="contained" onClick={handleSavePlayers}>
               Save
             </Button>
+          </DialogActions>
+        </Dialog>
+
+     {/* Dialog to view league ladder */}
+     <Dialog open={viewLadderDialogOpen} onClose={() => setViewLadderDialogOpen(false)}>
+          <DialogTitle>League ladder</DialogTitle>
+          <DialogContent>
+            {dataLoading && <CircularProgress color="inherit"/>}
+            {ladderData && (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Rank</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Player Name</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Matches</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Points</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Wins</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Losses</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Win %</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {ladderData.map((ladder, index) => (
+                    <TableRow 
+                      key={index}
+                      sx={{ backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#ffffff' }}
+                    >
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.rank}</TableCell>
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.first_name} {ladder.last_name}</TableCell>
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.matches}</TableCell>
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.points}</TableCell>
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.wins}</TableCell>
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.losses}</TableCell>
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.win_rate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setViewLadderDialogOpen(false)}>Close</Button>
           </DialogActions>
         </Dialog>
         

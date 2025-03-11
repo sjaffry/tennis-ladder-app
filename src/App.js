@@ -21,6 +21,32 @@ const theme = createTheme({
   },
 });
 
+export const loadLadder = async (league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg) => {
+  setPageLoading(true);
+  setDataLoading(true);
+  const url1 = 'https://ce7l3xzwm3.execute-api.us-west-2.amazonaws.com/Prod';
+
+  axios.get(url1, {
+    params: {
+      league_id: league_id
+    },
+    headers: {
+      Authorization: jwtToken
+    }
+  })
+  .then(response => {
+    const lData = response.data["ladder"];
+    setLadderData(lData);
+    setPageLoading(false);
+    setDataLoading(false);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    setErrorMsg(error.message);
+    alert('Session expired! Please refresh the page and try again.');
+  });
+}
+
 const App = ({ signOut, user }) => {
   const [selectedCategoryTile, setSelectedCategoryTile] = useState(null);
   const [selectedTile, setSelectedTile] = useState(null);
@@ -47,7 +73,7 @@ const App = ({ signOut, user }) => {
   const handleLeagueClick = async (index, league_id, league_name, league_type, email) => {
     setSelectedTile(index);
     loadMyMatches(email, league_id, league_type);
-    loadLadder(league_id);
+    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg);
     setLeagueName(league_name);
   }
 
@@ -69,32 +95,6 @@ const App = ({ signOut, user }) => {
     .then(response => {
       const mData = response.data["matchups"];
       setMatchData(mData);
-      setPageLoading(false);
-      setDataLoading(false);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setErrorMsg(error.message);
-      alert('Session expired! Please refresh the page and try again.');
-    });
-  }
-
-  const loadLadder = async (league_id) => {
-    setPageLoading(true);
-    setDataLoading(true);
-    const url1 = 'https://ce7l3xzwm3.execute-api.us-west-2.amazonaws.com/Prod';
-
-    axios.get(url1, {
-      params: {
-        league_id: league_id
-      },
-      headers: {
-        Authorization: jwtToken
-      }
-    })
-    .then(response => {
-      const lData = response.data["ladder"];
-      setLadderData(lData);
       setPageLoading(false);
       setDataLoading(false);
     })
