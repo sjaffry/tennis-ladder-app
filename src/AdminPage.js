@@ -196,6 +196,7 @@ const AdminPage = ({ signOut, user }) => {
 
   const handleAddPlayers = (league_id, league_type) => {
     setLeagueIdForAddPlayers(league_id);
+    setLeagueTypeForAddPlayers(league_type);
     // Open dialog to upload CSV
     setAddPlayersDialogOpen(true);
 
