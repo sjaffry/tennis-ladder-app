@@ -158,7 +158,7 @@ const AdminPage = ({ signOut, user }) => {
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('Cannot save new league: ' + error.message);
+        alert('Cannot delete league. Are there players and matches associated with this league? ' + error.message);
       });    
   };
 

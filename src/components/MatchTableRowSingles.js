@@ -25,6 +25,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   const [isOpponentTab, setIsOpponentTab] = useState(false);
   const [opponentTimeSlots, setOpponentTimeSlots] = useState({});
   const [openMessageDialog, setOpenMessageDialog] = useState(false);
+  const [availabilitySaved, setAvailabilitySaved] = useState(false);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -32,6 +33,12 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
       fetchAvailableDates();
     }
   }, [openCalendar]);
+
+  useEffect(() => {
+    if (openCalendar) {
+      fetchAvailableDates();
+    }
+  }, [openCalendar, availabilitySaved]);
 
   useEffect(() => {
     // Initialize objects
@@ -151,11 +158,13 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
       .then(response => {
         // Handle success
         console.log("Availability saved successfully!");
+        alert("Availability saved!");
         setOpenTimeSlotDialog(false);
+        setAvailabilitySaved(true);
       })
       .catch(error => {
         console.error("Error saving availability:", error);
-        alert('Cannot save new league: ' + error.message);
+        alert('Error saving availability: ' + error.message);
       });
   };
 
