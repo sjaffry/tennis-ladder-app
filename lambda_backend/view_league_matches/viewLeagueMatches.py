@@ -49,20 +49,25 @@ def lambda_handler(event, context):
             # Define the SQL query
             if league_type.lower() == "singles":
                 sql_query = """
-                        SELECT
-                        concat(p1.first_name,' ',p1.last_name) as player1_name,
-                        concat(p2.first_name,' ',p2.last_name) as player2_name,
-                        p1.email as player1_email,
-                        p2.email as player2_email
-                        FROM singles_match sm, player p1, player p2
-                        WHERE sm.player1_id = p1.player_id
-                        AND sm.player2_id = p2.player_id
-                        AND sm.league_id = %s;
+                    SELECT
+                    l.league_name,
+                    l.league_admin_email,
+                    concat(p1.first_name,' ',p1.last_name) as player1_name,
+                    concat(p2.first_name,' ',p2.last_name) as player2_name,
+                    p1.email as player1_email,
+                    p2.email as player2_email
+                    FROM singles_match sm, player p1, player p2, league l
+                    WHERE l.league_id=sm.league_id
+                    AND sm.player1_id = p1.player_id
+                    AND sm.player2_id = p2.player_id
+                    AND sm.league_id = %s;
                         """
             elif (league_type.lower() == "doubles" or league_type.lower() == "mix doubles"):
                 sql_query = """
                         WITH matches AS (
                             SELECT
+                            l.league_name,
+                            l.league_admin_email,
                             dm.match_id,
                             p1.first_name as p1_firstname,
                             p2.first_name as p2_firstname,
@@ -80,8 +85,9 @@ def lambda_handler(event, context):
                             set2_t2,
                             set3_t1,
                             set3_t2
-                            FROM doubles_match dm, doubles_team dt1, doubles_team dt2, player p1, player p2, player p3, player p4
-                            WHERE dm.team1_id = dt1.team_id
+                            FROM league l, doubles_match dm, doubles_team dt1, doubles_team dt2, player p1, player p2, player p3, player p4
+                            WHERE l.league_id = dm.league_id
+                            AND dm.team1_id = dt1.team_id
                             AND dt1.player1_id = p1.player_id
                             AND dt1.player2_id = p2.player_id
                             AND dt2.player1_id = p3.player_id

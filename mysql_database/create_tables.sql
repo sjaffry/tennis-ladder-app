@@ -28,7 +28,8 @@ CREATE TABLE league (
     category VARCHAR(100) NOT NULL,
     league_type VARCHAR(100) NOT NULL,
     end_date DATE,
-    business_name VARCHAR(100) NOT NULL
+    business_name VARCHAR(100) NOT NULL,
+    league_admin_email VARCHAR(200) NOT NULL
 );
 
 DROP TABLE IF EXISTS player_league;

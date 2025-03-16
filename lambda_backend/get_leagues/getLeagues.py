@@ -49,13 +49,13 @@ def lambda_handler(event, context):
             sql_query = """
                     SELECT league.league_id,
                     league.league_name,
+                    league.league_admin_email,
                     league.end_date,
                     league.business_name,
                     league.category,
                     league.league_type
                     FROM tennis_ladder.league
                     WHERE business_name = %s;
-
                     """
         
             # Execute the query with 'FTSC' as the parameter  

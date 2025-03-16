@@ -33,6 +33,7 @@ def lambda_handler(event, context):
     payload = json.loads(event["body"])
     league_id = payload['league_id']
     league_name = payload['league_name']
+    league_admin_email = payload['league_admin_email']
     end_date = payload['end_date']
     category = payload['category']
     league_type = payload['league_type']
@@ -57,7 +58,8 @@ def lambda_handler(event, context):
                 `end_date`,
                 `business_name`,
                 `category`,
-                `league_type`)
+                `league_type`,
+                `league_admin_email`)
                 VALUES
                 (%s,
                 %s,
@@ -70,11 +72,12 @@ def lambda_handler(event, context):
                 league_name = %s, 
                 end_date = %s,
                 category = %s,
-                league_type = %s;
+                league_type = %s,
+                league_admin_email = %s;
                 """
 
         # Execute the query
-        cursor.execute(sql_query, (league_id, league_name, end_date, business_name, category, league_type, league_name, end_date, category, league_type))
+        cursor.execute(sql_query, (league_id, league_name, end_date, business_name, category, league_type, league_admin_email, league_name, end_date, category, league_type, league_admin_email))
         connection.commit()
 
         result = "ok"

@@ -49,6 +49,7 @@ const AdminPage = ({ signOut, user }) => {
   const [leagueIdForAddPlayers, setLeagueIdForAddPlayers] = useState('');
   const [leagueTypeForAddPlayers, setLeagueTypeForAddPlayers] = useState('');
   const [leagueName, setLeagueName] = useState('');
+  const [leagueAdminEmail, setLeagueAdminEmail] = useState('');
   const [endDate, setEndDate] = useState('');
   const [category, setCategory] = useState('');
   const [leagueType, setLeagueType] = useState('');
@@ -115,6 +116,7 @@ const AdminPage = ({ signOut, user }) => {
       setCategory('');
       setLeagueType('');
       setEndDate('');
+      setLeagueAdminEmail('');
       setDialogOpen(true);
     }
     else {
@@ -133,6 +135,7 @@ const AdminPage = ({ signOut, user }) => {
     setCategory(league.category);
     setLeagueType(league.league_type);
     setEndDate(league.end_date);
+    setLeagueAdminEmail(league.league_admin_email);
     setEditLeague(true);
   };
 
@@ -177,6 +180,7 @@ const AdminPage = ({ signOut, user }) => {
       {
         league_id: leagueId,
         league_name: leagueName,
+        league_admin_email: leagueAdminEmail,
         end_date: endDate,
         category: category,
         league_type: leagueType,
@@ -297,7 +301,6 @@ const AdminPage = ({ signOut, user }) => {
         const matches = response.data["matchups"];
         setLeagueMatches(matches);
         setResponseDialogOpen(false);
-        alert("Matches have been setup!");
         handleViewMatches(leagueIdForAddPlayers, leagueTypeForAddPlayers)
       })
       .catch(error => {
@@ -330,12 +333,40 @@ const AdminPage = ({ signOut, user }) => {
       setErrorMsg(error.message);
       alert('Session expired! Please refresh the page and try again.');
     });
-
   }
-  
+
   const handleViewLadder = (league_id) => {
     loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg);
     setViewLadderDialogOpen(true);
+  }
+
+  const handleSendToPlayers = (league_matches, league_name, league_admin_email) => {
+    console.log('Sending league matches to all players');
+
+    const url1 = 'https://pdf3tq5yxf.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.put(
+      url1,
+      {
+        matches: league_matches,
+        league_name: league_name,
+        league_admin_email: league_admin_email
+      },
+      {
+        headers: {
+          Authorization: jwtToken,
+        },
+      }
+    )
+      .then(response => {
+        // Handle success
+        alert("Email successfully sent to all players!")
+        setLeagueMatchesDialogOpen(false);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error sending email: ' + error.message);
+      });
   }
 
   return (
@@ -444,6 +475,13 @@ const AdminPage = ({ signOut, user }) => {
               variant="outlined"
               value={leagueName}
               onChange={(e) => setLeagueName(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="League Admin Email"
+              variant="outlined"
+              value={leagueAdminEmail}
+              onChange={(e) => setLeagueAdminEmail(e.target.value)}
               fullWidth
             />
             <TextField
@@ -665,6 +703,9 @@ const AdminPage = ({ signOut, user }) => {
             <Button onClick={() => setLeagueMatchesDialogOpen(false)}>Close</Button>
             {leagueMatches.length === 0 && (
               <Button onClick={() => handleAddPlayers(leagueIdForSetupMatches, leagueTypeForSetupMatches)}>Setup Matches</Button>
+            )}
+            {leagueMatches.length > 0 && (
+              <Button onClick={() => handleSendToPlayers(leagueMatches,leagueMatches[0].league_name, leagueMatches[0].league_admin_email)}>Send to players</Button>
             )}
           </DialogActions>
         </Dialog>
