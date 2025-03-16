@@ -64,6 +64,7 @@ const AdminPage = ({ signOut, user }) => {
   const [dataLoading, setDataLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [viewLadderDialogOpen, setViewLadderDialogOpen] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
 
   // Load data on component mount
   useEffect(() => {
@@ -342,6 +343,7 @@ const AdminPage = ({ signOut, user }) => {
 
   const handleSendToPlayers = (league_matches, league_name, league_admin_email) => {
     console.log('Sending league matches to all players');
+    setEmailSending(true);
 
     const url1 = 'https://pdf3tq5yxf.execute-api.us-west-2.amazonaws.com/Prod';
 
@@ -362,6 +364,7 @@ const AdminPage = ({ signOut, user }) => {
         // Handle success
         alert("Email successfully sent to all players!")
         setLeagueMatchesDialogOpen(false);
+        setEmailSending(false);
       })
       .catch(error => {
         console.error('Error:', error);
@@ -668,6 +671,7 @@ const AdminPage = ({ signOut, user }) => {
         <Dialog open={leagueMatchesDialogOpen} onClose={() => setLeagueMatchesDialogOpen(false)}>
           <DialogTitle>Matches</DialogTitle>
           <DialogContent>
+          {emailSending && <CircularProgress color="inherit"/>}
           <TableContainer component={Paper} sx={{ mt: 2 }}>
               <Table>
                 <TableHead>
