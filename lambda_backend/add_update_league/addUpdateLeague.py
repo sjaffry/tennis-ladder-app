@@ -66,6 +66,7 @@ def lambda_handler(event, context):
                 %s,
                 %s,
                 %s,
+                %s,
                 %s
                 )
                 ON DUPLICATE KEY UPDATE
