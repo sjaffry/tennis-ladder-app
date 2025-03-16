@@ -173,10 +173,12 @@ const App = ({ signOut, user }) => {
                   sx={{
                     minWidth: 100,
                     height: 40,
-                    marginRight: 1,
-                    backgroundColor: '#20633f',
+                    backgroundColor: 'white', 
+                    border: 'none',
+                    color: '#20633f',
                     '&:hover': {
-                      backgroundColor: '#1d456e',
+                      backgroundColor: 'transparent', 
+                      border: '2px solid #20633f',
                     },
                   }}
                   onClick={launchAdminPage}
@@ -189,9 +191,12 @@ const App = ({ signOut, user }) => {
                 sx={{
                   minWidth: 100,
                   height: 40,
-                  backgroundColor: '#20633f',
+                  backgroundColor: 'white', 
+                  border: 'none',
+                  color: '#20633f',
                   '&:hover': {
-                    backgroundColor: '#1d456e',
+                    backgroundColor: 'transparent', 
+                    border: '2px solid #20633f',
                   },
                 }}
                 onClick={signOut}
@@ -204,30 +209,32 @@ const App = ({ signOut, user }) => {
   
         {/* Main Content */}
         <Box sx={{ flex: 1, width: '100%', p: 2, overflow: 'auto' }}>
-          <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom sx={{ mb: 4 }}>
+          <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom sx={{ mb: 4, textTransform: 'capitalize' }}>
             Hello {user.signInUserSession.idToken.payload.given_name}!
           </Typography>
   
           {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
   
           <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 6 }}>
-            <Button
-              key="1"
-              variant="contained"
-              sx={{
-                width: '30%',
-                p: 2,
-                m: 0.5,
-                backgroundColor: selectedCategoryTile === "1" ? '#20633f' : 'white',
-                color: selectedCategoryTile === "1" ? 'white' : 'black',
-                '&:hover': {
-                  backgroundColor: selectedCategoryTile === "1" ? '#20633f' : 'white',
-                },
-              }}
-              onClick={() => handleCategoryClick("1", "Tennis")}
-            >
-              Tennis    
-            </Button>
+          <Button
+            key="1"
+            variant="contained"
+            sx={{
+              width: '30%',
+              p: 2,
+              m: 0.5,
+              backgroundColor: selectedCategoryTile === "1" ? 'transparent' : 'white', 
+              border: selectedCategoryTile === "1" ? '2px solid #20633f' : 'none', 
+              color: selectedCategoryTile === "1" ? '#20633f' : 'black', 
+              '&:hover': {
+                backgroundColor: selectedCategoryTile === "1" ? 'transparent' : 'white',
+                border: selectedCategoryTile === "1" ? '2px solid #20633f' : 'none', 
+              },
+            }}
+            onClick={() => handleCategoryClick("1", "Tennis")}
+          >
+            Tennis    
+          </Button>
             <Button
               key="2"
               variant="contained"
@@ -235,10 +242,12 @@ const App = ({ signOut, user }) => {
                 width: '30%',
                 p: 2,
                 m: 0.5,
-                backgroundColor: selectedCategoryTile === "2" ? '#20633f' : 'white',
-                color: selectedCategoryTile === "2" ? 'white' : 'black',
+                backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
+                border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
+                color: selectedCategoryTile === "2" ? '#20633f' : 'black',
                 '&:hover': {
-                  backgroundColor: selectedCategoryTile === "2" ? '#20633f' : 'white',
+                  backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
+                  border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
                 },
               }}
               onClick={() => handleCategoryClick("2", "Pickleball")}
@@ -259,10 +268,12 @@ const App = ({ signOut, user }) => {
                     width: '30%',
                     p: 2,
                     m: 0.5,
-                    backgroundColor: selectedTile === index ? '#20633f' : 'white',
-                    color: selectedTile === index ? 'white' : 'black',
+                    backgroundColor: selectedTile === index ? 'transparent' : 'white', 
+                    border: selectedTile === index ? '2px solid #20633f' : 'none',
+                    color: selectedTile === index ? '#20633f' : 'black',
                     '&:hover': {
-                      backgroundColor: selectedTile === index ? '#20633f' : 'white',
+                      backgroundColor: selectedTile === index ? 'transparent' : 'white', 
+                      border: selectedTile === index ? '2px solid #20633f' : 'none',
                     },
                   }}
                   onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}

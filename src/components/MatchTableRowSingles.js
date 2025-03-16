@@ -221,7 +221,19 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                   <Button
                     variant="contained"
                     onClick={() => handleClickOpen({ ...match })}
-                    sx={{ backgroundColor: '#20633f', width: '60px', height: '30px', fontSize: '9px' }}
+                    sx={{
+                      width: '60px', 
+                      height: '30px', 
+                      fontSize: '9px',
+                      fontWeight: 'bold',
+                      backgroundColor: 'white', 
+                      border: 'none',
+                      color: '#20633f',
+                      '&:hover': {
+                        backgroundColor: 'transparent', 
+                        border: '2px solid #20633f',
+                      },
+                    }}
                   >
                     Add Score
                   </Button>
@@ -229,7 +241,19 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                     variant="contained"
                     color="secondary"
                     onClick={() => setOpenCalendar(true)}
-                    sx={{ backgroundColor: '#bf7315', width: '60px', height: '30px', fontSize: '9px' }}
+                    sx={{
+                      width: '60px', 
+                      height: '30px', 
+                      fontSize: '9px',
+                      fontWeight: 'bold',
+                      backgroundColor: 'white', 
+                      border: 'none',
+                      color: '#20633f',
+                      '&:hover': {
+                        backgroundColor: 'transparent', 
+                        border: '2px solid #20633f',
+                      },
+                    }}
                   >
                     Setup Match
                   </Button>
@@ -241,7 +265,19 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                   variant="contained"
                   color="secondary"
                   onClick={() => handleConfirmScoreClick({ ...match })}
-                  sx={{ width: '60px', height: '30px', fontSize: '9px' }}
+                  sx={{
+                    width: '60px', 
+                    height: '30px', 
+                    fontSize: '9px',
+                    fontWeight: 'bold',
+                    backgroundColor: 'white', 
+                    border: 'none',
+                    color: '#20633f',
+                    '&:hover': {
+                      backgroundColor: 'transparent', 
+                      border: '2px solid #20633f',
+                    },
+                  }}
                 >
                   Confirm score
                 </Button>

@@ -377,14 +377,36 @@ const AdminPage = ({ signOut, user }) => {
       <Box sx={{ display: 'flex', bgcolor: 'white', height: '100vh' }}>
         <Button
           variant="contained"
-          sx={{ position: 'absolute', top: 2, right: 102, backgroundColor: '#20633f' }}
+          sx={{
+            position: 'absolute', 
+            top: 2, 
+            right: 102,
+            backgroundColor: 'white', 
+            border: 'none',
+            color: '#20633f',
+            '&:hover': {
+              backgroundColor: 'transparent', 
+              border: '2px solid #20633f',
+            },
+          }}
           onClick={() => navigate('/')}
         >
           Back to Ladder
         </Button>
         <Button
           variant="contained"
-          sx={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#20633f' }}
+          sx={{
+            position: 'absolute', 
+            top: 2, 
+            right: 2,
+            backgroundColor: 'white', 
+            border: 'none',
+            color: '#20633f',
+            '&:hover': {
+              backgroundColor: 'transparent', 
+              border: '2px solid #20633f',
+            },
+          }}
           onClick={signOut}
         >
           Logout
@@ -404,7 +426,16 @@ const AdminPage = ({ signOut, user }) => {
               onChange={handleNewEventNameChange}
               sx={{ flexGrow: 1 }}
             />
-            <Button variant="contained" sx={{ backgroundColor: '#20633f' }} onClick={handleCreateClick}>
+            <Button variant="contained" 
+            sx={{ backgroundColor: 'white',
+              border: 'none',
+              color: '#20633f',
+              '&:hover': {
+                backgroundColor: 'transparent', 
+                border: '2px solid #20633f',
+              },  
+             }} 
+            onClick={handleCreateClick}>
               Create
             </Button>
           </Box>
@@ -442,21 +473,63 @@ const AdminPage = ({ signOut, user }) => {
                   <TableCell sx={{ display: "flex", gap: 1 }}>
                     <Button 
                       variant="contained" 
-                      sx={{ backgroundColor: '#20633f', minWidth: 'auto', height: 32, padding: '4px 10px', fontSize: '12px' }} 
+                      sx={{ 
+                        backgroundColor: '#20633f',
+                         minWidth: 'auto', 
+                         height: 32, 
+                         padding: '4px 10px', 
+                         fontSize: '12px', 
+                         fontWeight: 'bold',
+                         backgroundColor: 'white', 
+                         border: 'none',
+                         color: '#20633f',
+                         '&:hover': {
+                           backgroundColor: 'transparent', 
+                           border: '2px solid #20633f',
+                         },
+                        }} 
                       onClick={() => handleAddPlayers(league.league_id, league.league_type)}
                     >
                       Add players
                     </Button>
                     <Button 
                       variant="contained" 
-                      sx={{ backgroundColor: '#20633f', minWidth: 'auto', height: 32, padding: '4px 10px', fontSize: '12px' }} 
+                      sx={{ 
+                        backgroundColor: '#20633f',
+                         minWidth: 'auto', 
+                         height: 32, 
+                         padding: '4px 10px', 
+                         fontSize: '12px', 
+                         fontWeight: 'bold',
+                         backgroundColor: 'white', 
+                         border: 'none',
+                         color: '#20633f',
+                         '&:hover': {
+                           backgroundColor: 'transparent', 
+                           border: '2px solid #20633f',
+                         },
+                        }} 
                       onClick={() => handleViewMatches(league.league_id, league.league_type)}
                     >
                       View Matches
                     </Button>
                     <Button 
                       variant="contained" 
-                      sx={{ backgroundColor: '#20633f', minWidth: 'auto', height: 32, padding: '4px 10px', fontSize: '12px' }} 
+                      sx={{ 
+                        backgroundColor: '#20633f',
+                         minWidth: 'auto', 
+                         height: 32, 
+                         padding: '4px 10px', 
+                         fontSize: '12px', 
+                         fontWeight: 'bold',
+                         backgroundColor: 'white', 
+                         border: 'none',
+                         color: '#20633f',
+                         '&:hover': {
+                           backgroundColor: 'transparent', 
+                           border: '2px solid #20633f',
+                         },
+                        }} 
                       onClick={() => handleViewLadder(league.league_id)}
                     >
                       View Ladder
