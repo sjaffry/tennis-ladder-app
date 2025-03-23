@@ -10,6 +10,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   const [openCalendar, setOpenCalendar] = useState(false);
   const [selectedTab, setSelectedTab] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
   const [myPlayerId, setMyPlayerId] = useState(null);
   const [opponentPlayerId, setOpponentPlayerId] = useState(null);
   const [opponentPlayerEmail, setOpponentPlayerEmail] = useState(null);
@@ -109,6 +110,8 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   const handleDateChange = (date) => {
     const dateString = date.toISOString().split('T')[0];
     setSelectedDate(date);
+    const formattedDate = date.toLocaleString('en-US', { month: 'short' }).toUpperCase() + '-' + String(date.getDate()).padStart(2, '0');
+    setSelectedDateFormatted(formattedDate);
     setIsOpponentTab(selectedTab === 1);
 
     if (selectedTab === 0 || (selectedTab === 1 && opponentAvailableDates.includes(dateString))) {
@@ -183,7 +186,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
         player_email: email,
         opponent_email: opponentPlayerEmail,
         player_name: myName,
-        match_date: '2004-01-01',
+        match_date: selectedDateFormatted,
         league_name: leagueName,
         organizer_message: message
       },
@@ -354,7 +357,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
       
       {/* Message Dialog */}
       <Dialog open={openMessageDialog} onClose={() => setOpenMessageDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{match.player1_fname} vs {match.player2_fname}</DialogTitle>
+        <DialogTitle>{selectedDateFormatted} {match.player1_fname} vs {match.player2_fname}</DialogTitle>
         <DialogContent>
           <TextField
             label="Enter your message"

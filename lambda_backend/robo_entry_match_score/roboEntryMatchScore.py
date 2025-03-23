@@ -106,20 +106,21 @@ def lambda_handler(event, context):
     # Now load the data into the database
     match_type = jsonFormatted['match_type']
     league_name = jsonFormatted['league_name']
-    winner_player1_fname = jsonFormatted['players']['winner_player1_firstName']
-    winner_player1_lname = jsonFormatted['players']['winner_player1_lastName']
-    winner_player2_fname = jsonFormatted['players']['winner_player2_firstName']
-    winner_player2_lname = jsonFormatted['players']['winner_player2_lastName']
-    loser_player1_fname = jsonFormatted['players']['loser_player1_firstName']
-    loser_player1_lname = jsonFormatted['players']['loser_player1_lastName']
-    loser_player2_fname = jsonFormatted['players']['loser_player2_firstName']
-    loser_player2_lname = jsonFormatted['players']['loser_player2_lastName']
-    set1_w = jsonFormatted['score']['set_1']['winner_score']
-    set1_l = jsonFormatted['score']['set_1']['loser_score']
-    set2_w = jsonFormatted['score']['set_2']['winner_score']
-    set2_l = jsonFormatted['score']['set_2']['loser_score']
-    set3_w = jsonFormatted['score']['set_3']['winner_score']
-    set3_l = jsonFormatted['score']['set_3']['loser_score']
+    winner_player1_fname = jsonFormatted.get('players', {}).get('winner_player1_firstName', None)
+    winner_player1_lname = jsonFormatted.get('players', {}).get('winner_player1_lastName', None) 
+    winner_player2_fname = jsonFormatted.get('players', {}).get('winner_player2_firstName', None) 
+    winner_player2_lname = jsonFormatted.get('players', {}).get('winner_player2_lastName', None)
+    loser_player1_fname = jsonFormatted.get('players', {}).get('loser_player1_firstName', None)
+    loser_player1_lname = jsonFormatted.get('players', {}).get('loser_player1_lastName', None)
+    loser_player2_fname = jsonFormatted.get('players', {}).get('loser_player2_firstName', None) 
+    loser_player2_lname = jsonFormatted.get('players', {}).get('loser_player2_lastName', None)
+
+    set1_w = jsonFormatted.get('score', {}).get('set_1', {}).get('winner_score', None)
+    set1_l = jsonFormatted.get('score', {}).get('set_1', {}).get('loser_score', None)
+    set2_w = jsonFormatted.get('score', {}).get('set_2', {}).get('winner_score', None)
+    set2_l = jsonFormatted.get('score', {}).get('set_2', {}).get('loser_score', None)
+    set3_w = jsonFormatted.get('score', {}).get('set_3', {}).get('winner_score', None)
+    set3_l = jsonFormatted.get('score', {}).get('set_3', {}).get('loser_score', None)
 
     # Let's make sure all mandatory data is in the Json
     if match_type == '':
