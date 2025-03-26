@@ -374,19 +374,41 @@ const AdminPage = ({ signOut, user }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', bgcolor: 'white', height: '100vh' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: 'white', height: '100vh' }}>
+        {/* Color Banner at the Top */}
+        <Box sx={{ 
+          width: '100%', 
+          bgcolor: '#20633f', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          py: 1, 
+          px: 2, 
+          boxShadow: 1 
+        }}>
+          {/* Left: Logo and Title */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <img src={foothillslogo} alt="Logo" style={{ height: '50px', marginRight: '10px' }} />
+            <Typography 
+              fontFamily="Copperplate, Papyrus, fantasy" 
+              variant="h5"
+              sx={{ fontWeight: 'bold', color: "white" }}
+            >
+              Tennis & Pickleball Leagues
+            </Typography>
+          </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Button
           variant="contained"
           sx={{
             position: 'absolute', 
-            top: 2, 
+            top: 10, 
             right: 102,
             backgroundColor: 'white', 
             border: 'none',
             color: '#20633f',
             '&:hover': {
-              backgroundColor: 'transparent', 
-              border: '2px solid #20633f',
+              backgroundColor: 'white', 
             },
           }}
           onClick={() => navigate('/')}
@@ -397,20 +419,21 @@ const AdminPage = ({ signOut, user }) => {
           variant="contained"
           sx={{
             position: 'absolute', 
-            top: 2, 
+            top: 10, 
             right: 2,
             backgroundColor: 'white', 
             border: 'none',
             color: '#20633f',
             '&:hover': {
-              backgroundColor: 'transparent', 
-              border: '2px solid #20633f',
+              backgroundColor: 'white', 
             },
           }}
           onClick={signOut}
         >
           Logout
         </Button>
+        </Box>
+      </Box>
         <Box sx={{ width: '80%', p: 2, overflow: 'auto' }}>
           <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
             Welcome {user.signInUserSession.idToken.payload.given_name}
@@ -447,6 +470,8 @@ const AdminPage = ({ signOut, user }) => {
                 <TableCell><strong>Category</strong></TableCell>
                 <TableCell><strong>League Type</strong></TableCell>
                 <TableCell><strong>End Date</strong></TableCell>
+                <TableCell> </TableCell> { /* empty cell to align the lines*/ }
+                <TableCell> </TableCell> { /* empty cell to align the lines*/ }
               </TableRow>
             </TableHead>
             <TableBody>
@@ -470,7 +495,7 @@ const AdminPage = ({ signOut, user }) => {
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
-                  <TableCell sx={{ display: "flex", gap: 1 }}>
+                  <TableCell sx={{ gap: 1 }}>
                     <Button 
                       variant="contained" 
                       sx={{ 

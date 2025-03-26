@@ -4,6 +4,7 @@ import json
 import os
 import pymysql
 import base64
+from datetime import datetime
 from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):
@@ -19,6 +20,9 @@ def lambda_handler(event, context):
     parsed_message = json.loads(sns_message)
 
     email_content = parsed_message['content']
+    match_date = parsed_message['mail']['timestamp']
+    dt = datetime.fromisoformat(match_date.replace('Z', '+00:00'))
+    match_date_formatted = dt.strftime('%Y-%m-%d')
     email_headers = parsed_message['mail']['headers']
     business_name = next((header['value'] for header in email_headers if header['name'] == 'business-name'), None)
 
@@ -156,13 +160,13 @@ def lambda_handler(event, context):
     try:
         with connection.cursor() as cursor:
             if match_type == 'singles':
-                sql_query = "CALL `tennis_ladder`.`UpdateMatchScoreAndLadderRobot`('2024-01-01',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+                sql_query = "CALL `tennis_ladder`.`UpdateMatchScoreAndLadderRobot`(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
                 # Execute the query
-                cursor.execute(sql_query, (business_name, league_name, winner_player1_fname, winner_player1_lname, loser_player1_fname, loser_player1_lname, set1_w, set1_l, set2_w, set2_l, set3_w, set3_l))
+                cursor.execute(sql_query, (match_date_formatted, business_name, league_name, winner_player1_fname, winner_player1_lname, loser_player1_fname, loser_player1_lname, set1_w, set1_l, set2_w, set2_l, set3_w, set3_l))
             elif match_type == 'doubles':
-                sql_query = "CALL `tennis_ladder`.`UpdateDoublesMatchScoreAndLadderRobot`('2024-01-01',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+                sql_query = "CALL `tennis_ladder`.`UpdateDoublesMatchScoreAndLadderRobot`(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
                 # Execute the query
-                cursor.execute(sql_query, (business_name, league_name, winner_player1_fname, winner_player1_lname, winner_player2_fname, winner_player2_lname, loser_player1_fname, loser_player1_lname, loser_player2_fname, loser_player2_lname, set1_w, set1_l, set2_w, set2_l, set3_w, set3_l))
+                cursor.execute(sql_query, (match_date_formatted, business_name, league_name, winner_player1_fname, winner_player1_lname, winner_player2_fname, winner_player2_lname, loser_player1_fname, loser_player1_lname, loser_player2_fname, loser_player2_lname, set1_w, set1_l, set2_w, set2_l, set3_w, set3_l))
             else:
                 raise Exception('Unkonwn match type: ' + match_type)        
             

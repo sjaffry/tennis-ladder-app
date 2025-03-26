@@ -140,11 +140,10 @@ const App = ({ signOut, user }) => {
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: 'white', height: '100vh' }}>
-        
-        {/* White Banner at the Top */}
+        {/* Color Banner at the Top */}
         <Box sx={{ 
           width: '100%', 
-          bgcolor: 'white', 
+          bgcolor: '#20633f', 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between', 
@@ -158,12 +157,12 @@ const App = ({ signOut, user }) => {
             <Typography 
               fontFamily="Copperplate, Papyrus, fantasy" 
               variant="h5"
-              sx={{ fontWeight: 'bold', color: "#20633f" }}
+              sx={{ fontWeight: 'bold', color: "white" }}
             >
               Tennis & Pickleball Leagues
             </Typography>
           </Box>
-  
+    
           {/* Right: Admin and Logout Buttons */}
           {!isMobile && (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -171,14 +170,14 @@ const App = ({ signOut, user }) => {
                 <Button
                   variant="contained"
                   sx={{
+                    mr: 1,
                     minWidth: 100,
                     height: 40,
                     backgroundColor: 'white', 
                     border: 'none',
                     color: '#20633f',
                     '&:hover': {
-                      backgroundColor: 'transparent', 
-                      border: '2px solid #20633f',
+                      backgroundColor: 'white', 
                     },
                   }}
                   onClick={launchAdminPage}
@@ -195,17 +194,16 @@ const App = ({ signOut, user }) => {
                   border: 'none',
                   color: '#20633f',
                   '&:hover': {
-                    backgroundColor: 'transparent', 
-                    border: '2px solid #20633f',
+                    backgroundColor: 'white', 
                   },
                 }}
                 onClick={signOut}
               >
                 Logout
               </Button>
-            </Box>
-          )}
-        </Box>
+          </Box>
+        )}
+      </Box>
   
         {/* Main Content */}
         <Box sx={{ flex: 1, width: '100%', p: 2, overflow: 'auto' }}>
