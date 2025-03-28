@@ -66,6 +66,7 @@ const AdminPage = ({ signOut, user }) => {
   const [pageLoading, setPageLoading] = useState(false);
   const [viewLadderDialogOpen, setViewLadderDialogOpen] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
+  const [addingPlayers, setAddingPlayers] = useState(false);
 
   // Load data on component mount
   useEffect(() => {
@@ -255,6 +256,7 @@ const AdminPage = ({ signOut, user }) => {
 
   const handleSavePlayers = () => {
     console.log('Players saved:', playerData);
+    setAddingPlayers(true);
 
     const url1 = 'https://9yyvdaov8c.execute-api.us-west-2.amazonaws.com/Prod';
 
@@ -273,6 +275,7 @@ const AdminPage = ({ signOut, user }) => {
       .then(response => {
         // Handle success
         setSavedPlayers(response.data);
+        setAddPlayersDialogOpen(false);
         setResponseDialogOpen(true);
         setAddPlayersDialogOpen(false);
       })
@@ -627,6 +630,7 @@ const AdminPage = ({ signOut, user }) => {
         <Dialog open={addPlayersDialogOpen} onClose={() => setAddPlayersDialogOpen(false)}>
           <DialogTitle>Confirm or upload players to create matches</DialogTitle>
           <DialogContent>
+            {addingPlayers && <CircularProgress color="inherit"/>}
             <input type="file" accept=".csv" onChange={handleFileUpload} />
             <TableContainer component={Paper} sx={{ mt: 2 }}>
               <Table>

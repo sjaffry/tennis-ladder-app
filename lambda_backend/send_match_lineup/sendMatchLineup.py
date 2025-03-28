@@ -35,8 +35,12 @@ def generate_content (league_name, matchups, business_name):
 
     body_html = f'''<html>
             <body>
-            <h3>Below are the match ups for {league_name}</h3>
+            <h3>Below are the match-ups for {league_name}</h3>
             <p>
+            Please update your availability and schedule your matches via the ladder app.
+            </p>
+            <p>
+            https://sports-ladder.onreaction.com/
             </p>
             {generate_html_table(matchups)}
             </body>

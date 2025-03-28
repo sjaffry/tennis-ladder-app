@@ -11,6 +11,10 @@ MatchTableRowSingles-TEST.js
 App-TEST.js
 Dashboard-TEST.js
 AdminPage-TEST.js
+MatchTableRowSingles-PROD.js
+App-PROD.js
+Dashboard-PROD.js
+AdminPage-PROD.js
 node_modules/
 material-ui/
 scratch

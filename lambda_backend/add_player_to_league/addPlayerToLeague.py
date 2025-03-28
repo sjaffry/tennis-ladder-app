@@ -3,6 +3,11 @@ import os
 import pymysql
 import boto3
 import base64
+import random
+import string
+
+# Initialize the Cognito client
+cognito_client = boto3.client("cognito-idp")
 
 # Connect to the RDS MySQL database. Connecting at the top so the conn can be reused by child functions
 db_host = os.environ['DB_HOST']
@@ -37,6 +42,66 @@ def decode_jwt(token):
 
     return json.loads(payload)
 
+def generate_temp_password(length=12):
+    """Generate a random temporary password with required complexity."""
+    chars = string.ascii_letters + string.digits + "!@#$%^&*()"
+    return "".join(random.choice(chars) for _ in range(length))
+
+def check_user_exists(user_pool_id, email):
+    """Check if a user already exists in the Cognito user pool."""
+
+    try:
+        response = cognito_client.list_users(
+            UserPoolId=user_pool_id,
+            Filter=f'email="{email}"'
+        )
+
+        if len(response["Users"]) > 0:
+            print(f"User {email} already exists.")
+
+        return len(response["Users"]) > 0  # True if user exists, False otherwise
+    except Exception as e:
+        print(f"Error checking user existence: {e}")
+        return False
+
+def create_user(user_pool_id, email, given_name, family_name, business_name):
+    """Create a new Cognito user with a temporary password and email invitation."""
+    temp_password = generate_temp_password()
+    
+    try:
+        response = cognito_client.admin_create_user(
+            UserPoolId=user_pool_id,
+            Username=email,
+            UserAttributes=[
+                {"Name": "email", "Value": email},
+                {"Name": "email_verified", "Value": "true"},
+                {"Name": "given_name", "Value": given_name},
+                {"Name": "family_name", "Value": family_name}
+            ],
+            TemporaryPassword=temp_password
+        )
+
+        # Force user to change password on first login
+        cognito_client.admin_set_user_password(
+            UserPoolId=user_pool_id,
+            Username=email,
+            Password=temp_password,
+            Permanent=False
+        )
+
+        cognito_client.admin_add_user_to_group(
+            UserPoolId=user_pool_id,
+            Username=email,
+            GroupName=business_name
+        )
+
+        print(f"User {email} created successfully.")
+        return {"status": "success", "message": f"User {email} created successfully.", "temp_password": temp_password}
+    
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        return {"status": "error", "message": str(e)}
+
 def addOrUpdatePlayerToLeague(player, business_name, league_id):    
     try:
         email = player['email']
@@ -67,6 +132,7 @@ def lambda_handler(event, context):
     decoded = decode_jwt(token)
     # We only ever expect the user to be in one group only - business rule
     business_name = decoded['cognito:groups'][0]
+    user_pool_id = resource_name = decoded['iss'].split("/")[-1]
     added_players = []
 
     payload = json.loads(event["body"])
@@ -79,6 +145,13 @@ def lambda_handler(event, context):
                 print(f"Skipping player due to missing required fields: {player}")
                 continue
             
+            # First we're going to check if the user exists in the cognito pool
+            user_exists = check_user_exists(user_pool_id, player['email'])
+            if not user_exists:
+                # If the user doesn't exist, create a new user
+                create_user(user_pool_id, player['email'], player['firstName'], player['lastName'], business_name)
+            
+            # Now we add the user to the league
             result = addOrUpdatePlayerToLeague(player, business_name, league_id);
             added_players.append(result)
 
