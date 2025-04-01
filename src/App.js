@@ -393,7 +393,7 @@ const App = ({ signOut, user }) => {
               }}
               onClick={() => handleAvailabilityClick()}
             >
-              Player Availability    
+              My Availability    
             </Button>
             <CalendarDialog
               openCalendar={openCalendar}
