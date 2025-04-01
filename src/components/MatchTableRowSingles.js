@@ -74,7 +74,6 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   };
 
   const handleSendMessage = () => {
-    setOpenMessageDialog(false);
     setOpenCalendar(false);
     setOpenTimeSlotDialog(false);
     const url1 = 'https://f6f3hiboo3.execute-api.us-west-2.amazonaws.com/Prod';
@@ -94,6 +93,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     })
     .then(response => {
       alert("Email successfully sent to opponent!");
+      setOpenMessageDialog(false);
     })
     .catch(error => {
       console.error('Error:', error);
