@@ -3,18 +3,18 @@ import axios from 'axios';
 import { TextField, TableRow, TableCell, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-
 import MatchTableCell from './MatchTableCell';
+import CalendarDialog from "./CalendarDialog";
+import TimeslotDialog from "./TimeslotDialog";
+import { fetchPlayerAvailability } from '../App';
 
 const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myName }) => {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [selectedTab, setSelectedTab] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
-  const [myPlayerId, setMyPlayerId] = useState(null);
   const [opponentPlayerId, setOpponentPlayerId] = useState(null);
   const [opponentPlayerEmail, setOpponentPlayerEmail] = useState(null);
-  const [myAvailableDates, setMyAvailableDates] = useState([]);
   const [opponentAvailableDates, setOpponentAvailableDates] = useState([]);
   const [playerAvailability, setPlayerAvailability] = useState([]);
   const [openTimeSlotDialog, setOpenTimeSlotDialog] = useState(false);
@@ -23,82 +23,35 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     afternoon: false,
     evening: false,
   });
-  const [isOpponentTab, setIsOpponentTab] = useState(false);
   const [opponentTimeSlots, setOpponentTimeSlots] = useState({});
   const [openMessageDialog, setOpenMessageDialog] = useState(false);
-  const [availabilitySaved, setAvailabilitySaved] = useState(false);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (openCalendar) {
-      fetchAvailableDates();
+      const opponent_player_id = match.player1_email === email ? match.player2_id : match.player1_id;
+      const opponent_player_email = match.player1_email === email ? match.player2_email : match.player1_email;
+      setOpponentPlayerId(opponent_player_id);
+      setOpponentPlayerEmail(opponent_player_email);
+      fetchPlayerAvailability(jwtToken, opponent_player_email, setPlayerAvailability);
     }
   }, [openCalendar]);
 
   useEffect(() => {
-    if (openCalendar) {
-      fetchAvailableDates();
-    }
-  }, [openCalendar, availabilitySaved]);
-
-  useEffect(() => {
     // Initialize objects
-    const myDates = {};
     const opponentDates = {};
 
     // Process availability data
     playerAvailability.forEach(({ player_id, available_date, morning, afternoon, evening }) => {
       const availability = { morning: !!morning, afternoon: !!afternoon, evening: !!evening };
-
-      if (player_id === myPlayerId) {
-        myDates[available_date] = availability;
-      } else if (player_id === opponentPlayerId) {
-        opponentDates[available_date] = availability;
-      }
+      opponentDates[available_date] = availability;
     });
-
-    setMyAvailableDates(Object.keys(myDates));
     setOpponentAvailableDates(Object.keys(opponentDates));
     setOpponentTimeSlots(opponentDates);
   }, [playerAvailability]);
 
-  const fetchAvailableDates = async () => {
-
-    // Logged in user's email is the variable "email". So we do this test to identify the correct player id of logged in user
-    const my_player_id = match.player1_email === email ? match.player1_id : match.player2_id;
-    const opponent_player_id = match.player1_email === email ? match.player2_id : match.player1_id;
-    const opponent_player_email = match.player1_email === email ? match.player2_email : match.player1_email;
-    setMyPlayerId(my_player_id);
-    setOpponentPlayerId(opponent_player_id);
-    setOpponentPlayerEmail(opponent_player_email);
-
-    const url1 = 'https://2ooucvpwb3.execute-api.us-west-2.amazonaws.com/Prod';
-
-    axios.get(url1, {
-      params: {
-        player_id: my_player_id,
-        opponent_id: opponent_player_id
-      },
-      headers: {
-        Authorization: jwtToken
-      }
-    })
-    .then(response => {
-      const availability_data = response.data["Availability"];
-      setPlayerAvailability(availability_data);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Session expired! Please refresh the page and try again.');
-    });
-  };
-
   const getTileClassName = ({ date }) => {
     const dateString = date.toISOString().split('T')[0];
-
-    if (selectedTab === 0 && myAvailableDates.includes(dateString)) {
-      return 'green-date';
-    }
 
     if (selectedTab === 1 && opponentAvailableDates.includes(dateString)) {
       return 'green-date';
@@ -112,63 +65,8 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     setSelectedDate(date);
     const formattedDate = date.toLocaleString('en-US', { month: 'short' }).toUpperCase() + '-' + String(date.getDate()).padStart(2, '0');
     setSelectedDateFormatted(formattedDate);
-    setIsOpponentTab(selectedTab === 1);
-
-    if (selectedTab === 0 || (selectedTab === 1 && opponentAvailableDates.includes(dateString))) {
-      if (selectedTab === 1 && opponentAvailableDates.includes(dateString)) {
-        setSelectedTimeSlots(opponentTimeSlots[dateString] || {});
-      } else {
-        setSelectedTimeSlots({ morning: false, afternoon: false, evening: false });
-      }
-      setOpenTimeSlotDialog(true);
-    } else {
-      setSelectedTimeSlots({ morning: false, afternoon: false, evening: false });
-      setOpenTimeSlotDialog(true);
-    }
-  };
-
-  const handleTimeSlotChange = (event) => {
-    setSelectedTimeSlots({
-      ...selectedTimeSlots,
-      [event.target.name]: event.target.checked,
-    });
-  };
-
-  const handleSaveAvailability = async () => {
-    const dateString = selectedDate.toISOString().split('T')[0];
-
-    const availabilityData = {
-      date: dateString,
-      morning: selectedTimeSlots.morning,
-      afternoon: selectedTimeSlots.afternoon,
-      evening: selectedTimeSlots.evening,
-      player_id: myPlayerId
-    };
-
-    const url1 = 'https://lodf29a5ki.execute-api.us-west-2.amazonaws.com/Prod';
-
-    axios.put(
-      url1,
-      {
-        availability_data: availabilityData
-      },
-      {
-        headers: {
-          Authorization: jwtToken,
-        },
-      }
-    )
-      .then(response => {
-        // Handle success
-        console.log("Availability saved successfully!");
-        alert("Availability saved!");
-        setOpenTimeSlotDialog(false);
-        setAvailabilitySaved(true);
-      })
-      .catch(error => {
-        console.error("Error saving availability:", error);
-        alert('Error saving availability: ' + error.message);
-      });
+    setSelectedTimeSlots(opponentTimeSlots[dateString] || {});
+    setOpenTimeSlotDialog(true);
   };
 
   const handleScheduleMatchClick = () => {
@@ -299,95 +197,30 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
       </TableRow>
 
       {/* Calendar Dialog */}
-      <Dialog open={openCalendar} onClose={() => setOpenCalendar(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Setup Match - Choose an Available Date</DialogTitle>
-        <DialogContent>
-          <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)} centered>
-            <Tab label="My Calendar" />
-            <Tab label="Opponent's Calendar" />
-          </Tabs>
-
-          <Box display="flex" justifyContent="center" mt={2}>
-            <Calendar
-              onChange={handleDateChange}
-              value={selectedDate}
-              tileClassName={getTileClassName}
-              minDate={new Date()} 
-            />
-          </Box>
-          {/* Legend */}
-          <Box display="flex" alignItems="center" justifyContent="center" mt={2} gap={1}>
-            <Box width={16} height={16} bgcolor="#4caf50" borderRadius="50%" />
-            <span>Available</span>
-          </Box>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => setOpenCalendar(false)} color="secondary" variant="contained">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+      <CalendarDialog
+        openCalendar={openCalendar}
+        setOpenCalendar={setOpenCalendar}
+        isOpponentCalendar={true}
+        handleDateChange={handleDateChange}
+        selectedDate={selectedDate}
+        getTileClassName={getTileClassName}
+        isOpponent={true}
+      />
       {/* Time Slot Selection Dialog */}
-      <Dialog open={openTimeSlotDialog} onClose={() => setOpenTimeSlotDialog(false)}>
-        <DialogTitle>{isOpponentTab ? "Schedule Match" : "Select Time Slot"}</DialogTitle>
-        <DialogContent>
-          <FormGroup>
-            <FormControlLabel
-              control={<Checkbox name="morning" checked={selectedTimeSlots.morning || false} onChange={handleTimeSlotChange} disabled={isOpponentTab} />}
-              label="Morning"
-            />
-            <FormControlLabel
-              control={<Checkbox name="afternoon" checked={selectedTimeSlots.afternoon || false} onChange={handleTimeSlotChange} disabled={isOpponentTab} />}
-              label="Afternoon"
-            />
-            <FormControlLabel
-              control={<Checkbox name="evening" checked={selectedTimeSlots.evening || false} onChange={handleTimeSlotChange} disabled={isOpponentTab} />}
-              label="Evening"
-            />
-          </FormGroup>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={isOpponentTab ? handleScheduleMatchClick : handleSaveAvailability} color="primary" variant="contained">
-            {isOpponentTab ? "Schedule Match" : "Save Availability"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      
-      {/* Message Dialog */}
-      <Dialog open={openMessageDialog} onClose={() => setOpenMessageDialog(false)} maxWidth="sm" fullWidth>
-      <DialogTitle>{selectedDateFormatted} {match.player1_fname} vs {match.player2_fname}</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Enter your message"
-            multiline
-            fullWidth
-            rows={4}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            variant="outlined"
-            margin="dense"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenMessageDialog(false)} color="secondary" variant="contained">
-            Cancel
-          </Button>
-          <Button onClick={handleSendMessage} color="primary" variant="contained">
-            Send
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <style>
-        {`
-          .react-calendar__tile.green-date {
-            background-color: #4caf50 !important; 
-            color: white;
-            border-radius: 50%;
-          }
-        `}
-      </style>
+      <TimeslotDialog
+        openTimeSlotDialog={openTimeSlotDialog}
+        setOpenTimeSlotDialog={setOpenTimeSlotDialog}
+        isOpponentTab={true}
+        selectedTimeSlots={selectedTimeSlots}
+        handleScheduleMatchClick={handleScheduleMatchClick}
+        openMessageDialog={openMessageDialog}
+        setOpenMessageDialog={setOpenMessageDialog}
+        selectedDateFormatted={selectedDateFormatted}
+        match={match}
+        message={message}
+        setMessage={setMessage}
+        handleSendMessage={handleSendMessage}
+      />
     </>
   );
 };

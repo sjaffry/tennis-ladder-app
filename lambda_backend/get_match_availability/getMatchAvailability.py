@@ -29,8 +29,7 @@ def lambda_handler(event, context):
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
-    player_id = event["queryStringParameters"]['player_id']
-    opponent_id = event["queryStringParameters"]['opponent_id']
+    player_email = event["queryStringParameters"]['player_email']
     decoded = decode_jwt(token)
     # We only ever expect the user to be in one group only - business rule
     business_name = decoded['cognito:groups'][0]
@@ -51,16 +50,11 @@ def lambda_handler(event, context):
                 SELECT p.player_id, a.available_date, a.morning, a.afternoon, a.evening
                 FROM availability a, player p
                 WHERE a.player_id = p.player_id
-                AND p.player_id=%s
-                UNION
-                SELECT p.player_id, a.available_date, a.morning, a.afternoon, a.evening
-                FROM availability a, player p
-                WHERE a.player_id = p.player_id
-                AND p.player_id=%s;
+                AND p.email=%s
                 """
         
             # Execute the query with 'FTSC' as the parameter  
-            cursor.execute(sql_query, (player_id,opponent_id))
+            cursor.execute(sql_query, (player_email))
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall()  

@@ -2,6 +2,7 @@ import json
 import boto3
 import base64
 import os
+import re
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -25,26 +26,72 @@ def decode_jwt(token):
     return json.loads(payload)
 
 def generate_html_table(text_list):
-    html = "<table border='1'>\n"
+    html = """
+    <table border='1' style='border-collapse: collapse;'>
+        <style>
+            td { padding: 10px; }
+        </style>
+    """
     for text in text_list:
-        html += f"  <tr><td>{text}</td></tr>\n"
+        match = re.match(r"(Match \d+): (.+)", text)  # Extract match number and players
+        if match:
+            match_number, players = match.groups()
+            html += f" <tr><td>{match_number}</td><td style='padding-left: 20px;'>{players}</td></tr>\n"
+        else:
+            html += f"  <tr><td colspan='2'>{text}</td></tr>\n"  # Fallback in case format is unexpected
     html += "</table>"
     return html
 
 def generate_content (league_name, matchups, business_name):
 
-    body_html = f'''<html>
-            <body>
-            <h3>Below are the match-ups for {league_name}</h3>
+    body_html_part_1 = '''
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Sports Ladder Login</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                    margin: 50px;
+                }
+                h1 {
+                    color: #333;
+                }
+                h2 {
+                    color: #555;
+                }
+                .login-button {
+                    display: inline-block;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    color: white;
+                    background-color: #43c2f0;
+                    border: none;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    cursor: pointer;
+                }
+                .login-button:hover {
+                    background-color: #43c2f0;
+                }
+            </style>
+        </head>
+        <body>
+            <h2>Below are the match-ups for mens open league APR-JUL</h2>
+            <p>Please add your availability and setup matches using the Sports Ladder app.</p>
+            <p><a href="https://sports-ladder.onreaction.com/" class="login-button">Login to Sports Ladder</a></p>
             <p>
-            Please update your availability and schedule your matches via the ladder app.
-            </p>
-            <p>
-            https://sports-ladder.onreaction.com/
-            </p>
+            '''
+    body_html_part_2 = f'''
             {generate_html_table(matchups)}
+            </p>
             </body>
         </html>'''
+
+    body_html = body_html_part_1 + body_html_part_2
 
     body_text = f'''Below are the match ups for {league_name}.
                 {matchups}
@@ -66,6 +113,7 @@ def lambda_handler(event, context):
     matchups = []
     recipient_email = []
     subject = f'Match Draw! {league_name}'
+    match_number = 1  # Initialize match counter
 
     try:
         for matchup in payload['matches']:
@@ -76,9 +124,11 @@ def lambda_handler(event, context):
             if not matchup.get('player2_email'):
                 print(f"Skipping match record due to missing email fieldd: {match}")
                 continue
-            matchups.append(matchup["player1_name"]+" vs "+matchup["player2_name"])
+            matchups.append(f"Match {match_number}: {matchup['player1_name']} vs {matchup['player2_name']}")
+            # Append recipient emails
             recipient_email.append(matchup["player1_email"])
             recipient_email.append(matchup["player2_email"])
+            match_number += 1  # Increment match counter
         
         email_content = generate_content(league_name, matchups, business_name);
 

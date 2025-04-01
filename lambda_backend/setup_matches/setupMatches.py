@@ -24,13 +24,27 @@ def decode_jwt(token):
     return json.loads(payload)
 
 def generate_matches(player_ids):
-    matches = []
+    """Generate a round-robin schedule ensuring each player plays an equal number of matches."""
+    if len(player_ids) % 2 != 0:
+        player_ids.append("BYE")  # Add a bye if the number of players is odd
+
     num_players = len(player_ids)
-    
-    for i in range(num_players):
-        for j in range(i + 1, num_players):
-            matches.append((player_ids[i], player_ids[j]))
-    
+    rounds = num_players - 1  # Each player plays every other player once
+    matches = []
+
+    for round_num in range(rounds):
+        round_matches = []
+        for i in range(num_players // 2):
+            player1 = player_ids[i]
+            player2 = player_ids[num_players - 1 - i]
+            if "BYE" not in (player1, player2):  # Exclude "bye" matches
+                round_matches.append((player1, player2))
+        
+        matches.append({"Round": round_num + 1, "Matches": round_matches})
+
+        # Rotate players (except the first one) to generate new pairings
+        player_ids = [player_ids[0]] + [player_ids[-1]] + player_ids[1:-1]
+
     return matches
 
 def lambda_handler(event, context):
@@ -55,46 +69,49 @@ def lambda_handler(event, context):
     
     try:
         players = [player['player_id'] for player in payload['match_data']]
+        resp = []
         league_id = payload['match_data'][0]['league_id']
-        matches = generate_matches(players)
-        with connection.cursor() as cursor:
-            for match in matches:
-                player1, player2 = match
-                sql_query1 = """
-                    SELECT match_id FROM `tennis_ladder`.`singles_match`
-                    WHERE league_id = %s
-                    AND ((player1_id = %s AND player2_id = %s) OR
-                    (player2_id = %s AND player1_id = %s));
+        match_schedule = generate_matches(players)
+        with connection.cursor() as cursor:            
+            for round_info in match_schedule:
+                round = round_info["Round"] # we're not using it in the output just yet but could use it in the future if needed
+                for player1, player2 in round_info["Matches"]:
+                    sql_query1 = """
+                        SELECT match_id FROM `tennis_ladder`.`singles_match`
+                        WHERE league_id = %s
+                        AND ((player1_id = %s AND player2_id = %s) OR
+                        (player2_id = %s AND player1_id = %s));
+                        """
+                    sql_query2 = """
+                        INSERT IGNORE INTO `tennis_ladder`.`singles_match`
+                        (
+                        `match_id`,
+                        `player1_id`,
+                        `player2_id`,
+                        `league_id`)
+                        VALUES
+                        (%s,
+                        %s,
+                        %s,
+                        %s);
+                        """
+                    sql_query3 = """
+                    SELECT concat(p1.first_name, ' ', p1.last_name) as 'player1_name', concat(p2.first_name, ' ', p2.last_name) as 'player2_name'
+                    FROM player p1, player p2
+                    WHERE p1.player_id = %s
+                    AND p2.player_id = %s;
                     """
-                sql_query2 = """
-                    INSERT IGNORE INTO `tennis_ladder`.`singles_match`
-                    (
-                    `match_id`,
-                    `player1_id`,
-                    `player2_id`,
-                    `league_id`)
-                    VALUES
-                    (%s,
-                    %s,
-                    %s,
-                    %s);
-                    """
-                # Execute the queries
-                cursor.execute(sql_query1, (league_id, player1, player2, player1, player2))
-                result = cursor.fetchall()
-                match_id = result[0]["match_id"] if result else None
+                    # Execute the queries
+                    cursor.execute(sql_query1, (league_id, player1, player2, player1, player2))
+                    result = cursor.fetchall()
+                    match_id = result[0]["match_id"] if result else None
 
-                cursor.execute(sql_query2, (match_id, player1, player2, league_id))
+                    # If match_id is None then DB generates one
+                    cursor.execute(sql_query2, (match_id, player1, player2, league_id))
 
-            sql_query3 = """
-                SELECT concat(p1.first_name, ' ', p1.last_name) as 'player1_name', concat(p2.first_name, ' ', p2.last_name) as 'player2_name'
-                FROM `tennis_ladder`.`singles_match` sm, `tennis_ladder`.`player` p1, `tennis_ladder`.`player` p2
-                WHERE sm.league_id = %s
-                AND sm.player1_id = p1.player_id
-                AND sm.player2_id = p2.player_id;
-                """
-            cursor.execute(sql_query3, (league_id))
-            resp = cursor.fetchall()
+                    cursor.execute(sql_query3, (player1, player2))   
+                    player_names = cursor.fetchall()
+                    resp.append(player_names)                 
 
             result = {
                 "Business_name": business_name,

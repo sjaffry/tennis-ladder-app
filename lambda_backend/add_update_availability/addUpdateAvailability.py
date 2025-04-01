@@ -32,7 +32,7 @@ def lambda_handler(event, context):
 
     payload = json.loads(event["body"])
     availability = payload["availability_data"]
-    player_id = availability['player_id']
+    player_email = availability['player_email']
     date_available = availability['date']
     morning = availability['morning']
     afternoon = availability['afternoon']
@@ -51,7 +51,11 @@ def lambda_handler(event, context):
     )
 
     with connection.cursor() as cursor:
-        sql_query = """
+        sql_query_1 = """
+                SELECT player_id FROM `tennis_ladder`.`player`
+                WHERE email = %s;
+                """
+        sql_query_2 = """
                 INSERT INTO `tennis_ladder`.`availability`
                 (`player_id`,
                 `available_date`,
@@ -72,8 +76,12 @@ def lambda_handler(event, context):
                 evening = %s;
                 """
 
-        # Execute the query
-        cursor.execute(sql_query, (player_id, date_available, morning, afternoon, evening, date_available, morning, afternoon, evening))
+        # Execute the queries
+        cursor.execute(sql_query_1, (player_email))
+        player_id = cursor.fetchone()['player_id']
+
+        cursor.execute(sql_query_2, (player_id, date_available, morning, afternoon, evening, date_available, morning, afternoon, evening))
+        
         connection.commit()
 
         result = "ok"

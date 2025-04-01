@@ -10,6 +10,8 @@ import { Link } from "react-router-dom";
 import Dashboard from './components/Dashboard';
 import foothillslogo from './images/FTSC-logo.jpeg';
 import { useNavigate } from "react-router-dom";
+import CalendarDialog from "./components/CalendarDialog";
+import TimeslotDialog from "./components/TimeslotDialog";
 Amplify.configure(awsExports);
 
 
@@ -47,6 +49,28 @@ export const loadLadder = async (league_id, jwtToken, setLadderData, setPageLoad
   });
 }
 
+export const fetchPlayerAvailability = async (jwtToken, player_email, setPlayerAvailability) => {
+
+  const url1 = 'https://2ooucvpwb3.execute-api.us-west-2.amazonaws.com/Prod';
+
+  axios.get(url1, {
+    params: {
+      player_email: player_email
+    },
+    headers: {
+      Authorization: jwtToken
+    }
+  })
+  .then(response => {
+    const availability_data = response.data["Availability"];
+    setPlayerAvailability(availability_data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Session expired! Please refresh the page and try again.');
+  });
+};
+
 const App = ({ signOut, user }) => {
   const [selectedCategoryTile, setSelectedCategoryTile] = useState(null);
   const [selectedTile, setSelectedTile] = useState(null);
@@ -57,6 +81,18 @@ const App = ({ signOut, user }) => {
   const [matchData, setMatchData] = useState(null);
   const [ladderData, setLadderData] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
+  const [openCalendar, setOpenCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [myAvailableDates, setMyAvailableDates] = useState([]);
+  const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
+  const [playerAvailability, setPlayerAvailability] = useState([]);
+  const [availabilitySaved, setAvailabilitySaved] = useState(false);
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState({
+    morning: false,
+    afternoon: false,
+    evening: false,
+  });
+  const [openTimeSlotDialog, setOpenTimeSlotDialog] = useState(false);
   const user_groups = user.signInUserSession.idToken.payload['cognito:groups'];
   const email = user.signInUserSession.idToken.payload['email'];
   const jwtToken = user.signInUserSession.idToken.jwtToken;
@@ -68,7 +104,91 @@ const App = ({ signOut, user }) => {
 
   // Call page load API
   useEffect(() => {
-  }, []); 
+    if (openCalendar) {
+      fetchPlayerAvailability(jwtToken, email, setPlayerAvailability);
+    }
+  }, [openCalendar]); 
+
+  useEffect(() => {
+    if (openCalendar) {
+      fetchPlayerAvailability(jwtToken, email, setPlayerAvailability);
+    }
+  }, [openCalendar, availabilitySaved]);
+
+  useEffect(() => {
+    // Initialize objects
+    const myDates = {};
+
+    // Process availability data
+    playerAvailability.forEach(({ player_id, available_date, morning, afternoon, evening }) => {
+      const availability = { morning: !!morning, afternoon: !!afternoon, evening: !!evening };
+      myDates[available_date] = availability;
+    });
+
+    setMyAvailableDates(Object.keys(myDates));
+  }, [playerAvailability]);
+
+  const handleDateChange = (date) => {
+    const dateString = date.toISOString().split('T')[0];
+    setSelectedDate(date);
+    const formattedDate = date.toLocaleString('en-US', { month: 'short' }).toUpperCase() + '-' + String(date.getDate()).padStart(2, '0');
+    setSelectedDateFormatted(formattedDate);
+    setSelectedTimeSlots({ morning: false, afternoon: false, evening: false });
+    setOpenTimeSlotDialog(true);
+  }
+
+  const handleTimeSlotChange = (event) => {
+    setSelectedTimeSlots({
+      ...selectedTimeSlots,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  const getTileClassName = ({ date }) => {
+    const dateString = date.toISOString().split('T')[0];
+
+    if (myAvailableDates.includes(dateString)) {
+      return 'green-date';
+    }
+
+    return '';
+  };
+  
+  const handleSaveAvailability = async () => {
+    const dateString = selectedDate.toISOString().split('T')[0];
+
+    const availabilityData = {
+      date: dateString,
+      morning: selectedTimeSlots.morning,
+      afternoon: selectedTimeSlots.afternoon,
+      evening: selectedTimeSlots.evening,
+      player_email: email
+    };
+
+    const url1 = 'https://lodf29a5ki.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.put(
+      url1,
+      {
+        availability_data: availabilityData
+      },
+      {
+        headers: {
+          Authorization: jwtToken,
+        },
+      }
+    )
+      .then(response => {
+        // Handle success
+        console.log("Availability saved successfully!");
+        setOpenTimeSlotDialog(false);
+        setAvailabilitySaved(true);
+      })
+      .catch(error => {
+        console.error("Error saving availability:", error);
+        alert('Cannot save new league: ' + error.message);
+      });
+  };
 
   const handleLeagueClick = async (index, league_id, league_name, league_type, email) => {
     setSelectedTile(index);
@@ -135,6 +255,10 @@ const App = ({ signOut, user }) => {
 
   const launchAdminPage = async (event) => {
     navigate(AdminPage);
+  }
+
+  const handleAvailabilityClick = async () => {
+    setOpenCalendar(true);
   }
 
   return (
@@ -252,10 +376,45 @@ const App = ({ signOut, user }) => {
             >
               Pickleball    
             </Button>
+            <Button
+              key="2"
+              variant="contained"
+              sx={{
+                width: '30%',
+                p: 2,
+                m: 0.5,
+                backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
+                border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
+                color: selectedCategoryTile === "2" ? '#20633f' : 'black',
+                '&:hover': {
+                  backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
+                  border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
+                },
+              }}
+              onClick={() => handleAvailabilityClick()}
+            >
+              Player Availability    
+            </Button>
+            <CalendarDialog
+              openCalendar={openCalendar}
+              setOpenCalendar={setOpenCalendar}
+              handleDateChange={handleDateChange}
+              selectedDate={selectedDate}
+              getTileClassName={getTileClassName}
+            />
+            {/* Time Slot Selection Dialog */}
+            <TimeslotDialog
+              openTimeSlotDialog={openTimeSlotDialog}
+              setOpenTimeSlotDialog={setOpenTimeSlotDialog}
+              isOpponentTab={false}
+              selectedTimeSlots={selectedTimeSlots}
+              handleTimeSlotChange={handleTimeSlotChange}
+              handleSaveAvailability={handleSaveAvailability}
+              selectedDateFormatted={selectedDateFormatted}
+            />
           </Box>
   
           {pageLoading && <CircularProgress color="inherit" />}
-          
           {externalData && (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 6 }}>
               {externalData["Leagues"].map((league, index) => (
