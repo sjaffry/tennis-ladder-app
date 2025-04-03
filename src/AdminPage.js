@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { loadLadder } from './App';
 import foothillslogo from './images/FTSC-logo.jpeg';
+import config from "./config";
 import {
   ThemeProvider,
   Box,
@@ -378,11 +379,11 @@ const AdminPage = ({ signOut, user }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: 'white', height: '100vh' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: config.theme.secondaryBgColor, height: '100vh' }}>
         {/* Color Banner at the Top */}
         <Box sx={{ 
           width: '100%', 
-          bgcolor: '#20633f', 
+          bgcolor: config.theme.primaryBgColor, 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between', 
@@ -396,7 +397,7 @@ const AdminPage = ({ signOut, user }) => {
             <Typography 
               fontFamily="Copperplate, Papyrus, fantasy" 
               variant="h5"
-              sx={{ fontWeight: 'bold', color: "white" }}
+              sx={{ fontWeight: 'bold', color: config.theme.buttonTextColor }}
             >
               Tennis & Pickleball Leagues
             </Typography>
@@ -408,11 +409,11 @@ const AdminPage = ({ signOut, user }) => {
             position: 'absolute', 
             top: 10, 
             right: 102,
-            backgroundColor: 'white', 
+            backgroundColor: config.theme.secondaryBgColor, 
             border: 'none',
-            color: '#20633f',
+            color: config.theme.buttonTextColor,
             '&:hover': {
-              backgroundColor: 'white', 
+              backgroundColor: config.theme.buttonHoverBgColor, 
             },
           }}
           onClick={() => navigate('/')}
@@ -425,11 +426,11 @@ const AdminPage = ({ signOut, user }) => {
             position: 'absolute', 
             top: 10, 
             right: 2,
-            backgroundColor: 'white', 
+            backgroundColor: config.theme.secondaryBgColor, 
             border: 'none',
-            color: '#20633f',
+            color: config.theme.buttonTextColor,
             '&:hover': {
-              backgroundColor: 'white', 
+              backgroundColor: config.theme.buttonHoverBgColor,
             },
           }}
           onClick={signOut}
@@ -454,12 +455,12 @@ const AdminPage = ({ signOut, user }) => {
               sx={{ flexGrow: 1 }}
             />
             <Button variant="contained" 
-            sx={{ backgroundColor: 'white',
+            sx={{ backgroundColor: config.theme.secondaryBgColor,
               border: 'none',
-              color: '#20633f',
+              color: config.theme.buttonTextColor,
               '&:hover': {
                 backgroundColor: 'transparent', 
-                border: '2px solid #20633f',
+                border: `2px solid ${config.theme.buttonBorderColor}`,
               },  
              }} 
             onClick={handleCreateClick}>
@@ -488,13 +489,13 @@ const AdminPage = ({ signOut, user }) => {
                   <TableCell>
                     <IconButton
                       onClick={() => handleEdit(league)}
-                      sx={{ color: '#20633f' }}
+                      sx={{ color: config.theme.buttonTextColor }}
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
                       onClick={() => handleDelete(league)}
-                      sx={{ color: '#20633f' }}
+                      sx={{ color: config.theme.buttonTextColor }}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -503,17 +504,16 @@ const AdminPage = ({ signOut, user }) => {
                     <Button 
                       variant="contained" 
                       sx={{ 
-                        backgroundColor: '#20633f',
                          minWidth: 'auto', 
                          height: 32, 
                          padding: '4px 10px', 
                          fontSize: '12px', 
-                         backgroundColor: 'white', 
+                         backgroundColor: config.theme.secondaryBgColor, 
                          border: 'none',
-                         color: '#20633f',
+                         color: config.theme.buttonTextColor,
                          '&:hover': {
                            backgroundColor: 'transparent', 
-                           border: '2px solid #20633f',
+                           border: `2px solid ${config.theme.buttonBorderColor}`,
                          },
                         }} 
                       onClick={() => handleAddPlayers(league.league_id, league.league_type)}
@@ -523,17 +523,16 @@ const AdminPage = ({ signOut, user }) => {
                     <Button 
                       variant="contained" 
                       sx={{ 
-                        backgroundColor: '#20633f',
                          minWidth: 'auto', 
                          height: 32, 
                          padding: '4px 10px', 
                          fontSize: '12px', 
-                         backgroundColor: 'white', 
+                         backgroundColor: config.theme.secondaryBgColor, 
                          border: 'none',
-                         color: '#20633f',
+                         color: config.theme.buttonTextColor,
                          '&:hover': {
                            backgroundColor: 'transparent', 
-                           border: '2px solid #20633f',
+                           border: `2px solid ${config.theme.buttonBorderColor}`,
                          },
                         }} 
                       onClick={() => handleViewMatches(league.league_id, league.league_type)}
@@ -543,17 +542,16 @@ const AdminPage = ({ signOut, user }) => {
                     <Button 
                       variant="contained" 
                       sx={{ 
-                        backgroundColor: '#20633f',
                          minWidth: 'auto', 
                          height: 32, 
                          padding: '4px 10px', 
                          fontSize: '12px', 
-                         backgroundColor: 'white', 
+                         backgroundColor: config.theme.secondaryBgColor, 
                          border: 'none',
-                         color: '#20633f',
+                         color: config.theme.buttonTextColor,
                          '&:hover': {
                            backgroundColor: 'transparent', 
-                           border: '2px solid #20633f',
+                           border: `2px solid ${config.theme.buttonBorderColor}`,
                          },
                         }} 
                       onClick={() => handleViewLadder(league.league_id)}

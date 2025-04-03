@@ -7,6 +7,7 @@ import MatchTableCell from './MatchTableCell';
 import CalendarDialog from "./CalendarDialog";
 import TimeslotDialog from "./TimeslotDialog";
 import { fetchPlayerAvailability } from '../App';
+import config from "../config";
 
 const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myName }) => {
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -127,12 +128,12 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                       height: '30px', 
                       fontSize: '9px',
                       fontWeight: 'bold',
-                      backgroundColor: 'white', 
+                      backgroundColor: config.theme.secondaryBgColor, 
                       border: 'none',
-                      color: '#20633f',
+                      color: config.theme.buttonTextColor, 
                       '&:hover': {
                         backgroundColor: 'transparent', 
-                        border: '2px solid #20633f',
+                        border: `2px solid ${config.theme.buttonBorderColor}`,
                       },
                     }}
                   >
@@ -147,12 +148,12 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                       height: '30px', 
                       fontSize: '9px',
                       fontWeight: 'bold',
-                      backgroundColor: 'white', 
+                      backgroundColor: config.theme.secondaryBgColor,  
                       border: 'none',
-                      color: '#20633f',
+                      color: config.theme.buttonTextColor, 
                       '&:hover': {
                         backgroundColor: 'transparent', 
-                        border: '2px solid #20633f',
+                        border: `2px solid ${config.theme.buttonBorderColor}`,
                       },
                     }}
                   >
@@ -171,12 +172,12 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                     height: '30px', 
                     fontSize: '9px',
                     fontWeight: 'bold',
-                    backgroundColor: 'white', 
+                    backgroundColor: config.theme.secondaryBgColor, 
                     border: 'none',
-                    color: '#20633f',
+                    color: config.theme.buttonTextColor, 
                     '&:hover': {
                       backgroundColor: 'transparent', 
-                      border: '2px solid #20633f',
+                      border: `2px solid ${config.theme.buttonBorderColor}`,
                     },
                   }}
                 >

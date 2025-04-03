@@ -12,6 +12,7 @@ import foothillslogo from './images/FTSC-logo.jpeg';
 import { useNavigate } from "react-router-dom";
 import CalendarDialog from "./components/CalendarDialog";
 import TimeslotDialog from "./components/TimeslotDialog";
+import config from "./config";
 Amplify.configure(awsExports);
 
 
@@ -263,11 +264,11 @@ const App = ({ signOut, user }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: 'white', height: '100vh' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: config.theme.secondaryBgColor, height: '100vh' }}>
         {/* Color Banner at the Top */}
         <Box sx={{ 
           width: '100%', 
-          bgcolor: '#20633f', 
+          bgcolor: config.theme.primaryBgColor, 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between', 
@@ -297,11 +298,11 @@ const App = ({ signOut, user }) => {
                     mr: 1,
                     minWidth: 100,
                     height: 40,
-                    backgroundColor: 'white', 
+                    backgroundColor: config.theme.secondaryBgColor, 
                     border: 'none',
-                    color: '#20633f',
+                    color: config.theme.buttonTextColor,
                     '&:hover': {
-                      backgroundColor: 'white', 
+                      backgroundColor: config.theme.buttonHoverBgColor, 
                     },
                   }}
                   onClick={launchAdminPage}
@@ -314,11 +315,11 @@ const App = ({ signOut, user }) => {
                 sx={{
                   minWidth: 100,
                   height: 40,
-                  backgroundColor: 'white', 
+                  backgroundColor: config.theme.secondaryBgColor, 
                   border: 'none',
-                  color: '#20633f',
+                  color: config.theme.buttonTextColor,
                   '&:hover': {
-                    backgroundColor: 'white', 
+                    backgroundColor: config.theme.buttonHoverBgColor, 
                   },
                 }}
                 onClick={signOut}
@@ -345,12 +346,12 @@ const App = ({ signOut, user }) => {
               width: '30%',
               p: 2,
               m: 0.5,
-              backgroundColor: selectedCategoryTile === "1" ? 'transparent' : 'white', 
-              border: selectedCategoryTile === "1" ? '2px solid #20633f' : 'none', 
-              color: selectedCategoryTile === "1" ? '#20633f' : 'black', 
+              backgroundColor: selectedCategoryTile === "1" ? 'transparent' : config.theme.secondaryBgColor, 
+              border: selectedCategoryTile === "1" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
+              color: selectedCategoryTile === "1" ? config.theme.buttonTextColor : 'black', 
               '&:hover': {
-                backgroundColor: selectedCategoryTile === "1" ? 'transparent' : 'white',
-                border: selectedCategoryTile === "1" ? '2px solid #20633f' : 'none', 
+                backgroundColor: selectedCategoryTile === "1" ? 'transparent' : config.theme.secondaryBgColor,
+                border: selectedCategoryTile === "1" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
               },
             }}
             onClick={() => handleCategoryClick("1", "Tennis")}
@@ -364,12 +365,12 @@ const App = ({ signOut, user }) => {
                 width: '30%',
                 p: 2,
                 m: 0.5,
-                backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
-                border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
-                color: selectedCategoryTile === "2" ? '#20633f' : 'black',
+                backgroundColor: selectedCategoryTile === "2" ? 'transparent' : config.theme.secondaryBgColor,
+                border: selectedCategoryTile === "2" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
+                color: selectedCategoryTile === "2" ? config.theme.buttonTextColor : 'black',
                 '&:hover': {
-                  backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
-                  border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
+                  backgroundColor: selectedCategoryTile === "2" ? 'transparent' : config.theme.secondaryBgColor,
+                  border: selectedCategoryTile === "2" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
                 },
               }}
               onClick={() => handleCategoryClick("2", "Pickleball")}
@@ -377,21 +378,21 @@ const App = ({ signOut, user }) => {
               Pickleball    
             </Button>
             <Button
-              key="2"
+              key="3"
               variant="contained"
               sx={{
                 width: '30%',
                 p: 2,
                 m: 0.5,
-                backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
-                border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
-                color: selectedCategoryTile === "2" ? '#20633f' : 'black',
+                backgroundColor: selectedCategoryTile === "3" ? 'transparent' : config.theme.secondaryBgColor,
+                border: selectedCategoryTile === "3" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
+                color: selectedCategoryTile === "3" ? config.theme.buttonTextColor : 'black',
                 '&:hover': {
-                  backgroundColor: selectedCategoryTile === "2" ? 'transparent' : 'white',
-                  border: selectedCategoryTile === "2" ? '2px solid #20633f' : 'none', 
+                  backgroundColor: selectedCategoryTile === "3" ? 'transparent' : config.theme.secondaryBgColor,
+                  border: selectedCategoryTile === "3" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
                 },
               }}
-              onClick={() => handleAvailabilityClick()}
+              onClick={() => handleAvailabilityClick("3")}
             >
               My Availability    
             </Button>
@@ -425,12 +426,12 @@ const App = ({ signOut, user }) => {
                     width: '30%',
                     p: 2,
                     m: 0.5,
-                    backgroundColor: selectedTile === index ? 'transparent' : 'white', 
-                    border: selectedTile === index ? '2px solid #20633f' : 'none',
-                    color: selectedTile === index ? '#20633f' : 'black',
+                    backgroundColor: selectedTile === index ? 'transparent' : config.theme.secondaryBgColor,
+                    border: selectedTile === index ? `2px solid ${config.theme.buttonBorderColor}` : 'none',
+                    color: selectedTile === index ? config.theme.buttonTextColor : 'black',
                     '&:hover': {
-                      backgroundColor: selectedTile === index ? 'transparent' : 'white', 
-                      border: selectedTile === index ? '2px solid #20633f' : 'none',
+                      backgroundColor: selectedTile === index ? 'transparent' : config.theme.secondaryBgColor, 
+                      border: selectedTile === index ? `2px solid ${config.theme.buttonBorderColor}` : 'none',
                     },
                   }}
                   onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { TableCell } from '@mui/material';
+import config from "../config";
 
 const MatchTableCell = ({ content, isDark }) => {
   return (
@@ -8,10 +9,10 @@ const MatchTableCell = ({ content, isDark }) => {
         textAlign: 'center',
         width: '40px',
         height: '30px',
-        backgroundColor: isDark ? '#6dad8b' : 'white',
-        color: isDark ? 'white' : 'black',
+        backgroundColor: isDark ? config.theme.scoreBgColor : config.theme.secondaryBgColor,
+        color: isDark ? config.theme.secondaryBgColor : 'black',
         padding: '4px',
-        border: '1px solid #6dad8b'
+        border: `1px solid ${config.theme.scoreBgColor}`
       }}
     >
       {content}
