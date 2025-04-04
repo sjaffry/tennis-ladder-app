@@ -164,6 +164,7 @@ const App = ({ signOut, user }) => {
 
   const handleSaveAvailability = async () => {
     setSavingAvailability(true);
+    setAvailabilitySaved(false);
     const dateString = selectedDate.toISOString().split('T')[0];
 
     const availabilityData = {
