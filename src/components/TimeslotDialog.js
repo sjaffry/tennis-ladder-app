@@ -1,6 +1,6 @@
 
 import React from "react";
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { CircularProgress, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 
 const TimeslotDialog = ({
   openTimeSlotDialog,
@@ -10,13 +10,15 @@ const TimeslotDialog = ({
   handleTimeSlotChange,
   handleScheduleMatchClick,
   handleSaveAvailability,
+  handleClearAvailability,
   openMessageDialog,
   setOpenMessageDialog,
   selectedDateFormatted,
   match,
   message,
   setMessage,
-  handleSendMessage
+  handleSendMessage,
+  savingAvailability
 }) => {
   return (
     <>
@@ -40,9 +42,15 @@ const TimeslotDialog = ({
           </FormGroup>
         </DialogContent>
         <DialogActions>
+          {savingAvailability && <CircularProgress color="inherit" />}
           <Button onClick={isOpponentTab ? handleScheduleMatchClick : handleSaveAvailability} color="primary" variant="contained">
-            {isOpponentTab ? "Schedule Match" : "Save Availability"}
+            {isOpponentTab ? "Schedule Match" : "Save"}
           </Button>
+          {!isOpponentTab && (
+            <Button onClick={handleClearAvailability} color="primary" variant="contained">
+            Clear
+          </Button>
+          )}
         </DialogActions>
       </Dialog>
       

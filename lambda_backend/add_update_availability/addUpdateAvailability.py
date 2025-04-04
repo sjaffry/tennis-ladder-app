@@ -32,11 +32,11 @@ def lambda_handler(event, context):
 
     payload = json.loads(event["body"])
     availability = payload["availability_data"]
-    player_email = availability['player_email']
-    date_available = availability['date']
-    morning = availability['morning']
-    afternoon = availability['afternoon']
-    evening = availability['evening']
+    player_email = availability.get('player_email')
+    date_available = availability.get('date')
+    morning = availability.get('morning', 'false')
+    afternoon = availability.get('afternoon', 'false')
+    evening = availability.get('evening', 'false')
     decoded = decode_jwt(token)
     # We only ever expect the user to be in one group only - business rule
     business_name = decoded['cognito:groups'][0]

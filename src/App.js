@@ -88,11 +88,13 @@ const App = ({ signOut, user }) => {
   const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
   const [playerAvailability, setPlayerAvailability] = useState([]);
   const [availabilitySaved, setAvailabilitySaved] = useState(false);
+  const [savingAvailability, setSavingAvailability] = useState(false);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState({
     morning: false,
     afternoon: false,
     evening: false,
   });
+  const [myTimeSlots, setMyTimeSlots] = useState(false);
   const [openTimeSlotDialog, setOpenTimeSlotDialog] = useState(false);
   const user_groups = user.signInUserSession.idToken.payload['cognito:groups'];
   const email = user.signInUserSession.idToken.payload['email'];
@@ -127,6 +129,7 @@ const App = ({ signOut, user }) => {
     });
 
     setMyAvailableDates(Object.keys(myDates));
+    setMyTimeSlots(myDates);
   }, [playerAvailability]);
 
   const handleDateChange = (date) => {
@@ -134,7 +137,7 @@ const App = ({ signOut, user }) => {
     setSelectedDate(date);
     const formattedDate = date.toLocaleString('en-US', { month: 'short' }).toUpperCase() + '-' + String(date.getDate()).padStart(2, '0');
     setSelectedDateFormatted(formattedDate);
-    setSelectedTimeSlots({ morning: false, afternoon: false, evening: false });
+    setSelectedTimeSlots(myTimeSlots[dateString] || {});
     setOpenTimeSlotDialog(true);
   }
 
@@ -148,14 +151,19 @@ const App = ({ signOut, user }) => {
   const getTileClassName = ({ date }) => {
     const dateString = date.toISOString().split('T')[0];
 
-    if (myAvailableDates.includes(dateString)) {
+    if (myAvailableDates.includes(dateString) && !(!myTimeSlots[dateString]['morning'] && !myTimeSlots[dateString]['afternoon'] && !myTimeSlots[dateString]['evening'])) {
       return 'green-date';
     }
 
     return '';
   };
-  
+
+  const handleClearAvailability = async () => {
+    setSelectedTimeSlots({ morning: false, afternoon: false, evening: false });
+  };
+
   const handleSaveAvailability = async () => {
+    setSavingAvailability(true);
     const dateString = selectedDate.toISOString().split('T')[0];
 
     const availabilityData = {
@@ -184,6 +192,7 @@ const App = ({ signOut, user }) => {
         console.log("Availability saved successfully!");
         setOpenTimeSlotDialog(false);
         setAvailabilitySaved(true);
+        setSavingAvailability(false);
       })
       .catch(error => {
         console.error("Error saving availability:", error);
@@ -254,12 +263,13 @@ const App = ({ signOut, user }) => {
 
   }
 
-  const launchAdminPage = async (event) => {
-    navigate(AdminPage);
+  const handleAvailabilityClick = async (index) => {
+    setOpenCalendar(true);
+    setSelectedCategoryTile(index);
   }
 
-  const handleAvailabilityClick = async () => {
-    setOpenCalendar(true);
+  const launchAdminPage = async (event) => {
+    navigate(AdminPage);
   }
 
   return (
@@ -411,7 +421,9 @@ const App = ({ signOut, user }) => {
               selectedTimeSlots={selectedTimeSlots}
               handleTimeSlotChange={handleTimeSlotChange}
               handleSaveAvailability={handleSaveAvailability}
+              handleClearAvailability={handleClearAvailability}
               selectedDateFormatted={selectedDateFormatted}
+              savingAvailability={savingAvailability}
             />
           </Box>
   
