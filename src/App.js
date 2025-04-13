@@ -289,7 +289,7 @@ const App = ({ signOut, user }) => {
         }}>
           {/* Left: Logo and Title */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            
+            <img src={foothillslogo} alt="Logo" style={{ height: '50px', marginRight: '10px' }} />
             <Typography 
               fontFamily="Copperplate, Papyrus, fantasy" 
               variant="h5"

@@ -4,6 +4,7 @@ import json
 import os
 import pymysql
 import base64
+import quopri
 from datetime import datetime
 from botocore.exceptions import ClientError
 
@@ -109,7 +110,7 @@ def lambda_handler(event, context):
 
     # Now load the data into the database
     match_type = jsonFormatted['match_type']
-    league_name = jsonFormatted['league_name']
+    league_name = quopri.decodestring(jsonFormatted['league_name'])
     winner_player1_fname = jsonFormatted.get('players', {}).get('winner_player1_firstName', None)
     winner_player1_lname = jsonFormatted.get('players', {}).get('winner_player1_lastName', None) 
     winner_player2_fname = jsonFormatted.get('players', {}).get('winner_player2_firstName', None) 
