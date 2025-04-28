@@ -170,7 +170,7 @@ const AdminPage = ({ signOut, user }) => {
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('Cannot delete league. Are there players and matches associated with this league? ' + error.message);
+        alert('Cannot delete league. Are there players and matches associated? ' + error.message);
       });    
   };
 
@@ -276,7 +276,7 @@ const AdminPage = ({ signOut, user }) => {
       .then(response => {
         // Handle success
         setSavedPlayers(response.data);
-        setAddPlayersDialogOpen(false);
+        setAddingPlayers(false);
         setResponseDialogOpen(true);
         setAddPlayersDialogOpen(false);
       })

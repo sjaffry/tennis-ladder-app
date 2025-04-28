@@ -73,7 +73,8 @@ def lambda_handler(event, context):
                             sm.set2_p1,
                             sm.set2_p2,
                             sm.set3_p1,
-                            sm.set3_p2
+                            sm.set3_p2,
+                            "singles" as type
                             FROM singles_match sm, player p1, player p2
                             WHERE sm.player1_id = p1.player_id
                             AND sm.player2_id = p2.player_id
@@ -88,10 +89,14 @@ def lambda_handler(event, context):
                         WITH matches AS (
                             SELECT
                             dm.match_id,
-                            p1.first_name as p1_firstname,
-                            p2.first_name as p2_firstname,
-                            p3.first_name as p3_firstname,
-                            p4.first_name as p4_firstname,
+                            p1.first_name as player1_fname,
+                            p2.first_name as player2_fname,
+                            p3.first_name as player3_fname,
+                            p4.first_name as player4_fname,
+                            p1.email as player1_email,
+                            p2.email as player2_email,
+                            p3.email as player3_email,
+                            p4.email as player4_email,
                             p1.usta_rating as p1_rating,
                             p2.usta_rating as p2_rating,
                             p3.usta_rating as p3_rating,
@@ -102,12 +107,19 @@ def lambda_handler(event, context):
                             p4.player_id as player4_id,
                             dm.team1_id,
                             dm.team2_id,
+                            dm.entered_by,
+                            dm.team1_confirmed,
+                            dm.team2_confirmed,
+                            dm.league_id,
+                            dm.winner_team_id,
+                            dm.loser_team_id,
                             set1_t1,
                             set1_t2,
                             set2_t1,
                             set2_t2,
                             set3_t1,
-                            set3_t2
+                            set3_t2,
+                            "doubles" as type
                             FROM doubles_match dm, doubles_team dt1, doubles_team dt2, player p1, player p2, player p3, player p4
                             WHERE dm.team1_id = dt1.team_id
                             AND dt1.player1_id = p1.player_id

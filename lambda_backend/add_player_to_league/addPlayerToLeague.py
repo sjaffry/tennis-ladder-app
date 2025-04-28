@@ -104,12 +104,12 @@ def create_user(user_pool_id, email, given_name, family_name, business_name):
 
 def addOrUpdatePlayerToLeague(player, business_name, league_id):    
     try:
-        email = player['email']
-        first_name = player['firstName']
-        last_name = player['lastName']
-        middle_name = player['middleName']
-        gender = player['gender']
-        usta_rating = player['usta_rating']
+        email = player.get('email', None)
+        first_name = player.get('firstName', None)
+        last_name = player.get('lastName', None)
+        middle_name = player.get('middleName', None)
+        gender = player.get('gender', None)
+        usta_rating = player.get('usta_rating', None)
         with connection.cursor() as cursor:
             sql_query = """
                     CALL `tennis_ladder`.`AddPlayerToLeague`(%s,%s,%s,%s,%s,%s,%s,%s);
