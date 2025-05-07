@@ -63,24 +63,39 @@ def generate_content (league_name, matchups, business_name):
                 h2 {
                     color: #555;
                 }
-                .login-button {
+                a.login-button,
+                a.login-button:link,
+                a.login-button:visited,
+                a.login-button:hover,
+                a.login-button:active {
                     display: inline-block;
-                    padding: 10px 20px;
-                    font-size: 16px;
-                    color: white;
+                    padding: 12px 24px;
+                    font-size: 18px;
+                    color: white; /* <== THIS will now stick */
                     background-color: #43c2f0;
                     border: none;
-                    border-radius: 5px;
+                    border-radius: 8px;
                     text-decoration: none;
                     cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 }
-                .login-button:hover {
-                    background-color: #43c2f0;
+
+                a.login-button:hover, a.login-button:focus {
+                    background-color: #1fa8db;
+                    box-shadow: 0 6px 12px rgba(31, 168, 219, 0.6);
+                    transform: translateY(-2px);
+                }
+
+                a.login-button:active {
+                    background-color: #178bb8;
+                    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+                    transform: translateY(0);
                 }
             </style>
         </head>
         <body>
-            <h2>Below are the match-ups for mens open league APR-JUL</h2>
+            <h2>Below are the match-ups</h2>
             <p>Please add your availability and setup matches using the Sports Ladder app.</p>
             <p><a href="https://sports-ladder.onreaction.com/" class="login-button">Login to Sports Ladder</a></p>
             <p>
@@ -130,13 +145,15 @@ def lambda_handler(event, context):
             recipient_email.append(matchup["player2_email"])
             match_number += 1  # Increment match counter
         
-        email_content = generate_content(league_name, matchups, business_name);
+        email_content = generate_content(league_name, matchups, business_name)
+        dedpued_recipient_emails = list(set(recipient_email))
 
         # Send the email
         print('sending email to all players')
+        print(dedpued_recipient_emails)
         message = Mail(
             from_email=f'robot-{business_name}@onreaction.com',
-            to_emails=recipient_email,
+            to_emails=dedpued_recipient_emails,
             subject=subject,
             html_content=email_content["body_html"])
 

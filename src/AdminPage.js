@@ -238,22 +238,63 @@ const AdminPage = ({ signOut, user }) => {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+  
+    const expectedHeaders = ['first name', 'middle name', 'last name', 'email', 'gender'];
+  
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target.result;
-      const rows = text.split('\n').slice(1); // Skip the header row
+      const lines = text.split('\n').filter(line => line.trim() !== '');
+  
+      if (lines.length < 2) {
+        alert('Invalid file format: file must include headers and at least one row of data.');
+        return;
+      }
+  
+      // Remove double quotes from each line
+      const sanitizedLines = lines.map(line => line.replace(/"/g, ''));
+  
+      // Normalize headers to lowercase and trim spaces
+      const headerRow = sanitizedLines[0].split(',').map(h => h.trim().toLowerCase());
+  
+      const headerIndices = {};
+      const missingHeaders = [];
+  
+      // Map expected headers to their indices in the CSV
+      expectedHeaders.forEach((header) => {
+        const index = headerRow.indexOf(header);
+        if (index === -1) {
+          missingHeaders.push(header);
+        } else {
+          headerIndices[header] = index;
+        }
+      });
 
-      const parsedData = rows.map((row) => {
-        const [firstName, middleName, lastName, email, gender, usta_rating] = row.split(',').map((col) => col.trim());
-        return { firstName, middleName, lastName, email, gender, usta_rating };
+      // Check if all expected headers are present
+      if (missingHeaders.length > 0) {
+        alert(`Invalid file format: missing required column(s): ${missingHeaders.join(', ')}`);
+        return;
+      }
+  
+      const dataRows = sanitizedLines.slice(1);
+      const parsedData = dataRows.map((row) => {
+        const columns = row.split(',').map(col => col.trim());
+        console.log('Columns:', columns); // Debugging: Check parsed columns
+        return {
+          firstName: columns[headerIndices['first name']],
+          middleName: columns[headerIndices['middle name']],
+          lastName: columns[headerIndices['last name']],
+          email: columns[headerIndices['email']],
+          gender: columns[headerIndices['gender']],
+          usta_rating: columns[headerIndices['usta_rating']] || '', // Optional field
+        };
       });
 
       setPlayerData(parsedData);
     };
-
+  
     reader.readAsText(file);
-  };
+  };  
 
   const handleSavePlayers = () => {
     console.log('Players saved:', playerData);
