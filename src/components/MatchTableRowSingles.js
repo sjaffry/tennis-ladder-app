@@ -55,10 +55,10 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   const getTileClassName = ({ date }) => {
     const dateString = date.toISOString().split('T')[0];
 
-    if (selectedTab === 1 && opponentAvailableDates.includes(dateString)) {
+    if (selectedTab === 1 && opponentAvailableDates.includes(dateString) && !(!opponentTimeSlots[dateString]['morning'] && !opponentTimeSlots[dateString]['afternoon'] && !opponentTimeSlots[dateString]['evening'])) {
       return 'green-date';
     }
-
+  
     return '';
   };
 
