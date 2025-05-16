@@ -18,7 +18,8 @@ const TimeslotDialog = ({
   message,
   setMessage,
   handleSendMessage,
-  savingAvailability
+  savingAvailability,
+  sendingEmail
 }) => {
   return (
     <>
@@ -58,6 +59,7 @@ const TimeslotDialog = ({
       {match && (
         <Dialog open={openMessageDialog} onClose={() => setOpenMessageDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{selectedDateFormatted} {match.player1_fname} vs {match.player2_fname}</DialogTitle>
+        {sendingEmail && <CircularProgress color="inherit" />}    
             <DialogContent>
             <TextField
                 label="Enter your message"

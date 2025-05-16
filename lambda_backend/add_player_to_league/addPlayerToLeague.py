@@ -44,8 +44,27 @@ def decode_jwt(token):
 
 def generate_temp_password(length=12):
     """Generate a random temporary password with required complexity."""
-    chars = string.ascii_letters + string.digits + "!@#$%^&*()"
-    return "".join(random.choice(chars) for _ in range(length))
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    special = "!@#$%^&*()"
+    
+    # Ensure one of each required character type
+    password = [
+        random.choice(lowercase),
+        random.choice(uppercase),
+        random.choice(digits),
+        random.choice(special)
+    ]
+    
+    # Fill the rest randomly
+    remaining_length = length - len(password)
+    all_chars = lowercase + uppercase + digits + special
+    password.extend(random.choice(all_chars) for _ in range(remaining_length))
+    
+    # Shuffle the password
+    random.shuffle(password)
+    return ''.join(password)
 
 def check_user_exists(user_pool_id, email):
     """Check if a user already exists in the Cognito user pool."""
@@ -130,8 +149,14 @@ def addOrUpdatePlayerToLeague(player, business_name, league_id):
 def lambda_handler(event, context):
     token = event['headers']['Authorization']
     decoded = decode_jwt(token)
-    # We only ever expect the user to be in one group only - business rule
-    business_name = decoded['cognito:groups'][0]
+
+    # Since a user could also be in a tennis-admin group, we want to filter that out
+    filtered_values = [value for value in decoded['cognito:groups'] if value != 'tennis-admin']
+
+    # Assign the first remaining value to a variable (if there's at least one remaining value)
+    # We only ever expect one business name association to a user's profile
+    business_name = filtered_values[0] if filtered_values else None
+
     user_pool_id = resource_name = decoded['iss'].split("/")[-1]
     added_players = []
 
