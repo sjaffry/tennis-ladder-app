@@ -54,11 +54,40 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
 
   const getTileClassName = ({ date }) => {
     const dateString = date.toISOString().split('T')[0];
+    console.log('dateString:', dateString);
 
-    if (selectedTab === 1 && opponentAvailableDates.includes(dateString) && !(!opponentTimeSlots[dateString]['morning'] && !opponentTimeSlots[dateString]['afternoon'] && !opponentTimeSlots[dateString]['evening'])) {
-      return 'green-date';
+    if (selectedTab === 1 && opponentAvailableDates.includes(dateString)) {
+      const timeSlots = opponentTimeSlots[dateString];
+      console.log('Time slots:', timeSlots);
+      
+      // Check if all time slots are available
+      if (timeSlots.morning && timeSlots.afternoon && timeSlots.evening) {
+        console.log('green-date');
+        return 'green-date';
+      }
+      
+      // Check combinations of two time slots
+      if (timeSlots.morning && timeSlots.afternoon) {
+        return 'purple-yellow-date';
+      }
+      if (timeSlots.afternoon && timeSlots.evening) {
+        return 'blue-yellow-date';
+      }
+      if (timeSlots.morning && timeSlots.evening) {
+        return 'blue-purple-date';
+      }
+      if (timeSlots.morning && !timeSlots.evening && !timeSlots.afternoon) {
+        return 'purple-date';
+      }
+      if (timeSlots.afternoon && !timeSlots.evening && !timeSlots.morning) {
+        return 'yellow-date';
+      }
+      if (timeSlots.evening && !timeSlots.morning && !timeSlots.afternoon) {
+        return 'blue-date';
+      }
     }
-  
+
+    console.log('returning blank')
     return '';
   };
 
