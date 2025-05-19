@@ -197,7 +197,7 @@ const App = ({ signOut, user }) => {
       })
       .catch(error => {
         console.error("Error saving availability:", error);
-        alert('Cannot save new league: ' + error.message);
+        alert('Error saving availability: ' + error.message);
       });
   };
 
@@ -246,7 +246,8 @@ const App = ({ signOut, user }) => {
 
     axios.get(url1, {
       params: {
-        category: category
+        category: category,
+        email: email
       },
       headers: {
         Authorization: jwtToken

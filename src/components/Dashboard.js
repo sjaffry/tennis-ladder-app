@@ -40,6 +40,7 @@ const Dashboard = ({
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);  // To control dialog open/close
+  const [addingScore, setAddingScore] = useState(false); // To control loading state
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [matchData, setMatchData] = useState([]);
   const [matchDataChanged, setMatchDataChanged] = useState(false);
@@ -167,7 +168,9 @@ const Dashboard = ({
       winner_id: winnerId,
       loser_id: loserId,
       player1_confirmed: (prevFormData.player1_confirmed == email ? email : null),
-      player2_confirmed: (prevFormData.player2_confirmed == email ? email : null)
+      player2_confirmed: (prevFormData.player2_confirmed == email ? email : null),
+      match_type: selectedMatch.type,
+      match_id: selectedMatch.match_id,
     }));
 
     setIsFormDataChanged(true);
@@ -176,6 +179,7 @@ const Dashboard = ({
   const handleSubmitScore = async () => {
     const url = 'https://m4nit5u1x3.execute-api.us-west-2.amazonaws.com/Prod';
   
+    setAddingScore(true);
     // Perform the API call with updatedFormData
     const response = await fetch(url, {
       method: 'POST',
@@ -187,8 +191,8 @@ const Dashboard = ({
     });
   
     if (response.ok) {
+      setAddingScore(false);
       setOpen(false);
-      alert('Score added successfully');
       const jsonResponse = await response.json(); // Parse response JSON once
 
       // Access Match_data directly if jsonResponse.body is already parsed
@@ -218,6 +222,7 @@ const Dashboard = ({
         )
       );
 
+      alert('Score added successfully');
       // Forcing the button next to the score to update
       setMatchDataChanged(prev => !prev);
 
@@ -238,6 +243,7 @@ const Dashboard = ({
       player2_set3: match.set3_p2,
       player1_id: match.player1_id,
       player2_id: match.player2_id,
+      match_id: match.match_id,
       league_id: match.league_id,
       winner_id: match.winner_id,
       loser_id: match.loser_id,
@@ -323,6 +329,7 @@ const Dashboard = ({
       {/* Dialog (popup window) for adding score */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add Match Score</DialogTitle>
+        {addingScore && <CircularProgress color="inherit"/>}
         <DialogContent>
           {selectedMatch && (
           <TableContainer component={Paper}>

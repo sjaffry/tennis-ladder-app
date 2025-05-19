@@ -30,6 +30,7 @@ def lambda_handler(event, context):
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
     category = event["queryStringParameters"]['category']
+    email = event["queryStringParameters"]['email']
     decoded = decode_jwt(token)
  
     # Since a user could also be in a tennis-admin group, we want to filter that out
@@ -55,15 +56,15 @@ def lambda_handler(event, context):
                         WHERE l.league_id = pl.league_id
                         AND p.player_id = pl.player_id
                         AND l.business_name = %s
-                        AND l.category = %s;
+                        AND l.category = %s
+                        AND p.email = %s;
                         """
         
             # Execute the query with 'FTSC' as the parameter
-            cursor.execute(sql_query, (business_name, category))
+            cursor.execute(sql_query, (business_name, category, email))
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall()  
-            #league_names = [item['league_name'] for item in resp if 'league_name' in item]
     
         result = {
             "Business name": business_name,

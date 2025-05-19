@@ -23,32 +23,107 @@ def decode_jwt(token):
 
     return json.loads(payload)
 
+def send_email_to_opponent(
+        aws_acc_id,
+        match_type, 
+        match_id, 
+        business_name, 
+        player1_id, 
+        player2_id,
+        league_id, 
+        winner_id, 
+        loser_id, 
+        entered_by, 
+        p1_set1, 
+        p2_set1, 
+        p1_set2, 
+        p2_set2, 
+        p1_set3, 
+        p2_set3):
+  
+    # We're going to reuse the existing lambda prepareScoreEmail
+    # to send the email to the opponent
+    payload = {
+        "body": {
+        "Business_name": business_name,
+        "Match_data": {
+        "Match_type": match_type,
+        "match_id": match_id,
+        "player1_id": player1_id,
+        "player2_id": player2_id,
+        "entered_by": entered_by,
+        "player1_confirmed": None,
+        "player2_confirmed": None,
+        "league_id": league_id,
+        "winner_id": winner_id,
+        "loser_id": loser_id,
+        "entered_by": entered_by,
+        "set1_p1": p1_set1,
+        "set1_p2": p2_set1,
+        "set2_p1": p1_set2,
+        "set2_p2": p2_set2,
+        "set3_p1": p1_set3,
+        "set3_p2": p2_set3
+            }
+        }
+    }
+
+    # Invoke AWS step functions state machine
+    client = boto3.client('stepfunctions', region_name='us-west-2')
+    print('invoking prepareScoreConfirmationTest')
+    response = client.start_execution(
+        stateMachineArn='arn:aws:states:us-west-2:{}:stateMachine:PlayerMatchEntryStateMachine'.format(aws_acc_id),
+        input=json.dumps(payload)
+    )
+    if response['ResponseMetadata']['HTTPStatusCode'] != 200:
+        print('Error invoking state machine PlayerMatchEntryStateMachine', response)
+    else:
+        print('Lambda prepScoreEmail successfully executed:', response['executionArn'])
+
+    return "done"
+
 def lambda_handler(event, context):
 
     db_host = os.environ['DB_HOST']
+    aws_acc_id = os.environ['AWS_ACC_ID']
     db_user = os.environ['DB_USER']
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
 
     # Match info
-    winner_id = event['body']['winner_id']
-    loser_id = event['body']['loser_id']
-    entered_by = event['body']['entered_by']
-    p1_confirmed = event['body']['player1_confirmed']
-    p2_confirmed = event['body']['player2_confirmed']
-    league_id = event['body']['league_id']
-    p1_set1 = event['body']['player1_set1']
-    p2_set1 = event['body']['player2_set1']
-    p1_set2 = event['body']['player1_set2']
-    p2_set2 = event['body']['player2_set2']
-    p1_set3 = event['body']['player1_set3']
-    p2_set3 = event['body']['player2_set3']
+    body = event.get('body', {})
+    match_type = body.get('match_type')
+    match_id = body.get('match_id')
+    player1_id = body.get('player1_id')
+    player2_id = body.get('player2_id')
+    player3_id = body.get('player3_id', None)
+    player4_id = body.get('player4_id', None)
+    
+    # Match score
+    winner_id = body.get('winner_id')
+    loser_id = body.get('loser_id')
+    entered_by = body.get('entered_by')
+    opponent_email = body.get('opponent_email')
+    p1_confirmed = body.get('player1_confirmed')
+    p2_confirmed = body.get('player2_confirmed')
+    league_id = body.get('league_id')
+    p1_set1 = body.get('player1_set1')
+    p2_set1 = body.get('player2_set1')
+    p1_set2 = body.get('player1_set2')
+    p2_set2 = body.get('player2_set2')
+    p1_set3 = body.get('player1_set3')
+    p2_set3 = body.get('player2_set3')
 
     # API Auth
     decoded = decode_jwt(token)
-    # We only ever expect the user to be in one group only - business rule
-    business_name = decoded['cognito:groups'][0]
+
+    # Since a user could also be in a tennis-admin group, we want to filter that out
+    filtered_values = [value for value in decoded['cognito:groups'] if value != 'tennis-admin']
+
+    # Assign the first remaining value to a variable (if there's at least one remaining value)
+    # We only ever expect one business name association to a user's profile
+    business_name = filtered_values[0] if filtered_values else None
     
     # Connect to the RDS MySQL database
     connection = pymysql.connect(
@@ -62,10 +137,10 @@ def lambda_handler(event, context):
     try:
         with connection.cursor() as cursor:
             # Define the SQL query
-            sql_query = "CALL `tennis_ladder`.`UpdateMatchScoreAndLadder`('2024-01-01',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+            sql_query = "CALL `tennis_ladder`.`UpdateMatchScoreAndLadder`('2024-01-01',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
         
             # Execute the query with 'FTSC' as the parameter
-            cursor.execute(sql_query, (league_id, winner_id, loser_id, entered_by, p1_confirmed, p2_confirmed, p1_set1, p2_set1, p1_set2, p2_set2, p1_set3, p2_set3))
+            cursor.execute(sql_query, (match_id, league_id, winner_id, loser_id, entered_by, p1_confirmed, p2_confirmed, p1_set1, p2_set1, p1_set2, p2_set2, p1_set3, p2_set3))
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall() 
@@ -78,8 +153,28 @@ def lambda_handler(event, context):
     except Exception as e:
         print('Error adding score into MySQL:', e)
         raise e
-        
-
+    
+    # This is a secondary process to send an email to the opponent
+    # We do not want failure to send email to stop the broader process
+    # of updating the match score and ladder
+    resp = send_email_to_opponent(
+        aws_acc_id,
+        match_type, 
+        match_id, 
+        business_name, 
+        player1_id, 
+        player2_id,
+        league_id, 
+        winner_id, 
+        loser_id, 
+        entered_by, 
+        p1_set1, 
+        p2_set1, 
+        p1_set2, 
+        p2_set2, 
+        p1_set3, 
+        p2_set3)
+    
     return {
         'statusCode': 200,
         'headers': {
@@ -88,5 +183,5 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Methods": "OPTIONS,PUT,POST,GET"
     },    
         'body': json.dumps(result)
-    } 
+    }
 

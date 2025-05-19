@@ -68,10 +68,11 @@ BEGIN
 				
 			-- Update the ladder for a LOSS
 			INSERT INTO `tennis_ladder`.`singles_ladder`
-			(`player_id`, `league_id`, `matches`, `losses`)
-			VALUES (p_loser_id, p_league_id, 1, 1)
+			(`player_id`, `league_id`, `matches`, `points`, `losses`)
+			VALUES (p_loser_id, p_league_id, 1, 1, 1)
 			ON DUPLICATE KEY UPDATE
 				matches = matches + 1,
+				points = points + 1,
 				losses = losses + 1;
 		END IF;
 	END IF;

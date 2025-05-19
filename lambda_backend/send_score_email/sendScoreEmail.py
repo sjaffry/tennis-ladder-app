@@ -15,6 +15,7 @@ def send_email (score_data, url, recipient_email):
         set3_2 = score_data["set3_p2"]
         winner_name_1 = score_data["winner_name"]
         winner_name_2 = '' # Not applicable in singles match
+        entered_by_name = score_data["entered_by_name"]
     elif score_data['match_type'] == "doubles":
         set1_1 = score_data["set1_t1"]
         set1_2 = score_data["set1_t2"]
@@ -24,6 +25,7 @@ def send_email (score_data, url, recipient_email):
         set3_2 = score_data["set3_t2"]
         winner_name_1 = score_data["p1_winner_name"]
         winner_name_2 = score_data["p2_winner_name"]
+        entered_by_name = score_data["entered_by_name"].title()
     else:
         raise Exception('Invalid match type')
 
@@ -32,7 +34,7 @@ def send_email (score_data, url, recipient_email):
     league_name = score_data["league_name"]
     body_html = f'''<html>
             <body>
-            <h3>Robot has auto entered the scores</h3>
+            <h3>{entered_by_name} has entered the score</h3>
             <p>
             {set1_1}-{set1_2}
             {set2_1}-{set2_2}
@@ -98,7 +100,12 @@ def lambda_handler(event, context):
     for i in event["recipients"]:
         url = i["url"]
         recipient_email = i["recipient_email"]
-        send_email(score_data, url, recipient_email)
+        # only send email to the person who didn't enter the score
+        if recipient_email == score_data["entered_by_email"]:
+            continue
+        else:
+            print("sending email to: " + recipient_email)   
+            send_email(score_data, url, recipient_email)
 
     return {
         'statusCode': 200,

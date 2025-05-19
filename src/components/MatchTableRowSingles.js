@@ -137,9 +137,9 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   return (
     <>
       <TableRow>
-        <TableCell>{match.player1_fname} {match.player1_lname} {match.p1_rating} {match.player1_id == match.winner_id ? '(winner)' : ''}</TableCell>
+        <TableCell>{match.player1_fname} {match.player1_lname} {match.p1_rating} {match.player1_id === match.winner_id ? '(winner)' : ''}</TableCell>
         <TableCell> vs </TableCell>
-        <TableCell>{match.player2_fname} {match.player2_lname} {match.p2_rating} {match.player2_id == match.winner_id ? '(winner)' : ''}</TableCell>
+        <TableCell>{match.player2_fname} {match.player2_lname} {match.p2_rating} {match.player2_id === match.winner_id ? '(winner)' : ''}</TableCell>
         <TableCell>
           <TableRow>
             {["set1_p1", "set1_p2", "set2_p1", "set2_p2", "set3_p1", "set3_p2"].map((setKey, idx) => (

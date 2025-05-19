@@ -4,6 +4,7 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS UpdateMatchScoreAndLadder;
 CREATE PROCEDURE UpdateMatchScoreAndLadder(
     IN p_match_date DATE,
+    IN p_match_id INT,
     IN p_league_id INT,
     IN p_winner_id INT,
 	IN p_loser_id INT,
@@ -19,7 +20,7 @@ CREATE PROCEDURE UpdateMatchScoreAndLadder(
 )
 BEGIN
 
-	DECLARE v_match_id INT;
+	-- DECLARE v_match_id INT;
 	DECLARE exit handler for SQLEXCEPTION
     BEGIN
         -- Rollback transaction in case of error
@@ -27,19 +28,19 @@ BEGIN
     END;
 
 	-- Let's now get the unique match id between the 2 players.
-SELECT 
-    match_id
-INTO v_match_id FROM
-    singles_match sm
-WHERE
-    ((sm.player1_id = p_winner_id
-        AND sm.player2_id = p_loser_id)
-        OR (sm.player1_id = p_loser_id
-        AND sm.player2_id = p_winner_id))
-        AND sm.league_id = p_league_id;
+-- SELECT 
+--     match_id
+-- INTO v_match_id FROM
+--     singles_match sm
+-- WHERE
+--     ((sm.player1_id = p_winner_id
+--         AND sm.player2_id = p_loser_id)
+--         OR (sm.player1_id = p_loser_id
+--         AND sm.player2_id = p_winner_id))
+--         AND sm.league_id = p_league_id;
     
 	-- Check if match_id was found, if not, raise an error
-    IF v_match_id IS NULL THEN
+    IF p_match_id IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No matches found';
     END IF;
@@ -63,7 +64,7 @@ SET
     `winner_id` = p_winner_id,
     `loser_id` = p_loser_id
 WHERE
-    `match_id` = v_match_id;
+    `match_id` = p_match_id;
     
 -- Update ladder only once both players have confirmed
 IF (p_p1_confirmed is NOT NULL) AND (p_p2_confirmed is NOT NULL) THEN
@@ -78,10 +79,11 @@ IF (p_p1_confirmed is NOT NULL) AND (p_p2_confirmed is NOT NULL) THEN
         
     -- Update the ladder for a LOSS
     INSERT INTO `tennis_ladder`.`singles_ladder`
-    (`player_id`, `league_id`, `matches`, `losses`)
-    VALUES (p_loser_id, p_league_id, 1, 1)
+    (`player_id`, `league_id`, `matches`, `points`, `losses`)
+    VALUES (p_loser_id, p_league_id, 1, 1, 1)
     ON DUPLICATE KEY UPDATE
         matches = matches + 1,
+        points = points + 1,
         losses = losses + 1;
 END IF;
 
@@ -103,7 +105,7 @@ END IF;
 		sm.set3_p1,
 		sm.set3_p2
     FROM `tennis_ladder`.`singles_match` sm
-    WHERE `match_id` = v_match_id;
+    WHERE `match_id` = p_match_id;
     
 END $$
 

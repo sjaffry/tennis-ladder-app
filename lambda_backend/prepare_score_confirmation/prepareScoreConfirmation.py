@@ -121,7 +121,7 @@ def lambda_handler(event, context):
     match_type = event["body"]["Match_data"]["Match_type"]
     match_id = event["body"]["Match_data"]["match_id"]
     league_id = event["body"]["Match_data"]["league_id"]
-    league_name = event["body"]["Match_data"]["league_name"]
+    entered_by = event["body"]["Match_data"]["entered_by"]
     
     if match_type == "singles":
         player1_id = event["body"]["Match_data"]["player1_id"]
@@ -163,12 +163,23 @@ def lambda_handler(event, context):
                 player1_query = f'select email, first_name from player where player_id = %s;'
                 player2_query = f'select email, first_name from player where player_id = %s;'
                 winner_query = f'select first_name from player where player_id = %s;'
+                league_query = f'select league_name from league where league_id = %s;'
+                entered_by_query = f'select first_name from player where email = %s;'
                 cursor.execute(player1_query, (player1_id))
                 player1_resp = cursor.fetchall()
                 cursor.execute(player2_query, (player2_id))
                 player2_resp = cursor.fetchall()
                 cursor.execute(winner_query, (winner_id))
                 winner_resp = cursor.fetchall()
+                cursor.execute(league_query, (league_id))
+                league_resp = cursor.fetchall()
+                # only execute the following query if entered_by is not equal to "robot"
+                if entered_by != "robot":
+                    cursor.execute(entered_by_query, (entered_by))
+                    entered_by_resp = cursor.fetchall()
+                    entered_by_name = entered_by_resp[0]['first_name']
+                else:
+                    entered_by_name = "robot"
 
                 score_data = {
                 "match_type": match_type,
@@ -181,14 +192,16 @@ def lambda_handler(event, context):
                 "loser_id": loser_id,
                 "match_id": match_id,
                 "league_id": league_id,
-                "league_name": league_name,
+                "league_name": league_resp[0]['league_name'],
                 "set1_p1": set1_p1, 
                 "set1_p2": set1_p2, 
                 "set2_p1": set2_p1, 
                 "set2_p2": set2_p2,
                 "set3_p1": set3_p1,
                 "set3_p2": set3_p2,
-                "business_name": business_name
+                "business_name": business_name,
+                "entered_by_name": entered_by_name,
+                "entered_by_email": entered_by
                 }
                 
                 # For each player, call send_confirm_score
@@ -237,7 +250,7 @@ def lambda_handler(event, context):
                 "loser_id": loser_id,
                 "match_id": match_id,
                 "league_id": league_id,
-                "league_name": league_name,
+                "league_name": "league_name",
                 "set1_t1": set1_t1, 
                 "set1_t2": set1_t2, 
                 "set2_t1": set2_t1, 
