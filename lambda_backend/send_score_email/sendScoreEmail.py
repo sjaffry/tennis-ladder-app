@@ -15,7 +15,7 @@ def send_email (score_data, url, recipient_email):
         set3_2 = score_data["set3_p2"]
         winner_name_1 = score_data["winner_name"]
         winner_name_2 = '' # Not applicable in singles match
-        entered_by_name = score_data["entered_by_name"]
+        entered_by_name = score_data["entered_by_name"].title()
     elif score_data['match_type'] == "doubles":
         set1_1 = score_data["set1_t1"]
         set1_2 = score_data["set1_t2"]

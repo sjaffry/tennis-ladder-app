@@ -66,9 +66,13 @@ const AdminPage = ({ signOut, user }) => {
   const [dataLoading, setDataLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [viewLadderDialogOpen, setViewLadderDialogOpen] = useState(false);
+  const [viewScoresDialogOpen, setViewScoresDialogOpen] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
   const [addingPlayers, setAddingPlayers] = useState(false);
+  const [leagueScores, setLeagueScores] = useState(null);
+  const [scoresLoading, setScoresLoading] = useState(false);
 
+  
   // Load data on component mount
   useEffect(() => {
     getLeaguesFromDB();
@@ -387,6 +391,33 @@ const AdminPage = ({ signOut, user }) => {
     setViewLadderDialogOpen(true);
   }
 
+  const handleViewScores = (league_id, league_type) => {
+    setViewScoresDialogOpen(true); 
+    setScoresLoading(true);   
+    const url1 = 'https://3diiyndzv8.execute-api.us-west-2.amazonaws.com/Prod';
+
+    axios.get(url1, {
+      params: {
+        league_id: league_id,
+        league_type: league_type
+      },
+      headers: {
+        Authorization: jwtToken
+      }
+    })
+    .then(response => {
+      const scores = response.data["Scores"];
+      setLeagueScores(scores);
+      setLeagueName(response.data["League_name"]);
+      setScoresLoading(false);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setErrorMsg(error.message);
+      alert('Session expired! Please refresh the page and try again.');
+    });
+  }
+
   const handleSendToPlayers = (league_matches, league_name, league_admin_email) => {
     console.log('Sending league matches to all players');
     setEmailSending(true);
@@ -599,6 +630,25 @@ const AdminPage = ({ signOut, user }) => {
                     >
                       View Ladder
                     </Button>
+                    <Button 
+                      variant="contained" 
+                      sx={{ 
+                         minWidth: 'auto', 
+                         height: 32, 
+                         padding: '4px 10px', 
+                         fontSize: '12px', 
+                         backgroundColor: config.theme.secondaryBgColor, 
+                         border: 'none',
+                         color: config.theme.buttonTextColor,
+                         '&:hover': {
+                           backgroundColor: 'transparent', 
+                           border: `2px solid ${config.theme.buttonBorderColor}`,
+                         },
+                        }} 
+                      onClick={() => handleViewScores(league.league_id, league.league_type)}
+                    >
+                      View scores
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -717,6 +767,53 @@ const AdminPage = ({ signOut, user }) => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Dialog to view scores */}
+        {leagueScores && (
+        <Dialog open={viewScoresDialogOpen} onClose={() => setViewScoresDialogOpen(false)}>
+          <DialogTitle>All scores for {leagueName}</DialogTitle>
+          <DialogContent>
+            {scoresLoading && <CircularProgress color="inherit"/>}
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Player 1</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong></strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Player 2</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Score</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Winner</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {leagueScores.map((score, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{score.player1_name}</TableCell>
+                      <TableCell>vs</TableCell>
+                      <TableCell>{score.player2_name}</TableCell>
+                      <TableCell>{score.set1_p1}-{score.set1_p2} {score.set2_p1}-{score.set2_p2} {score.set3_p1}-{score.set3_p2}</TableCell>
+                      <TableCell>{score.winner}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setViewScoresDialogOpen(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+        )}
 
      {/* Dialog to view league ladder */}
      <Dialog open={viewLadderDialogOpen} onClose={() => setViewLadderDialogOpen(false)}>

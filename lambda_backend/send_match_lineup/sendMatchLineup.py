@@ -120,8 +120,6 @@ def generate_content (league_name, matchups, business_name):
 def lambda_handler(event, context):
     token = event['headers']['Authorization']
     decoded = decode_jwt(token)
-    # We only ever expect the user to be in one group only - business rule
-    business_name = decoded['cognito:groups'][0]
     payload = json.loads(event["body"])
     league_name = payload['league_name']
     league_admin_email = payload['league_admin_email']
@@ -129,6 +127,13 @@ def lambda_handler(event, context):
     recipient_email = []
     subject = f'Match Draw! {league_name}'
     match_number = 1  # Initialize match counter
+
+    # Since a user could also be in a tennis-admin group, we want to filter that out
+    filtered_values = [value for value in decoded['cognito:groups'] if value != 'tennis-admin']
+
+    # Assign the first remaining value to a variable (if there's at least one remaining value)
+    # We only ever expect one business name association to a user's profile
+    business_name = filtered_values[0] if filtered_values else None
 
     try:
         for matchup in payload['matches']:
