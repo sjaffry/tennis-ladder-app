@@ -534,7 +534,7 @@ const AdminPage = ({ signOut, user }) => {
                 <td>${ladder.points}</td>
                 <td>${ladder.wins}</td>
                 <td>${ladder.losses}</td>
-                <td>${ladder.win_rate}</td>
+                <td>${ladder.win_rate ?? '0.00'}</td>
               </tr>
             `).join('')}
           </tbody>
