@@ -24,7 +24,7 @@ const theme = createTheme({
   },
 });
 
-export const loadLadder = async (league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg) => {
+export const loadLadder = async (league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName) => {
   setPageLoading(true);
   setDataLoading(true);
   const url1 = 'https://ce7l3xzwm3.execute-api.us-west-2.amazonaws.com/Prod';
@@ -40,6 +40,7 @@ export const loadLadder = async (league_id, jwtToken, setLadderData, setPageLoad
   .then(response => {
     const lData = response.data["ladder"];
     setLadderData(lData);
+    setLeagueName(response.data["league_name"]);
     setPageLoading(false);
     setDataLoading(false);
   })
@@ -48,7 +49,7 @@ export const loadLadder = async (league_id, jwtToken, setLadderData, setPageLoad
     setErrorMsg(error.message);
     alert('Session expired! Please refresh the page and try again.');
   });
-}
+};
 
 export const fetchPlayerAvailability = async (jwtToken, player_email, setPlayerAvailability) => {
 
@@ -204,7 +205,7 @@ const App = ({ signOut, user }) => {
   const handleLeagueClick = async (index, league_id, league_name, league_type, email) => {
     setSelectedTile(index);
     loadMyMatches(email, league_id, league_type);
-    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg);
+    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName);
     setLeagueName(league_name);
   }
 

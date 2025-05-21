@@ -57,19 +57,19 @@ const AdminPage = ({ signOut, user }) => {
   const [leagueType, setLeagueType] = useState('');
   const [leagueData, setLeagueData] = useState([]);
   const [responseDialogOpen, setResponseDialogOpen] = useState(false);
-  const [leagueMatches, setLeagueMatches] = useState('');
+  const [leagueMatches, setLeagueMatches] = useState([]);
   const [leagueMatchesDialogOpen, setLeagueMatchesDialogOpen] = useState(false);
-  const [savedPlayers, setSavedPlayers] = useState(null);
+  const [savedPlayers, setSavedPlayers] = useState([]);
   const [leagueTypeForSetupMatches, setLeagueTypeForSetupMatches] = useState('');
   const [leagueIdForSetupMatches, setLeagueIdForSetupMatches] = useState('');
-  const [ladderData, setLadderData] = useState(null);
+  const [ladderData, setLadderData] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [viewLadderDialogOpen, setViewLadderDialogOpen] = useState(false);
   const [viewScoresDialogOpen, setViewScoresDialogOpen] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
   const [addingPlayers, setAddingPlayers] = useState(false);
-  const [leagueScores, setLeagueScores] = useState(null);
+  const [leagueScores, setLeagueScores] = useState([]);
   const [scoresLoading, setScoresLoading] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [messageToPlayers, setMessageToPlayers] = useState('');
@@ -390,7 +390,7 @@ const AdminPage = ({ signOut, user }) => {
   }
 
   const handleViewLadder = (league_id) => {
-    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg);
+    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName);
     setViewLadderDialogOpen(true);
   }
 
@@ -461,6 +461,102 @@ const AdminPage = ({ signOut, user }) => {
         console.error('Error:', error);
         alert('Error sending email: ' + error.message);
       });
+  };
+
+  const generateLadderHTML = (ladderData, leagueName) => {
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${leagueName} - Ladder Standings</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #333;
+          }
+          h1 {
+            color:#282222;
+            text-align: center;
+            margin-bottom: 30px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+          }
+          th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+          }
+          th {
+            background-color: ${config.theme.primaryBgColor};
+            color: white;
+            font-weight: bold;
+          }
+          tr:nth-child(even) {
+            background-color: #f8f9fa;
+          }
+          tr:hover {
+            background-color: #f2f2f2;
+          }
+          .timestamp {
+            text-align: center;
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>${leagueName} - Ladder Standings</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player Name</th>
+              <th>Matches</th>
+              <th>Points</th>
+              <th>Wins</th>
+              <th>Losses</th>
+              <th>Win %</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ladderData.map(ladder => `
+              <tr>
+                <td>${ladder.rank}</td>
+                <td>${ladder.first_name} ${ladder.last_name}</td>
+                <td>${ladder.matches}</td>
+                <td>${ladder.points}</td>
+                <td>${ladder.wins}</td>
+                <td>${ladder.losses}</td>
+                <td>${ladder.win_rate}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="timestamp">Generated on ${new Date().toLocaleString()}</div>
+      </body>
+      </html>
+    `;
+    return htmlContent;
+  };
+
+  const handleExportLadder = () => {
+    const htmlContent = generateLadderHTML(ladderData, leagueName);
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${leagueName.replace(/\s+/g, '_')}_ladder.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -831,7 +927,7 @@ const AdminPage = ({ signOut, user }) => {
 
      {/* Dialog to view league ladder */}
      <Dialog open={viewLadderDialogOpen} onClose={() => setViewLadderDialogOpen(false)}>
-          <DialogTitle>League ladder</DialogTitle>
+          <DialogTitle>{leagueName} Ladder</DialogTitle>
           <DialogContent>
             {dataLoading && <CircularProgress color="inherit"/>}
             {ladderData && (
@@ -869,6 +965,17 @@ const AdminPage = ({ signOut, user }) => {
             )}
           </DialogContent>
           <DialogActions>
+            <Button onClick={handleExportLadder} 
+              sx={{ 
+                backgroundColor: config.theme.secondaryBgColor,
+                color: config.theme.buttonTextColor,
+                '&:hover': {
+                  backgroundColor: config.theme.buttonHoverBgColor,
+                },
+              }}
+            >
+              Export as HTML
+            </Button>
             <Button onClick={() => setViewLadderDialogOpen(false)}>Close</Button>
           </DialogActions>
         </Dialog>
