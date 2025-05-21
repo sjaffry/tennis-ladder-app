@@ -71,6 +71,9 @@ const AdminPage = ({ signOut, user }) => {
   const [addingPlayers, setAddingPlayers] = useState(false);
   const [leagueScores, setLeagueScores] = useState(null);
   const [scoresLoading, setScoresLoading] = useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [messageToPlayers, setMessageToPlayers] = useState('');
+  const [selectedMatches, setSelectedMatches] = useState(null);
 
   
   // Load data on component mount
@@ -419,17 +422,28 @@ const AdminPage = ({ signOut, user }) => {
   }
 
   const handleSendToPlayers = (league_matches, league_name, league_admin_email) => {
+    setSelectedMatches({
+      matches: league_matches,
+      league_name: league_name,
+      league_admin_email: league_admin_email
+    });
+    setMessageDialogOpen(true);
+  };
+
+  const handleSendMessage = () => {
     console.log('Sending league matches to all players');
     setEmailSending(true);
+    setMessageDialogOpen(false);
 
-    const url1 = 'https://pdf3tq5yxf.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://igxke5au2k.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.put(
       url1,
       {
-        matches: league_matches,
-        league_name: league_name,
-        league_admin_email: league_admin_email
+        matches: selectedMatches.matches,
+        league_name: selectedMatches.league_name,
+        league_admin_email: selectedMatches.league_admin_email,
+        message: messageToPlayers
       },
       {
         headers: {
@@ -438,16 +452,16 @@ const AdminPage = ({ signOut, user }) => {
       }
     )
       .then(response => {
-        // Handle success
         alert("Email successfully sent to all players!")
         setLeagueMatchesDialogOpen(false);
         setEmailSending(false);
+        setMessageToPlayers('');
       })
       .catch(error => {
         console.error('Error:', error);
         alert('Error sending email: ' + error.message);
       });
-  }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -950,6 +964,25 @@ const AdminPage = ({ signOut, user }) => {
           </DialogActions>
         </Dialog>
         )}
+
+        {/* Dialog to send message */}
+        <Dialog open={messageDialogOpen} onClose={() => setMessageDialogOpen(false)}>
+          <DialogTitle>Send Message to Players</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Message"
+              multiline
+              rows={4}
+              value={messageToPlayers}
+              onChange={(e) => setMessageToPlayers(e.target.value)}
+              fullWidth
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setMessageDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSendMessage}>Send</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </ThemeProvider>
   );
