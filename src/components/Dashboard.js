@@ -288,7 +288,7 @@ const Dashboard = ({
                       <TableCell sx={{textAlign: 'center'}}>{ladder.points}</TableCell>
                       <TableCell sx={{textAlign: 'center'}}>{ladder.wins}</TableCell>
                       <TableCell sx={{textAlign: 'center'}}>{ladder.losses}</TableCell>
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.win_rate}</TableCell>
+                      <TableCell sx={{textAlign: 'center'}}>{ladder.win_rate ?? '0.00'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
