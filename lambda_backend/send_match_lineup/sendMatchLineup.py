@@ -42,7 +42,7 @@ def generate_html_table(text_list):
     html += "</table>"
     return html
 
-def generate_content (league_name, matchups, business_name):
+def generate_content (league_name, matchups, business_name, league_admin_message):
 
     body_html_part_1 = '''
         <!DOCTYPE html>
@@ -93,20 +93,21 @@ def generate_content (league_name, matchups, business_name):
                     transform: translateY(0);
                 }
             </style>
-        </head>
+        </head>'''
+    body_html_part_2 = f'''
         <body>
             <h2>Below are the match-ups</h2>
+            <h3>Message from league admin: </h3> {league_admin_message}
             <p>Please add your availability and setup matches using the Sports Ladder app.</p>
             <p><a href="https://sports-ladder.onreaction.com/" class="login-button">Login to Sports Ladder</a></p>
-            <p>
-            '''
-    body_html_part_2 = f'''
+            <p>'''
+    body_html_part_3 = f'''
             {generate_html_table(matchups)}
             </p>
             </body>
         </html>'''
 
-    body_html = body_html_part_1 + body_html_part_2
+    body_html = body_html_part_1 + body_html_part_2 + body_html_part_3
 
     body_text = f'''Below are the match ups for {league_name}.
                 {matchups}

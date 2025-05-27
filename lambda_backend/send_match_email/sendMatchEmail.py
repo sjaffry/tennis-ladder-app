@@ -25,7 +25,7 @@ def decode_jwt(token):
     return json.loads(payload)
 
 def send_email (business_name, organizer_email, organizer_name, organizer_message, opponent_email, match_date, league_name):
-    subject = f'New match request! {league_name}'
+    subject = f'New match request from {organizer_name.title()}'
     body_html = f'''<html>
             <body>
             <b>{organizer_name.title()}</b> would like to play on {match_date}.

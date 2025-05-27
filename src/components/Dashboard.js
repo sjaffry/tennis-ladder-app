@@ -258,73 +258,89 @@ const Dashboard = ({
   return (
     <Box>
       <Grid container spacing={isMobile ? 1 : 3} mb={6}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-            <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>Ladder results</Typography>
-            {dataLoading && <CircularProgress color="inherit"/>}
-            {ladderData && (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Rank</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Player Name</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Matches</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Points</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Wins</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Losses</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Win %</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {ladderData.map((ladder, index) => (
-                    <TableRow 
-                      key={index}
-                      sx={{ backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#ffffff' }}
-                    >
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.rank}</TableCell>
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.first_name} {ladder.last_name}</TableCell>
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.matches}</TableCell>
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.points}</TableCell>
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.wins}</TableCell>
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.losses}</TableCell>
-                      <TableCell sx={{textAlign: 'center'}}>{ladder.win_rate ?? '0.00'}</TableCell>
+        {/* Only render My Matches grid if matchData exists and has items */}
+        {matchData && matchData.length > 0 && (
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
+              <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>My matches</Typography>
+              {dataLoading && <CircularProgress color="inherit"/>}
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                  </TableHead>
+                  <TableBody>
+                    {matchData.map((match, index) =>
+                      match.type === "doubles" ? (
+                        <MatchTableRowDoubles
+                          key={index}
+                          match={match}
+                          email={email}
+                          handleClickOpen={handleClickOpen}
+                          handleConfirmScoreClick={handleConfirmScoreClick}
+                          jwtToken={jwtToken}
+                          leagueName={leagueName}
+                          myName={myName}
+                        />
+                      ) : (
+                        <MatchTableRowSingles
+                          key={index}
+                          match={match}
+                          email={email}
+                          handleClickOpen={handleClickOpen}
+                          handleConfirmScoreClick={handleConfirmScoreClick}
+                          jwtToken={jwtToken}
+                          leagueName={leagueName}
+                          myName={myName}
+                        />
+                      )
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Grid>
+        )}
+
+        {/* Only render Ladder Results grid if ladderData exists and has items */}
+        {ladderData && ladderData.length > 0 && (
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
+              <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>Ladder results</Typography>
+              {dataLoading && <CircularProgress color="inherit"/>}
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Rank</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Player Name</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Matches</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Points</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Wins</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Losses</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Win %</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            )}
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-            <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>My matches</Typography>
-            {dataLoading && <CircularProgress color="inherit"/>}
-            {matchData && (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                </TableHead>
-                <TableBody>
-                  {matchData.map((match, index) => (
-                    <MatchTableRowSingles
-                    key={index}
-                    match={match}
-                    email={email}
-                    handleClickOpen={handleClickOpen}
-                    handleConfirmScoreClick={handleConfirmScoreClick}
-                    jwtToken={jwtToken}
-                    leagueName={leagueName}
-                    myName={myName}
-                  />
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            )}
-          </Paper>
-        </Grid>
+                  </TableHead>
+                  <TableBody>
+                    {ladderData.map((ladder, index) => (
+                      <TableRow 
+                        key={index}
+                        sx={{ backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#ffffff' }}
+                      >
+                        <TableCell sx={{textAlign: 'center'}}>{ladder.rank}</TableCell>
+                        <TableCell sx={{textAlign: 'center'}}>{ladder.first_name} {ladder.last_name}</TableCell>
+                        <TableCell sx={{textAlign: 'center'}}>{ladder.matches}</TableCell>
+                        <TableCell sx={{textAlign: 'center'}}>{ladder.points}</TableCell>
+                        <TableCell sx={{textAlign: 'center'}}>{ladder.wins}</TableCell>
+                        <TableCell sx={{textAlign: 'center'}}>{ladder.losses}</TableCell>
+                        <TableCell sx={{textAlign: 'center'}}>{ladder.win_rate ?? '0.00'}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Grid>
+        )}
       </Grid>
       {/* Dialog (popup window) for adding score */}
       <Dialog open={open} onClose={handleClose}>

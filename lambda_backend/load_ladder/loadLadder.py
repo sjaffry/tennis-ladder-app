@@ -31,8 +31,13 @@ def lambda_handler(event, context):
     token = event['headers']['Authorization']
     league_id = event["queryStringParameters"]['league_id']
     decoded = decode_jwt(token)
-    # We only ever expect the user to be in one group only - business rule
-    business_name = decoded['cognito:groups'][0]
+
+    # Since a user could also be in a tennis-admin group, we want to filter that out
+    filtered_values = [value for value in decoded['cognito:groups'] if value != 'tennis-admin']
+
+    # Assign the first remaining value to a variable (if there's at least one remaining value)
+    # We only ever expect one business name association to a user's profile
+    business_name = filtered_values[0] if filtered_values else None
     
     # Connect to the RDS MySQL database
     connection = pymysql.connect(
@@ -48,6 +53,7 @@ def lambda_handler(event, context):
             # Define the SQL query
             sql_query = """
                 SELECT ROW_NUMBER() OVER() AS "rank",
+                        l.`league_name`,
                         p.`first_name`,
                         p.`last_name`,
                         sl.`points`,
@@ -55,10 +61,11 @@ def lambda_handler(event, context):
                         sl.`wins`,
                         sl.`losses`,
                         CAST(ROUND(sl.`wins` / sl.`matches` * 100, 2) AS CHAR) AS "win_rate"
-                    FROM singles_ladder as sl, player p
+                    FROM singles_ladder as sl, player p, league l
                     WHERE sl.`league_id` = %s
                     AND sl.player_id = p.player_id
-                    ORDER BY sl.`points` DESC
+                    AND sl.league_id = l.league_id
+                    ORDER BY sl.`points` DESC;
                     """
         
             # Execute the query with 'FTSC' as the parameter
@@ -66,9 +73,12 @@ def lambda_handler(event, context):
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall()  
+
+            # store the league name from the first row of the sql result
+            league_name = resp[0]["league_name"] if resp else None
     
         result = {
-            "Business name": business_name,
+            "league_name": league_name,
             "ladder": resp
         }
 

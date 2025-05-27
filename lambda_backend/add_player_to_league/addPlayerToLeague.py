@@ -139,6 +139,18 @@ def addOrUpdatePlayerToLeague(player, business_name, league_id):
             league_name = result[0]["league_name"]
             player_id = result[0]["player_id"]
 
+        # Now add an initial entry into the singles ladder table for this player
+        with connection.cursor() as cursor: 
+            sql_query = """
+                    INSERT INTO `singles_ladder` (player_id, league_id, matches, points, wins, losses)
+                    VALUES (%s, %s, 0, 0, 0, 0)
+                    ON DUPLICATE KEY UPDATE
+                    player_id=player_id;
+                    """
+            # Execute the query
+            cursor.execute(sql_query, (player_id, league_id))
+            print("Player added to singles ladder successfully.")
+
     except Exception as e:
         print('Error adding players into database:', e)
         return {"player_id": player_id, "first_name": first_name, "last_name": last_name, "league_name": league_name, "league_id": league_id, "status": "Not Added -"+str(e)}
