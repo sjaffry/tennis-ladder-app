@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import MatchTableRowSingles from './MatchTableRowSingles';
 import MatchTableRowDoubles from './MatchTableRowDoubles';
@@ -38,6 +38,7 @@ const Dashboard = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
+  const ladderRef = useRef(null);
 
   const [open, setOpen] = useState(false);  // To control dialog open/close
   const [addingScore, setAddingScore] = useState(false); // To control loading state
@@ -81,6 +82,10 @@ const Dashboard = ({
 
   useEffect(() => {
   }, [matchDataChanged]);
+
+  const scrollToLadder = () => {
+    ladderRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
   
   const handleClickOpen = (match) => {
     setSelectedMatch(match);
@@ -258,7 +263,30 @@ const Dashboard = ({
   return (
     <Box>
       <Grid container spacing={isMobile ? 1 : 3} mb={6}>
-        {/* Only render My Matches grid if matchData exists and has items */}
+        {/* Mobile-only View Ladder button */}
+        {isMobile && matchData && matchData.length > 0 && ladderData && ladderData.length > 0 && (
+          <Grid item xs={12}>
+            <Button 
+              variant="contained"
+              fullWidth
+              onClick={scrollToLadder}
+              sx={{
+                mb: 2,
+                backgroundColor: 'transparent',
+                border: 'none',
+                color:  'black',
+                '&:hover': {
+                  backgroundColor: 'transparent', 
+                  border: 'none',
+                },
+              }}
+            >
+              View Ladder Results
+            </Button>
+          </Grid>
+        )}
+
+        {/* Existing My Matches grid */}
         {matchData && matchData.length > 0 && (
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
@@ -301,9 +329,9 @@ const Dashboard = ({
           </Grid>
         )}
 
-        {/* Only render Ladder Results grid if ladderData exists and has items */}
+        {/* Ladder Results grid with ref */}
         {ladderData && ladderData.length > 0 && (
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} ref={ladderRef}>
             <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
               <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>Ladder results</Typography>
               {dataLoading && <CircularProgress color="inherit"/>}
