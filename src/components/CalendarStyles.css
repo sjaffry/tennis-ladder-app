@@ -1,0 +1,84 @@
+/* Custom calendar styles */
+.custom-calendar .react-calendar__tile.green-date abbr {
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: auto;
+}
+
+.custom-calendar .react-calendar__tile.purple-yellow-date abbr {
+  background: linear-gradient(to bottom, #a3339e 50%, #bd9531 50%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: auto;
+}
+
+.custom-calendar .react-calendar__tile.blue-yellow-date abbr {
+  background: linear-gradient(to bottom, blue 50%, #bd9531 50%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: auto;
+}
+
+.custom-calendar .react-calendar__tile.blue-purple-date abbr {
+  background: linear-gradient(to bottom, blue 50%, #a3339e 50%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: auto;           
+}
+
+.custom-calendar .react-calendar__tile.yellow-date abbr {
+  background-color: #bd9531; 
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: auto;
+}
+
+.custom-calendar .react-calendar__tile.blue-date abbr {
+  background-color: blue; 
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: auto;
+}
+
+.custom-calendar .react-calendar__tile.purple-date abbr {
+  background-color: #a3339e; 
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: auto;
+}

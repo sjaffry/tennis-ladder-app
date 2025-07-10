@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { TextField, TableRow, TableCell, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+import { TextField, TableRow, TableCell, Button, Box } from '@mui/material';
 import MatchTableCell from './MatchTableCell';
 import CalendarDialog from "./CalendarDialog";
 import TimeslotDialog from "./TimeslotDialog";
@@ -10,7 +8,7 @@ import { fetchPlayerAvailability } from '../App';
 import config from "../config";
 
 const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myName, setOpenCalendar, openCalendar }) => {
-  const [selectedTab, setSelectedTab] = useState(1);
+  // Keep existing states
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
   const [opponentPlayerId, setOpponentPlayerId] = useState(null);
@@ -27,68 +25,94 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   const [openMessageDialog, setOpenMessageDialog] = useState(false);
   const [message, setMessage] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
+  
+  // Add a local state for calendar dialog control
+  const [localOpenCalendar, setLocalOpenCalendar] = useState(false);
+  // Add a dialogId to force complete remount
+  const [dialogId, setDialogId] = useState(Date.now());
 
+  // Process availability data when it changes
   useEffect(() => {
-    if (openCalendar) {
-      const opponent_player_id = match.player1_email === email ? match.player2_id : match.player1_id;
-      const opponent_player_email = match.player1_email === email ? match.player2_email : match.player1_email;
-      setOpponentPlayerId(opponent_player_id);
-      setOpponentPlayerEmail(opponent_player_email);
-      fetchPlayerAvailability(jwtToken, opponent_player_email, setPlayerAvailability);
-    }
-  }, [openCalendar]);
-
-  useEffect(() => {
+    // Make sure playerAvailability exists and has data
+    if (!playerAvailability || playerAvailability.length === 0) return;
+    
     // Initialize objects
     const opponentDates = {};
 
     // Process availability data
-    playerAvailability.forEach(({ player_id, available_date, morning, afternoon, evening }) => {
-      const availability = { morning: !!morning, afternoon: !!afternoon, evening: !!evening };
-      opponentDates[available_date] = availability;
+    playerAvailability.forEach(({ available_date, morning, afternoon, evening }) => {
+      // Ensure consistent date format
+      const formattedDate = available_date.includes('T') 
+        ? available_date.split('T')[0] 
+        : available_date;
+        
+      const availability = { 
+        morning: Boolean(morning), 
+        afternoon: Boolean(afternoon), 
+        evening: Boolean(evening) 
+      };
+      
+      opponentDates[formattedDate] = availability;
     });
+    
+    // Debug - log the processed data once
+    console.log('Processed opponent dates:', opponentDates);
+    console.log('Available dates:', Object.keys(opponentDates));
+    
     setOpponentAvailableDates(Object.keys(opponentDates));
     setOpponentTimeSlots(opponentDates);
   }, [playerAvailability]);
 
-  const getTileClassName = ({ date }) => {
+  const getTileClassName = useCallback(({ date }) => {
     const dateString = date.toISOString().split('T')[0];
-    console.log('dateString:', dateString);
-
-    if (selectedTab === 1 && opponentAvailableDates.includes(dateString)) {
+    
+    // Add extra debugging to track the data used for coloring
+    if (date.getDate() === 15) { // Only log once per month to reduce noise
+      console.log(`getTileClassName checking date ${dateString}`);
+      console.log(`Available dates at render time:`, opponentAvailableDates);
+    }
+    
+    // Check if the date is in our available dates
+    if (opponentAvailableDates.includes(dateString)) {
       const timeSlots = opponentTimeSlots[dateString];
-      console.log('Time slots:', timeSlots);
       
-      // Check if all time slots are available
-      if (timeSlots.morning && timeSlots.afternoon && timeSlots.evening) {
-        console.log('green-date');
+      if (!timeSlots) return '';
+      
+      // Convert to booleans more explicitly to ensure consistent behavior
+      const morning = Boolean(timeSlots.morning === true || timeSlots.morning === 1 || timeSlots.morning === "true" || timeSlots.morning === "1");
+      const afternoon = Boolean(timeSlots.afternoon === true || timeSlots.afternoon === 1 || timeSlots.afternoon === "true" || timeSlots.afternoon === "1");
+      const evening = Boolean(timeSlots.evening === true || timeSlots.evening === 1 || timeSlots.evening === "true" || timeSlots.evening === "1");
+      
+      // All time slots available
+      if (morning && afternoon && evening) {
         return 'green-date';
       }
       
-      // Check combinations of two time slots
-      if (timeSlots.morning && timeSlots.afternoon) {
+      // Two time slots available
+      if (morning && afternoon && !evening) {
         return 'purple-yellow-date';
       }
-      if (timeSlots.afternoon && timeSlots.evening) {
+      if (afternoon && evening && !morning) {
         return 'blue-yellow-date';
       }
-      if (timeSlots.morning && timeSlots.evening) {
+      if (morning && evening && !afternoon) {
         return 'blue-purple-date';
       }
-      if (timeSlots.morning && !timeSlots.evening && !timeSlots.afternoon) {
+      
+      // Single time slot available
+      if (morning && !afternoon && !evening) {
         return 'purple-date';
       }
-      if (timeSlots.afternoon && !timeSlots.evening && !timeSlots.morning) {
+      if (afternoon && !morning && !evening) {
         return 'yellow-date';
       }
-      if (timeSlots.evening && !timeSlots.morning && !timeSlots.afternoon) {
+      if (evening && !morning && !afternoon) {
         return 'blue-date';
       }
     }
-
-    console.log('returning blank')
+    
     return '';
-  };
+  }, [opponentAvailableDates, opponentTimeSlots]);
 
   const handleDateChange = (date) => {
     const dateString = date.toISOString().split('T')[0];
@@ -99,13 +123,48 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     setOpenTimeSlotDialog(true);
   };
 
+  const handleSetupMatchClick = (match) => {
+    // Generate a new dialog ID to force complete remount
+    setDialogId(Date.now());
+    
+    // Clear state to prevent data mixing
+    setOpponentAvailableDates([]);
+    setOpponentTimeSlots({});
+    setPlayerAvailability([]);
+    
+    const opponent_player_id = match.player1_email === email ? match.player2_id : match.player1_id;
+    const opponent_player_email = match.player1_email === email ? match.player2_email : match.player1_email;
+    
+    console.log(`Setting up match with ${opponent_player_email}`);
+    
+    setOpponentPlayerId(opponent_player_id);
+    setOpponentPlayerEmail(opponent_player_email);
+    
+    // Open local calendar first
+    setLocalOpenCalendar(true);
+    
+    // Fetch data after opening calendar
+    fetchPlayerAvailability(jwtToken, opponent_player_email, (availability) => {
+      console.log(`Fetched availability for ${opponent_player_email}:`, availability);
+      
+      if (!availability || availability.length === 0) {
+        console.log('No availability data returned');
+        return;
+      }
+      
+      setPlayerAvailability(availability);
+    });
+  };
+
+  // Other handlers remain the same
   const handleScheduleMatchClick = () => {
     setOpenMessageDialog(true);
   };
 
   const handleSendMessage = () => {
+    // Existing send message logic
     setSendingEmail(true);
-    setOpenCalendar(false);
+    setLocalOpenCalendar(false);
     setOpenTimeSlotDialog(false);
     const url1 = 'https://f6f3hiboo3.execute-api.us-west-2.amazonaws.com/Prod';
 
@@ -136,6 +195,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   return (
     <>
       <TableRow>
+        {/* Existing table row content */}
         <TableCell>{match.player1_fname} {match.player1_lname} {match.p1_rating} {match.player1_id === match.winner_id ? '(winner)' : ''}</TableCell>
         <TableCell> vs </TableCell>
         <TableCell>{match.player2_fname} {match.player2_lname} {match.p2_rating} {match.player2_id === match.winner_id ? '(winner)' : ''}</TableCell>
@@ -173,7 +233,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => setOpenCalendar(true)}
+                    onClick={() => handleSetupMatchClick(match)}
                     sx={{
                       width: '60px', 
                       height: '30px', 
@@ -191,7 +251,9 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                     Setup Match
                   </Button>
                 </Box>
-              ) : match.entered_by !== email &&
+              ) : (
+                /* Rest of your button logic */
+                match.entered_by !== email &&
                 match.player1_confirmed !== email &&
                 match.player2_confirmed !== email ? (
                 <Button
@@ -222,22 +284,29 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                 >
                   Pending confirm player 2
                 </Button>
-              ) : null}
+              ) : null
+              )}
             </TableCell>
           </TableRow>
         </TableCell>
       </TableRow>
 
-      {/* Calendar Dialog */}
-      <CalendarDialog
-        openCalendar={openCalendar}
-        setOpenCalendar={setOpenCalendar}
-        isOpponentCalendar={true}
-        handleDateChange={handleDateChange}
-        selectedDate={selectedDate}
-        getTileClassName={getTileClassName}
-        isOpponent={true}
-      />
+      {/* Create a new instance of CalendarDialog for each open request */}
+      {localOpenCalendar && (
+        <CalendarDialog
+          key={dialogId} // This forces a complete remount each time
+          openCalendar={localOpenCalendar}
+          setOpenCalendar={setLocalOpenCalendar}
+          isOpponentCalendar={true}
+          handleDateChange={handleDateChange}
+          selectedDate={selectedDate}
+          getTileClassName={getTileClassName}
+          isOpponent={true}
+          opponentName={match.player1_email === email ? `${match.player2_fname} ${match.player2_lname}` : `${match.player1_fname} ${match.player1_lname}`}
+          opponentEmail={opponentPlayerEmail}
+        />
+      )}
+      
       {/* Time Slot Selection Dialog */}
       <TimeslotDialog
         openTimeSlotDialog={openTimeSlotDialog}

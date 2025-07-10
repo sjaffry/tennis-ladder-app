@@ -1,6 +1,8 @@
-import React from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Tabs, Tab, Box, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Tab, Box, CircularProgress, Typography } from "@mui/material";
 import Calendar from "react-calendar";
+import 'react-calendar/dist/Calendar.css';
+import './CalendarStyles.css';
 
 const CalendarDialog = ({
   openCalendar,
@@ -8,24 +10,83 @@ const CalendarDialog = ({
   setOpenCalendar,
   handleDateChange,
   selectedDate,
-  getTileClassName
+  getTileClassName,
+  opponentName,
+  opponentEmail
 }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Reset loading state when dialog opens or closes
+  useEffect(() => {
+    if (openCalendar) {
+      console.log(`Calendar dialog opened for ${opponentName || 'opponent'} (${opponentEmail || 'unknown'})`);
+      setIsLoading(true);
+      
+      // Set a timeout to check if data has loaded
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [openCalendar, opponentName, opponentEmail]);
+  
+  // Check if we have data to display
+  useEffect(() => {
+    if (getTileClassName && typeof getTileClassName === 'function') {
+      // Test the function with tomorrow's date
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // If we get any className back, we have data
+      const className = getTileClassName({ date: tomorrow });
+      if (className) {
+        setIsLoading(false);
+      }
+    }
+  }, [getTileClassName]);
+
   return (
-    <>
-      {/* Calendar Dialog */}
-      <Dialog open={openCalendar} onClose={() => setOpenCalendar(false)} maxWidth="sm" fullWidth>
-        <DialogTitle> {isOpponentCalendar ? "Schedule Match" : "Add Availability"} </DialogTitle>
-        <DialogContent>
-          <Tab label = {isOpponentCalendar ? "Opponent's Calendar" : "My Calendar"} />
-          <Box display="flex" justifyContent="center" mt={2}>
-            <Calendar
-              onChange={handleDateChange}
-              value={selectedDate}
-              tileClassName={getTileClassName}
-              minDate={new Date()} 
-            />
+    <Dialog 
+      open={openCalendar} 
+      onClose={() => setOpenCalendar(false)} 
+      maxWidth="sm" 
+      fullWidth
+      BackdropProps={{
+        style: { backgroundColor: 'rgba(0, 0, 0, 0.5)' }
+      }}
+    >
+      <DialogTitle> 
+        {isOpponentCalendar ? `Schedule Match with ${opponentName || 'Opponent'}` : "Add Availability"}
+      </DialogTitle>
+      <DialogContent>
+        <Tab label={isOpponentCalendar ? "Opponent's Calendar" : "My Calendar"} />
+        
+        {isLoading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
+            <CircularProgress />
+            <Box ml={2}>Loading availability data...</Box>
           </Box>
-          {/* Legend */}
+        ) : (
+          <>
+            <Box mb={2}>
+              <Typography variant="body2" color="textSecondary">
+                Showing availability for {opponentName || 'Opponent'} ({opponentEmail || 'unknown'})
+              </Typography>
+            </Box>
+            <Box display="flex" justifyContent="center" mt={2}>
+              <Calendar
+                onChange={handleDateChange}
+                value={selectedDate}
+                tileClassName={getTileClassName}
+                minDate={new Date()} 
+                className="custom-calendar" 
+              />
+            </Box>
+          </>
+        )}
+        
+        {!isLoading && (
           <Box display="flex" alignItems="center" justifyContent="center" mt={2} gap={1} flexWrap="wrap">
             <Box display="flex" alignItems="center" gap={1}>
               <Box width={16} height={16} bgcolor="#4caf50" borderRadius="50%"/>
@@ -44,55 +105,14 @@ const CalendarDialog = ({
               <span>Evening</span>
             </Box>
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCalendar(false)} color="secondary" variant="contained">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <style>
-        {`
-          .react-calendar__tile.green-date {
-            background-color: #4caf50 !important; 
-            color: white;
-            border-radius: 50%;
-          }
-          .react-calendar__tile.purple-yellow-date {
-            background: conic-gradient(#bd9531 0deg 180deg, #a3339e 180deg 360deg) !important;
-            color: white;
-            border-radius: 50%;
-          }
-          
-          .react-calendar__tile.blue-yellow-date {
-            background: conic-gradient(blue 0deg 180deg, #bd9531 180deg 360deg) !important;
-            color: white;
-            border-radius: 50%;
-          }
-          
-          .react-calendar__tile.blue-purple-date {
-            background: conic-gradient(blue 0deg 180deg, #a3339e 180deg 360deg) !important;
-            color: white;
-            border-radius: 50%;            
-          }
-          .react-calendar__tile.yellow-date {
-            background-color: #bd9531 !important; 
-            color: white;
-            border-radius: 50%;
-          }
-          .react-calendar__tile.blue-date {
-            background-color: blue !important; 
-            color: white;
-            border-radius: 50%;
-          }
-          .react-calendar__tile.purple-date {
-            background-color: #a3339e !important; 
-            color: white;
-            border-radius: 50%;
-          }
-        `}
-      </style>
-    </>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setOpenCalendar(false)} color="secondary" variant="contained">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
