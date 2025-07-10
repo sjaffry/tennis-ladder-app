@@ -107,7 +107,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     setSendingEmail(true);
     setOpenCalendar(false);
     setOpenTimeSlotDialog(false);
-    const url1 = 'https://7vhzcxuhc8.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://f6f3hiboo3.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {
