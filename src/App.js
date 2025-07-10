@@ -24,14 +24,15 @@ const theme = createTheme({
   },
 });
 
-export const loadLadder = async (league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName) => {
+export const loadLadder = async (league_id, league_type, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName) => {
   setPageLoading(true);
   setDataLoading(true);
   const url1 = 'https://ce7l3xzwm3.execute-api.us-west-2.amazonaws.com/Prod';
 
   axios.get(url1, {
     params: {
-      league_id: league_id
+      league_id: league_id,
+      league_type: league_type
     },
     headers: {
       Authorization: jwtToken
@@ -83,6 +84,8 @@ const App = ({ signOut, user }) => {
   const [matchData, setMatchData] = useState(null);
   const [ladderData, setLadderData] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
+  const [leagueId, setLeagueId] = useState(null);
+  const [leagueType, setLeagueType] = useState(null);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [myAvailableDates, setMyAvailableDates] = useState([]);
@@ -205,8 +208,10 @@ const App = ({ signOut, user }) => {
   const handleLeagueClick = async (index, league_id, league_name, league_type, email) => {
     setSelectedTile(index);
     loadMyMatches(email, league_id, league_type);
-    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName);
+    loadLadder(league_id, league_type, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName);
     setLeagueName(league_name);
+    setLeagueId(league_id);
+    setLeagueType(league_type);
   }
 
   const loadMyMatches = async (email, league_id, league_type) => {
@@ -464,6 +469,8 @@ const App = ({ signOut, user }) => {
             jwtToken={jwtToken}
             email={email}
             leagueName={leagueName}
+            leagueId={leagueId}
+            leagueType={leagueType}
             myName={user.signInUserSession.idToken.payload.given_name}
           />
         </Box>

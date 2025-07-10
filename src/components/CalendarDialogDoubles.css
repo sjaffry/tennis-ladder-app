@@ -1,0 +1,40 @@
+/* Calendar styling */
+.user-available {
+  background-color: #e8f5e9 !important;
+  color: #000 !important;
+}
+
+.match-possible {
+  background-color: #4caf50 !important;
+  color: white !important;
+  font-weight: bold !important;
+}
+
+/* Legend styling */
+.calendar-legend {
+  display: flex;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border: 1px solid #ddd;
+}
+
+.color-box.user-available {
+  background-color: #e8f5e9;
+}
+
+.color-box.match-possible {
+  background-color: #4caf50;
+}

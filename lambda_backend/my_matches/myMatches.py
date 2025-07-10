@@ -106,15 +106,14 @@ def lambda_handler(event, context):
                             p2.player_id as player2_id,
                             p3.player_id as player3_id,
                             p4.player_id as player4_id,
-                            dm.match_id,
-                            dm.team1_id,
-                            dm.team2_id,
                             dm.entered_by,
-                            dm.team1_confirmed,
-                            dm.team2_confirmed,
+                            dm.winner_confirmed,
+                            dm.loser_confirmed,
                             dm.league_id,
-                            dm.winner_team_id,
-                            dm.loser_team_id,
+                            dm.winner1_id,
+                            dm.winner2_id,
+                            dm.loser1_id,
+                            dm.loser2_id,
                             set1_t1,
                             set1_t2,
                             set2_t1,
@@ -122,15 +121,13 @@ def lambda_handler(event, context):
                             set3_t1,
                             set3_t2,
                             "doubles" as type
-                            FROM doubles_match dm, doubles_team dt1, doubles_team dt2, player p1, player p2, player p3, player p4
-                            WHERE dm.team1_id = dt1.team_id
-                            AND dt1.player1_id = p1.player_id
-                            AND dt1.player2_id = p2.player_id
-                            AND dt2.player1_id = p3.player_id
-                            AND dt2.player2_id = p4.player_id
-                            AND dm.team2_id = dt2.team_id
+                            FROM doubles_match dm, player p1, player p2, player p3, player p4
+                            WHERE dm.player1_id = p1.player_id
+                            AND dm.player2_id = p2.player_id
+                            AND dm.player3_id = p3.player_id
+                            AND dm.player4_id = p4.player_id
                             AND dm.league_id = %s)
-                        SELECT m.* 
+                        SELECT p.player_id, m.* 
                         FROM player p, matches m
                         WHERE p.email = %s
                         AND (p.player_id = m.player1_id OR p.player_id = m.player2_id OR p.player_id = m.player3_id OR p.player_id = m.player4_id);

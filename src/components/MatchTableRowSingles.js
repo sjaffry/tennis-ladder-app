@@ -9,8 +9,7 @@ import TimeslotDialog from "./TimeslotDialog";
 import { fetchPlayerAvailability } from '../App';
 import config from "../config";
 
-const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myName }) => {
-  const [openCalendar, setOpenCalendar] = useState(false);
+const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myName, setOpenCalendar, openCalendar }) => {
   const [selectedTab, setSelectedTab] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
@@ -108,7 +107,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     setSendingEmail(true);
     setOpenCalendar(false);
     setOpenTimeSlotDialog(false);
-    const url1 = 'https://f6f3hiboo3.execute-api.us-west-2.amazonaws.com/Prod';
+    const url1 = 'https://7vhzcxuhc8.execute-api.us-west-2.amazonaws.com/Prod';
 
     axios.get(url1, {
       params: {

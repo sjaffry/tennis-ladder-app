@@ -26,18 +26,6 @@ BEGIN
         -- Rollback transaction in case of error
         ROLLBACK;
     END;
-
-	-- Let's now get the unique match id between the 2 players.
--- SELECT 
---     match_id
--- INTO v_match_id FROM
---     singles_match sm
--- WHERE
---     ((sm.player1_id = p_winner_id
---         AND sm.player2_id = p_loser_id)
---         OR (sm.player1_id = p_loser_id
---         AND sm.player2_id = p_winner_id))
---         AND sm.league_id = p_league_id;
     
 	-- Check if match_id was found, if not, raise an error
     IF p_match_id IS NULL THEN

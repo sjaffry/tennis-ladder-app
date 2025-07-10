@@ -64,7 +64,7 @@ def lambda_handler(event, context):
             <email>
             {email_content}
             </email>
-            To execute this task, ignore all email metadata information. Read the email text after the words 'Content-Type: text/plain; charset="UTF-8"' and then identify the players, identify the league name, identify if it's a singles or a doubles match and determine the score per set and who the winner of the match was in the text and use them as keys in the JSON object. Then, extract the relevant information from the text and populate the corresponding values in the JSON object. 
+            To execute this task, ignore all email metadata information. Read the email text after the words 'Content-Type: text/plain; charset="UTF-8"' and then identify the players, identify the league name - note that league name is sometimes at the end of the sentence after the score, also do not include the word league into the league name that you extract. Identify if it's a singles or a doubles match and determine the score per set and who the winner of the match was in the text and use them as keys in the JSON object. Then, extract the relevant information from the text and populate the corresponding values in the JSON object. 
             Only deem a match to be doubles if there are 4 player names mentioned otherwise it's a singles match. Ensure that the data is accurately represented and properly formatted within the JSON structure. Respond only with the json data. Do not include any text before or after the json.
             If a value for a particular key is missing then return an empty string in it's place.
             Use the following JSON format to produce the json output. If it's a singles match then do not include the keys and values for player2:
@@ -106,6 +106,9 @@ def lambda_handler(event, context):
     # Extract and print the response text.
     response_text = model_response["generation"]
     jsonFormatted = json.loads(response_text)
+
+    ## DEBUG
+    print(jsonFormatted)
 
 
     # Now load the data into the database

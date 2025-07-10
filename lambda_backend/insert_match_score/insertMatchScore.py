@@ -90,30 +90,50 @@ def lambda_handler(event, context):
     db_password = os.environ['DB_PASSWORD']
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
-
-    # Match info
     body = event.get('body', {})
-    match_type = body.get('match_type')
-    match_id = body.get('match_id')
-    player1_id = body.get('player1_id')
-    player2_id = body.get('player2_id')
-    player3_id = body.get('player3_id', None)
-    player4_id = body.get('player4_id', None)
+    match_type = body.get('match_type', None)
+    match_id = body.get('match_id', None)
+    entered_by = body.get('entered_by', None)
+    winner_confirmed = body.get('winner_confirmed', None)
+    loser_confirmed = body.get('loser_confirmed', None)
+    league_id = body.get('league_id', None)
+
+    # Singles Match info
+    player1_id = body.get('player1_id', None)
+    player2_id = body.get('player2_id', None)
+    winner_id = body.get('winner_id', None)
+    loser_id = body.get('loser_id', None)
+    opponent_email = body.get('opponent_email', None)
+
+    # Double Match info
+    team1_player1_id = body.get('team1_player1_id', None)
+    team1_player2_id = body.get('team1_player2_id', None)
+    team2_player1_id = body.get('team2_player1_id', None)
+    team2_player2_id = body.get('team2_player2_id', None)
+    winners = body.get('winner_ids', None)
+    losers = body.get('loser_ids', None)
+    winner_player1_id = winners[0] if winners else None
+    winner_player2_id = winners[1] if winners else None
+    loser_player1_id = losers[0] if losers else None
+    loser_player2_id = losers[1] if losers else None
     
-    # Match score
-    winner_id = body.get('winner_id')
-    loser_id = body.get('loser_id')
-    entered_by = body.get('entered_by')
-    opponent_email = body.get('opponent_email')
-    p1_confirmed = body.get('player1_confirmed')
-    p2_confirmed = body.get('player2_confirmed')
-    league_id = body.get('league_id')
-    p1_set1 = body.get('player1_set1')
-    p2_set1 = body.get('player2_set1')
-    p1_set2 = body.get('player1_set2')
-    p2_set2 = body.get('player2_set2')
-    p1_set3 = body.get('player1_set3')
-    p2_set3 = body.get('player2_set3')
+    # Singles Match score
+    p1_confirmed = body.get('player1_confirmed', None)
+    p2_confirmed = body.get('player2_confirmed', None)
+    p1_set1 = body.get('player1_set1', None)
+    p2_set1 = body.get('player2_set1', None)
+    p1_set2 = body.get('player1_set2', None)
+    p2_set2 = body.get('player2_set2', None)
+    p1_set3 = body.get('player1_set3', None)
+    p2_set3 = body.get('player2_set3', None)
+
+    # Doubles Match score
+    team1_set1 = body.get('team1_set1', None)
+    team2_set1 = body.get('team2_set1', None)
+    team1_set2 = body.get('team1_set2', None)
+    team2_set2 = body.get('team2_set2', None)
+    team1_set3 = body.get('team1_set3', None)
+    team2_set3 = body.get('team2_set3', None)    
 
     # API Auth
     decoded = decode_jwt(token)
@@ -137,13 +157,21 @@ def lambda_handler(event, context):
     try:
         with connection.cursor() as cursor:
             # Define the SQL query
-            sql_query = "CALL `tennis_ladder`.`UpdateMatchScoreAndLadder`('2024-01-01',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
-        
-            # Execute the query with 'FTSC' as the parameter
-            cursor.execute(sql_query, (match_id, league_id, winner_id, loser_id, entered_by, p1_confirmed, p2_confirmed, p1_set1, p2_set1, p1_set2, p2_set2, p1_set3, p2_set3))
+            if match_type == 'singles':
+                sql_query = "CALL `tennis_ladder`.`UpdateMatchScoreAndLadderTest`('2024-01-01', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+                # Execute the query
+                cursor.execute(sql_query, (match_id, league_id, winner_id, loser_id, entered_by, p1_confirmed, p2_confirmed, p1_set1, p2_set1, p1_set2, p2_set2, p1_set3, p2_set3))
+            elif match_type == 'doubles':
+                sql_query = "CALL `tennis_ladder`.`UpdateDoublesMatchScoreAndLadder`('2024-01-01',%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+                # Execute the query
+                cursor.execute(sql_query, (match_id, league_id, winner_player1_id, winner_player2_id, loser_player1_id, loser_player2_id, entered_by, winner_confirmed, loser_confirmed, team1_set1, team2_set1, team1_set2, team2_set2, team1_set3, team2_set3))
+            else:
+                print('Invalid match type:', match_type)
+                raise ValueError('Invalid match type')
             
             # Fetch all the rows that match the condition
             resp = cursor.fetchall() 
+            print(resp)
 
         result = {
             "Business_name": business_name,
@@ -157,23 +185,24 @@ def lambda_handler(event, context):
     # This is a secondary process to send an email to the opponent
     # We do not want failure to send email to stop the broader process
     # of updating the match score and ladder
-    resp = send_email_to_opponent(
-        aws_acc_id,
-        match_type, 
-        match_id, 
-        business_name, 
-        player1_id, 
-        player2_id,
-        league_id, 
-        winner_id, 
-        loser_id, 
-        entered_by, 
-        p1_set1, 
-        p2_set1, 
-        p1_set2, 
-        p2_set2, 
-        p1_set3, 
-        p2_set3)
+    if match_type == 'singles':
+        resp = send_email_to_opponent(
+            aws_acc_id,
+            match_type, 
+            match_id, 
+            business_name, 
+            player1_id, 
+            player2_id,
+            league_id, 
+            winner_id, 
+            loser_id, 
+            entered_by, 
+            p1_set1, 
+            p2_set1, 
+            p1_set2, 
+            p2_set2, 
+            p1_set3, 
+            p2_set3)
     
     return {
         'statusCode': 200,

@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import MatchTableRowSingles from './MatchTableRowSingles';
 import MatchTableRowDoubles from './MatchTableRowDoubles';
+import CalendarDialogDoubles from './CalendarDialogDoubles'; // Import the new component
+import config from "../config";
+import axios from 'axios';
 import { 
   Box, 
   Button, 
@@ -21,8 +24,12 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
- } from '@mui/material';
+  DialogActions,
+  MenuItem,
+  FormControl,
+  Select,
+  InputLabel
+} from '@mui/material';
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = ({
@@ -32,6 +39,8 @@ const Dashboard = ({
   jwtToken,
   email,
   leagueName,
+  leagueId,
+  leagueType,
   myName
 }) => {
 
@@ -41,6 +50,9 @@ const Dashboard = ({
   const ladderRef = useRef(null);
 
   const [open, setOpen] = useState(false);  // To control dialog open/close
+  const [openCalendar, setOpenCalendar] = useState(false); // To control calendar dialog
+  const [openDoublesCalendar, setOpenDoublesCalendar] = useState(false); // To control doubles calendar dialog
+  const [doublesScoreOpen, setDoublesScoreOpen] = useState(false); // To control doubles score dialog
   const [addingScore, setAddingScore] = useState(false); // To control loading state
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [matchData, setMatchData] = useState([]);
@@ -64,6 +76,18 @@ const Dashboard = ({
     player2_confirmed: ''
   });
 
+  // Add state for team players
+  const [teamPlayers, setTeamPlayers] = useState([]);
+  const [selectedTeam1Player1, setSelectedTeam1Player1] = useState('');
+  const [selectedTeam1Player2, setSelectedTeam1Player2] = useState('');
+  const [selectedTeam2Player1, setSelectedTeam2Player1] = useState('');
+  const [selectedTeam2Player2, setSelectedTeam2Player2] = useState('');
+
+  // Add state for all players' availability
+  const [allPlayersAvailability, setAllPlayersAvailability] = useState({});
+  const [fetchingAvailability, setFetchingAvailability] = useState(false);
+
+
   useEffect(() => {
     setMatchData(initialMatchData);
   }, [initialMatchData]);
@@ -73,6 +97,12 @@ const Dashboard = ({
       handleSubmitScore();
     }
   }, [formData, open, isFormDataChanged]);
+
+  useEffect(() => {
+    if (doublesScoreOpen && isFormDataChanged) {
+      handleSubmitScore();
+    }
+  }, [formData, doublesScoreOpen, isFormDataChanged]);
 
   useEffect(() => {
     if (isScoreConfirmed) {
@@ -86,7 +116,62 @@ const Dashboard = ({
   const scrollToLadder = () => {
     ladderRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-  
+
+  // Function to fetch all players' availability - fix the return value
+  const fetchAllPlayersAvailability = async (leagueId) => {
+    try {
+      // const to hold yesterday's date in the format yyyy-mm-dd
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);  // Subtract 1 day
+      const formattedDate = yesterday.toISOString().split('T')[0];
+
+      // Use await with axios instead of mixing with .then()
+      const response = await axios.get(
+        `https://kz49eh4q82.execute-api.us-west-2.amazonaws.com/Prod`,
+        {
+          params: {
+            league_id: leagueId,
+            yest_date: formattedDate
+          },
+          headers: {
+            'Authorization': jwtToken
+          }
+        }
+      );
+
+      const data = response.data;
+      // Format the data with the current user identified separately
+      const formattedData = {};
+    
+      // First, find the current user and add their data
+      const currentUserData = data.find(player => player.email === email);
+      if (currentUserData) {
+        formattedData.currentUser = {
+          availability: currentUserData.availability,
+          first_name: currentUserData.first_name,
+          last_name: currentUserData.last_name
+        };
+      }
+    
+      // Add all other players
+      data.forEach(player => {
+        if (player.email !== email) {
+          formattedData[player.player_id] = {
+            availability: player.availability,
+            first_name: player.first_name,
+            last_name: player.last_name
+          };
+        }
+      });
+
+      return formattedData;
+    } catch (error) {
+      console.error('Error fetching all players availability:', error);
+      return {}; // Return empty object on error
+    }
+  };
+
+  // Function to handle opening the dialog for adding singles score 
   const handleClickOpen = (match) => {
     setSelectedMatch(match);
 
@@ -109,9 +194,87 @@ const Dashboard = ({
     setOpen(true);
   };
   
+  // Function to handle opening the dialog for adding doubles score
+  const handleDoublesScoreClickOpen = () => {
+
+    // Set form data as before
+    setFormData({
+      league_id: leagueId,
+      entered_by: email
+    });
+
+    // Properly append query parameter to the URL
+    const url = `https://7up7gc29q6.execute-api.us-west-2.amazonaws.com/Prod?league_id=${leagueId}`;
+    
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': jwtToken,
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.team_players) {
+        const players = data.team_players.map(player => ({
+          id: player.player_id,
+          name: `${player.first_name} ${player.last_name}`
+        }));
+        setTeamPlayers(players);
+      } else {
+        console.error('No team players found in response');
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching team players:', error);
+      alert('Error fetching team players. Please try again later.');
+    });
+
+    setIsFormDataChanged(false);
+    setDoublesScoreOpen(true);
+  };
+  
+    // Handle player selection changes
+  const handlePlayerChange = (event) => {
+    const { name, value } = event.target;
+    
+    switch(name) {
+      case 'team1player1':
+        setSelectedTeam1Player1(value);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          team1_player1_id: value // Update formData with selected player ID
+        }));
+        break;
+      case 'team1player2':
+        setSelectedTeam1Player2(value);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          team1_player2_id: value // Update formData with selected player ID
+        }));
+        break;
+      case 'team2player1':
+        setSelectedTeam2Player1(value);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          team2_player1_id: value // Update formData with selected player ID
+        }));
+        break;
+      case 'team2player2':
+        setSelectedTeam2Player2(value);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          team2_player2_id: value // Update formData with selected player ID
+        }));
+        break;
+      default:
+        break;
+    }
+  };
 
   const handleClose = () => {
     setOpen(false);
+    setDoublesScoreOpen(false);
     setSelectedMatch(null);
   };
 
@@ -123,41 +286,88 @@ const Dashboard = ({
     });
   };
 
-  const calculateWinner = (formData, player1_id, player2_id) => {
-    // Keep track of the sets won by each player
-    let player1SetsWon = 0;
-    let player2SetsWon = 0;
-  
-    // Parse each set score and determine the winner
-    const sets = [
-      { player1: formData.player1_set1, player2: formData.player2_set1 },
-      { player1: formData.player1_set2, player2: formData.player2_set2 },
-      { player1: formData.player1_set3, player2: formData.player2_set3 }
-    ];
-  
-    sets.forEach((set) => {
-      const player1Score = parseInt(set.player1, 10);
-      const player2Score = parseInt(set.player2, 10);
-  
-      if (player1Score > player2Score) {
-        player1SetsWon += 1;
-      } else if (player2Score > player1Score) {
-        player2SetsWon += 1;
-      }
-    });
-  
-    let winnerId = null;
-    let loserId = null;
-    if (player1SetsWon > player2SetsWon) {
-      winnerId = player1_id;
-      loserId = player2_id;
-      
-    } else if (player2SetsWon > player1SetsWon) {
-      winnerId = player2_id;
-      loserId = player1_id;
-    }
+  const calculateWinner = (formData, player1_id, player2_id, team1_player1_id, team1_player2_id, team2_player1_id, team2_player2_id) => {
+    // Determine if this is a doubles match
+    const isDoubles = team1_player1_id !== undefined && team1_player2_id !== undefined;
     
-    return { winnerId, loserId };
+    // Keep track of the sets won by each player/team
+    let team1SetsWon = 0;
+    let team2SetsWon = 0;
+
+    // Parse each set score and determine the winner
+    let sets;
+    
+    if (isDoubles) {
+      // Use team scores for doubles
+      sets = [
+        { team1: formData.team1_set1, team2: formData.team2_set1 },
+        { team1: formData.team1_set2, team2: formData.team2_set2 },
+        { team1: formData.team1_set3, team2: formData.team2_set3 }
+      ];
+      
+      sets.forEach((set) => {
+        const team1Score = parseInt(set.team1, 10);
+        const team2Score = parseInt(set.team2, 10);
+
+        if (!isNaN(team1Score) && !isNaN(team2Score)) {
+          if (team1Score > team2Score) {
+            team1SetsWon += 1;
+          } else if (team2Score > team1Score) {
+            team2SetsWon += 1;
+          }
+        }
+      });
+    } else {
+      // Use player scores for singles
+      sets = [
+        { player1: formData.player1_set1, player2: formData.player2_set1 },
+        { player1: formData.player1_set2, player2: formData.player2_set2 },
+        { player1: formData.player1_set3, player2: formData.player2_set3 }
+      ];
+      
+      sets.forEach((set) => {
+        const player1Score = parseInt(set.player1, 10);
+        const player2Score = parseInt(set.player2, 10);
+
+        if (!isNaN(player1Score) && !isNaN(player2Score)) {
+          if (player1Score > player2Score) {
+            team1SetsWon += 1;
+          } else if (player2Score > player1Score) {
+            team2SetsWon += 1;
+          }
+        }
+      });
+    }
+
+    // For singles: return winner_id and loser_id
+    // For doubles: return arrays of winner_ids and loser_ids
+    if (isDoubles) {
+      let winnerIds = [];
+      let loserIds = [];
+      
+      if (team1SetsWon > team2SetsWon) {
+        winnerIds = [team1_player1_id, team1_player2_id];
+        loserIds = [team2_player1_id, team2_player2_id];
+      } else if (team2SetsWon > team1SetsWon) {
+        winnerIds = [team2_player1_id, team2_player2_id];
+        loserIds = [team1_player1_id, team1_player2_id];
+      }
+      
+      return { winnerIds, loserIds };
+    } else {
+      let winnerId = null;
+      let loserId = null;
+      
+      if (team1SetsWon > team2SetsWon) {
+        winnerId = player1_id;
+        loserId = player2_id;
+      } else if (team2SetsWon > team1SetsWon) {
+        winnerId = player2_id;
+        loserId = player1_id;
+      }
+      
+      return { winnerId, loserId };
+    }
   };   
   
   const handleAddScoreClick = async () => {
@@ -181,9 +391,36 @@ const Dashboard = ({
     setIsFormDataChanged(true);
   };
 
+
+  // Update the handleDoublesAddScoreClick to include selected players
+  const handleDoublesAddScoreClick = async () => {
+
+    console.log("calculating winners")
+ 
+    const { winnerIds, loserIds } = calculateWinner(
+      formData,
+      null,
+      null,
+      selectedTeam1Player1,
+      selectedTeam1Player2,
+      selectedTeam2Player1,
+      selectedTeam2Player2
+    );
+    
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      winner_ids: winnerIds,
+      loser_ids: loserIds,
+      match_type: "doubles"
+    }));
+    
+    console.log("value of DoublesClickOpen", doublesScoreOpen);
+    setIsFormDataChanged(true);
+  };
+
   const handleSubmitScore = async () => {
     const url = 'https://m4nit5u1x3.execute-api.us-west-2.amazonaws.com/Prod';
-  
+    
     setAddingScore(true);
     // Perform the API call with updatedFormData
     const response = await fetch(url, {
@@ -198,6 +435,7 @@ const Dashboard = ({
     if (response.ok) {
       setAddingScore(false);
       setOpen(false);
+      setDoublesScoreOpen(false);
       const jsonResponse = await response.json(); // Parse response JSON once
 
       // Access Match_data directly if jsonResponse.body is already parsed
@@ -207,30 +445,64 @@ const Dashboard = ({
 
       const updatedMatchData = responseBody.Match_data;
 
-      setMatchData((prevMatchData) =>
-        prevMatchData.map((match) =>
-          match.player1_id === selectedMatch.player1_id &&
-          match.player2_id === selectedMatch.player2_id &&
-          match.league_id === selectedMatch.league_id
-            ? {
-                ...match,
-                set1_p1: updatedMatchData.set1_p1,
-                set1_p2: updatedMatchData.set1_p2,
-                set2_p1: updatedMatchData.set2_p1,
-                set2_p2: updatedMatchData.set2_p2,
-                set3_p1: updatedMatchData.set3_p1,
-                set3_p2: updatedMatchData.set3_p2,
-                player1_confirmed: updatedMatchData.player1_confirmed,
-                player2_confirmed: updatedMatchData.player2_confirmed
+      // Check if this is a new match or updating an existing one
+      if (leagueType && leagueType.toLowerCase().includes('doubles')) {
+        if (formData.match_id) {
+          // This is an existing match - update it
+          setMatchData(prevMatchData =>
+            prevMatchData.map(match => {
+              if (match.match_id === formData.match_id) {
+                return {
+                  ...match,
+                  set1_t1: updatedMatchData.set1_t1,
+                  set2_t1: updatedMatchData.set2_t1,
+                  set3_t1: updatedMatchData.set3_t1,
+                  set1_t2: updatedMatchData.set1_t2,
+                  set2_t2: updatedMatchData.set2_t2,
+                  set3_t2: updatedMatchData.set3_t2,
+                  winner_confirmed: updatedMatchData.winner_confirmed,
+                  loser_confirmed: updatedMatchData.loser_confirmed
+                };
               }
-            : match
-        )
-      );
+              return match;
+            })
+          );
+        } else {
+          // This is a new match - add it
+          setMatchData(prevMatchData => [
+            ...prevMatchData,
+            {
+              ...updatedMatchData,
+              type: 'doubles'
+            }
+          ]);
+        }
+      } else {
+        // Singles match logic (unchanged)
+        setMatchData((prevMatchData) =>
+          prevMatchData.map((match) =>
+            match.player1_id === selectedMatch.player1_id &&
+            match.player2_id === selectedMatch.player2_id &&
+            match.league_id === selectedMatch.league_id
+              ? {
+                  ...match,
+                  set1_p1: updatedMatchData.set1_p1,
+                  set1_p2: updatedMatchData.set1_p2,
+                  set2_p1: updatedMatchData.set2_p1,
+                  set2_p2: updatedMatchData.set2_p2,
+                  set3_p1: updatedMatchData.set3_p1,
+                  set3_p2: updatedMatchData.set3_p2,
+                  player1_confirmed: updatedMatchData.player1_confirmed,
+                  player2_confirmed: updatedMatchData.player2_confirmed
+                }
+              : match
+          )
+      )};
 
       alert('Score added successfully');
       // Forcing the button next to the score to update
       setMatchDataChanged(prev => !prev);
-
+      setIsScoreConfirmed(false);
     } else {
       alert('Error adding score');
     }
@@ -239,26 +511,76 @@ const Dashboard = ({
   const handleConfirmScoreClick = async (match) => {
     setSelectedMatch(match);
 
-    setFormData({
-      player1_set1: match.set1_p1,
-      player1_set2: match.set2_p1,
-      player1_set3: match.set3_p1,
-      player2_set1: match.set1_p2,
-      player2_set2: match.set2_p2,
-      player2_set3: match.set3_p2,
-      player1_id: match.player1_id,
-      player2_id: match.player2_id,
-      match_id: match.match_id,
-      league_id: match.league_id,
-      winner_id: match.winner_id,
-      loser_id: match.loser_id,
-      entered_by: match.entered_by,
-      player1_confirmed: (match.player1_email == email ? email: match.player1_confirmed),
-      player2_confirmed: (match.player2_email == email ? email: match.player2_confirmed)
-    });
-  
+    if (match.type === "singles") {
+      setFormData({
+        player1_set1: match.set1_p1,
+        player1_set2: match.set2_p1,
+        player1_set3: match.set3_p1,
+        player2_set1: match.set1_p2,
+        player2_set2: match.set2_p2,
+        player2_set3: match.set3_p2,
+        player1_id: match.player1_id,
+        player2_id: match.player2_id,
+        match_id: match.match_id,
+        match_type: match.type,
+        league_id: match.league_id,
+        winner_id: match.winner_id,
+        loser_id: match.loser_id,
+        entered_by: match.entered_by,
+        player1_confirmed: (match.player1_email == email ? email: match.player1_confirmed),
+        player2_confirmed: (match.player2_email == email ? email: match.player2_confirmed)
+      });
+    } else if (match.type === "doubles") {
+      setFormData({
+        match_id: match.match_id,
+        league_id: match.league_id,
+        match_type: match.type,
+        winner_ids: [match.winner1_id, match.winner2_id],
+        loser_ids: [match.loser1_id, match.loser2_id],
+        entered_by: match.entered_by,
+        team1_set1: match.set1_t1,
+        team1_set2: match.set2_t1,
+        team1_set3: match.set3_t1,
+        team2_set1: match.set1_t2,
+        team2_set2: match.set2_t2,
+        team2_set3: match.set3_t2,
+        winner_confirmed: (match.player_id == match.winner1_id || match.player_id == match.winner2_id ? email : match.winner_confirmed),
+        loser_confirmed: (match.player_id == match.loser1_id || match.player_id == match.loser2_id ? email : match.loser_confirmed)
+      });
+    }
+
     setIsScoreConfirmed(true);
   } 
+
+  // Handle the "Setup New Match" button click
+  const handleSetupNewMatch = async () => {
+    setFetchingAvailability(true);
+    
+    try {
+      // Call fetchAllPlayersAvailability to get data
+      const availabilityData = await fetchAllPlayersAvailability(leagueId);
+
+      // Open the calendar dialog
+      setOpenDoublesCalendar(true);
+      setAllPlayersAvailability(availabilityData);
+      console.log('Player availability data loaded:', availabilityData);
+      
+    } catch (error) {
+      console.error('Error setting up new match:', error);
+      alert('Failed to load player availability. Please try again.');
+    } finally {
+      setFetchingAvailability(false);
+    }
+  };
+
+  // Handle date selection in the calendar
+  const handleDateChange = (date) => {
+    // Handle the selected date
+    console.log("Selected date:", date);
+    
+    // You might want to store the selected date in state
+    // and do something with it, like open a time slot selection dialog
+  };
 
   return (
     <Box>
@@ -291,6 +613,50 @@ const Dashboard = ({
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
               <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>My matches</Typography>
+              
+              {/* Action buttons for doubles leagues - shown only once at the top */}
+              {leagueType && leagueType.toLowerCase().includes('doubles') && (
+                <Box sx={{ display: 'flex', justifyContent: 'space-around', gap: 2, mb: 2 }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => handleDoublesScoreClickOpen()}
+                    sx={{
+                      py: 1,
+                      px: 2,
+                      flex: 1,
+                      backgroundColor: config.theme.secondaryBgColor, 
+                      border: 'none',
+                      color: config.theme.buttonTextColor, 
+                      '&:hover': {
+                        backgroundColor: 'transparent', 
+                        border: `2px solid ${config.theme.buttonBorderColor}`,
+                      },
+                    }}
+                  >
+                    Add New Score
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={handleSetupNewMatch} // Use the new function here
+                    disabled={fetchingAvailability} // Disable button while fetching
+                    sx={{
+                      py: 1,
+                      px: 2,
+                      flex: 1,
+                      backgroundColor: config.theme.secondaryBgColor, 
+                      border: 'none',
+                      color: config.theme.buttonTextColor, 
+                      '&:hover': {
+                        backgroundColor: 'transparent', 
+                        border: `2px solid ${config.theme.buttonBorderColor}`,
+                      },
+                    }}
+                  >
+                    {fetchingAvailability ? 'Loading...' : 'Setup New Match'}
+                  </Button>
+                </Box>
+              )}
+              
               {dataLoading && <CircularProgress color="inherit"/>}
               <TableContainer component={Paper}>
                 <Table>
@@ -299,16 +665,20 @@ const Dashboard = ({
                   <TableBody>
                     {matchData.map((match, index) =>
                       match.type === "doubles" ? (
-                        <MatchTableRowDoubles
-                          key={index}
-                          match={match}
-                          email={email}
-                          handleClickOpen={handleClickOpen}
-                          handleConfirmScoreClick={handleConfirmScoreClick}
-                          jwtToken={jwtToken}
-                          leagueName={leagueName}
-                          myName={myName}
-                        />
+                        // Just render the match row without the action buttons row
+                        <React.Fragment key={index}>
+                          <MatchTableRowDoubles
+                            match={match}
+                            email={email}
+                            handleDoublesScoreClickOpen={handleDoublesScoreClickOpen}
+                            handleConfirmScoreClick={handleConfirmScoreClick}
+                            jwtToken={jwtToken}
+                            leagueName={leagueName}
+                            myName={myName}
+                            setOpenCalendar={setOpenCalendar}
+                            openCalendar={openCalendar}
+                          />
+                        </React.Fragment>
                       ) : (
                         <MatchTableRowSingles
                           key={index}
@@ -319,6 +689,8 @@ const Dashboard = ({
                           jwtToken={jwtToken}
                           leagueName={leagueName}
                           myName={myName}
+                          setOpenCalendar={setOpenCalendar}
+                          openCalendar={openCalendar}
                         />
                       )
                     )}
@@ -370,7 +742,7 @@ const Dashboard = ({
           </Grid>
         )}
       </Grid>
-      {/* Dialog (popup window) for adding score */}
+      {/* Dialog (popup window) for adding singles score */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add Match Score</DialogTitle>
         {addingScore && <CircularProgress color="inherit"/>}
@@ -463,6 +835,201 @@ const Dashboard = ({
           <Button onClick={handleAddScoreClick} color="primary">Submit</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog (popup window) for adding doubles score */}
+      <Dialog open={doublesScoreOpen} onClose={handleClose} maxWidth="md">
+        <DialogTitle>Add Doubles Match Score</DialogTitle>
+        {addingScore && <CircularProgress color="inherit"/>}
+        <DialogContent>
+          {/* Team Selection Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom>Team 1</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="team1-player1-label">Player 1</InputLabel>
+                  <Select
+                    labelId="team1-player1-label"
+                    name="team1player1"
+                    value={selectedTeam1Player1}
+                    onChange={handlePlayerChange}
+                    label="Player 1"
+                  >
+                    {teamPlayers.map(player => (
+                      <MenuItem key={player.id} value={player.id}>
+                        {player.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="team1-player2-label">Player 2</InputLabel>
+                  <Select
+                    labelId="team1-player2-label"
+                    name="team1player2"
+                    value={selectedTeam1Player2}
+                    onChange={handlePlayerChange}
+                    label="Player 2"
+                  >
+                    {teamPlayers.map(player => (
+                      <MenuItem key={player.id} value={player.id}>
+                        {player.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>Team 2</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="team2-player1-label">Player 1</InputLabel>
+                  <Select
+                    labelId="team2-player1-label"
+                    name="team2player1"
+                    value={selectedTeam2Player1}
+                    onChange={handlePlayerChange}
+                    label="Player 1"
+                  >
+                    {teamPlayers.map(player => (
+                      <MenuItem key={player.id} value={player.id}>
+                        {player.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="team2-player2-label">Player 2</InputLabel>
+                  <Select
+                    labelId="team2-player2-label"
+                    name="team2player2"
+                    value={selectedTeam2Player2}
+                    onChange={handlePlayerChange}
+                    label="Player 2"
+                  >
+                    {teamPlayers.map(player => (
+                      <MenuItem key={player.id} value={player.id}>
+                        {player.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
+
+          {/* Score input section */}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell align="center">Set 1</TableCell>
+                  <TableCell align="center">Set 2</TableCell>
+                  <TableCell align="center">Set 3</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell align="center">
+                    <strong>
+                      {teamPlayers.find(p => p.id === selectedTeam1Player1)?.name || 'Player 1'} / 
+                      {teamPlayers.find(p => p.id === selectedTeam1Player2)?.name || 'Player 2'}
+                    </strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <TextField
+                      name="team1_set1"
+                      value={formData.team1_set1}
+                      onChange={handleInputChange}
+                      type="text"
+                      inputProps={{ maxLength: 1 }}
+                      sx={{ width: '40px' }}
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <TextField
+                      name="team1_set2"
+                      value={formData.team1_set2}
+                      onChange={handleInputChange}
+                      type="text"
+                      inputProps={{ maxLength: 1 }}
+                      sx={{ width: '40px' }}
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <TextField
+                      name="team1_set3"
+                      value={formData.team1_set3}
+                      onChange={handleInputChange}
+                      type="text"
+                      inputProps={{ maxLength: 1 }}
+                      sx={{ width: '40px' }}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="center">
+                    <strong>
+                      {teamPlayers.find(p => p.id === selectedTeam2Player1)?.name || 'Player 1'} / 
+                      {teamPlayers.find(p => p.id === selectedTeam2Player2)?.name || 'Player 2'}
+                    </strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <TextField
+                      name="team2_set1"
+                      value={formData.team2_set1}
+                      onChange={handleInputChange}
+                      type="text"
+                      inputProps={{ maxLength: 1 }}
+                      sx={{ width: '40px' }}
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <TextField
+                      name="team2_set2"
+                      value={formData.team2_set2}
+                      onChange={handleInputChange}
+                      type="text"
+                      inputProps={{ maxLength: 1 }}
+                      sx={{ width: '40px' }}
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <TextField
+                      name="team2_set3"
+                      value={formData.team2_set3}
+                      onChange={handleInputChange}
+                      type="text"
+                      inputProps={{ maxLength: 1 }}
+                      sx={{ width: '40px' }}
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleDoublesAddScoreClick} color="primary">Submit</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add the CalendarDialogDoubles component */}
+      <CalendarDialogDoubles
+        openCalendar={openDoublesCalendar}
+        setOpenCalendar={setOpenDoublesCalendar}
+        handleDateChange={handleDateChange}
+        selectedDate={null} // Or use a state variable if you track the selected date
+        allPlayersAvailability={allPlayersAvailability}
+      />
     </Box>
   );
 };

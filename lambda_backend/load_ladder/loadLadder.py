@@ -30,6 +30,7 @@ def lambda_handler(event, context):
     db_name = os.environ['DB_NAME']
     token = event['headers']['Authorization']
     league_id = event["queryStringParameters"]['league_id']
+    league_type = event["queryStringParameters"]['league_type']
     decoded = decode_jwt(token)
 
     # Since a user could also be in a tennis-admin group, we want to filter that out
@@ -51,22 +52,42 @@ def lambda_handler(event, context):
     try:
         with connection.cursor() as cursor:
             # Define the SQL query
-            sql_query = """
-                SELECT ROW_NUMBER() OVER() AS "rank",
-                        l.`league_name`,
-                        p.`first_name`,
-                        p.`last_name`,
-                        sl.`points`,
-                        sl.`matches`,
-                        sl.`wins`,
-                        sl.`losses`,
-                        CAST(ROUND(sl.`wins` / sl.`matches` * 100, 2) AS CHAR) AS "win_rate"
-                    FROM singles_ladder as sl, player p, league l
-                    WHERE sl.`league_id` = %s
-                    AND sl.player_id = p.player_id
-                    AND sl.league_id = l.league_id
-                    ORDER BY sl.`points` DESC;
-                    """
+            if league_type.lower() == "singles":
+                sql_query = """
+                    SELECT ROW_NUMBER() OVER() AS "rank",
+                            l.`league_name`,
+                            p.`first_name`,
+                            p.`last_name`,
+                            sl.`points`,
+                            sl.`matches`,
+                            sl.`wins`,
+                            sl.`losses`,
+                            CAST(ROUND(sl.`wins` / sl.`matches` * 100, 2) AS CHAR) AS "win_rate"
+                        FROM singles_ladder as sl, player p, league l
+                        WHERE sl.`league_id` = %s
+                        AND sl.player_id = p.player_id
+                        AND sl.league_id = l.league_id
+                        ORDER BY sl.`points` DESC;
+                        """
+            elif (league_type.lower() == "doubles" or league_type.lower() == "mix doubles"):
+                sql_query = """
+                    SELECT ROW_NUMBER() OVER() AS "rank",
+                            l.`league_name`,
+                            p.`first_name`,
+                            p.`last_name`,
+                            dl.`points`,
+                            dl.`matches`,
+                            dl.`wins`,
+                            dl.`losses`,
+                            CAST(ROUND(dl.`wins` / dl.`matches` * 100, 2) AS CHAR) AS "win_rate"
+                        FROM doubles_ladder as dl, player p, league l
+                        WHERE dl.`league_id` = %s
+                        AND dl.player_id = p.player_id
+                        AND dl.league_id = l.league_id
+                        ORDER BY dl.`points` DESC;
+                        """
+            else:
+                raise ValueError("Invalid league type provided")
         
             # Execute the query with 'FTSC' as the parameter
             cursor.execute(sql_query, (league_id))
