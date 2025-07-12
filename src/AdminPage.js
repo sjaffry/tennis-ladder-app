@@ -389,10 +389,10 @@ const AdminPage = ({ signOut, user }) => {
     });
   }
 
-  const handleViewLadder = (league_id) => {
-    loadLadder(league_id, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName);
+  const handleViewLadder = (league_id, league_type) => {
+    loadLadder(league_id, league_type, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName);
     setViewLadderDialogOpen(true);
-  }
+  };
 
   const handleViewScores = (league_id, league_type) => {
     setViewScoresDialogOpen(true); 
@@ -736,7 +736,7 @@ const AdminPage = ({ signOut, user }) => {
                            border: `2px solid ${config.theme.buttonBorderColor}`,
                          },
                         }} 
-                      onClick={() => handleViewLadder(league.league_id)}
+                      onClick={() => handleViewLadder(league.league_id, league.league_type)}
                     >
                       View Ladder
                     </Button>
