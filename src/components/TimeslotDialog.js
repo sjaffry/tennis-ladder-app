@@ -1,4 +1,3 @@
-
 import React from "react";
 import { CircularProgress, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 
@@ -19,8 +18,24 @@ const TimeslotDialog = ({
   setMessage,
   handleSendMessage,
   savingAvailability,
-  sendingEmail
+  sendingEmail,
+  recurringFlag,
+  setRecurringFlag
 }) => {
+  
+  const handleRecurringChange = (event) => {
+    setRecurringFlag(event.target.checked);
+  };
+
+  // Check if any time slot is selected
+  const hasTimeSlotSelected = selectedTimeSlots.morning || selectedTimeSlots.afternoon || selectedTimeSlots.evening;
+
+  // Enhanced clear handler that also clears recurring flag
+  const handleClearWithRecurring = () => {
+    handleClearAvailability();
+    setRecurringFlag(false);
+  };
+
   return (
     <>
       {/* Time Slot Selection Dialog */}
@@ -40,6 +55,19 @@ const TimeslotDialog = ({
               control={<Checkbox name="evening" checked={selectedTimeSlots.evening || false} onChange={handleTimeSlotChange} disabled={isOpponentTab} />}
               label="Evening"
             />
+            {!isOpponentTab && (
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    name="recurring" 
+                    checked={recurringFlag || false} 
+                    onChange={handleRecurringChange}
+                    disabled={!hasTimeSlotSelected}
+                  />
+                }
+                label="Recurring weekly"
+              />
+            )}
           </FormGroup>
         </DialogContent>
         <DialogActions>
@@ -48,7 +76,7 @@ const TimeslotDialog = ({
             {isOpponentTab ? "Schedule Match" : "Save"}
           </Button>
           {!isOpponentTab && (
-            <Button onClick={handleClearAvailability} color="primary" variant="contained">
+            <Button onClick={handleClearWithRecurring} color="primary" variant="contained">
             Clear
           </Button>
           )}

@@ -99,6 +99,7 @@ const App = ({ signOut, user }) => {
     evening: false,
   });
   const [myTimeSlots, setMyTimeSlots] = useState(false);
+  const [recurringFlag, setRecurringFlag] = useState(false);
   const [openTimeSlotDialog, setOpenTimeSlotDialog] = useState(false);
   const user_groups = user.signInUserSession.idToken.payload['cognito:groups'];
   const email = user.signInUserSession.idToken.payload['email'];
@@ -176,7 +177,8 @@ const App = ({ signOut, user }) => {
       morning: selectedTimeSlots.morning,
       afternoon: selectedTimeSlots.afternoon,
       evening: selectedTimeSlots.evening,
-      player_email: email
+      player_email: email,
+      recurring: recurringFlag
     };
 
     const url1 = 'https://lodf29a5ki.execute-api.us-west-2.amazonaws.com/Prod';
@@ -432,6 +434,8 @@ const App = ({ signOut, user }) => {
               handleClearAvailability={handleClearAvailability}
               selectedDateFormatted={selectedDateFormatted}
               savingAvailability={savingAvailability}
+              recurringFlag={recurringFlag}
+              setRecurringFlag={setRecurringFlag}
             />
           </Box>
   
