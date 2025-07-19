@@ -127,7 +127,7 @@ const Dashboard = ({
 
       // Use await with axios instead of mixing with .then()
       const response = await axios.get(
-        `https://kz49eh4q82.execute-api.us-west-2.amazonaws.com/Prod`,
+        `https://e85cod6odh.execute-api.us-west-2.amazonaws.com/Prod`,
         {
           params: {
             league_id: leagueId,
@@ -612,7 +612,7 @@ const Dashboard = ({
         {matchData && matchData.length > 0 && (
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-              <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>My matches</Typography>
+              <Typography fontFamily="Verdana, sans-serif" variant="h5" gutterBottom>My matches</Typography>
               
               {/* Action buttons for doubles leagues - shown only once at the top */}
               {leagueType && leagueType.toLowerCase().includes('doubles') && (
@@ -705,7 +705,7 @@ const Dashboard = ({
         {ladderData && ladderData.length > 0 && (
           <Grid item xs={12} md={6} ref={ladderRef}>
             <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-              <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom>Ladder results</Typography>
+              <Typography fontFamily="Verdana, sans-serif" variant="h5" gutterBottom>Ladder results</Typography>
               {dataLoading && <CircularProgress color="inherit"/>}
               <TableContainer component={Paper}>
                 <Table>

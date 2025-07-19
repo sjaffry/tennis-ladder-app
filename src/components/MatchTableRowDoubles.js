@@ -1,42 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { TextField, TableRow, TableCell, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+import React, { useEffect } from 'react';
+import { TableRow, TableCell, Button } from '@mui/material';
 import MatchTableCell from './MatchTableCell';
 import config from "../config";
 
-const MatchTableRowDoubles = ({ match, email, handleDoublesScoreClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myName, setOpenDoublesCalendar, openDoublesCalendar }) => {
-  const [selectedTab, setSelectedTab] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
-  const [opponentPlayerId, setOpponentPlayerId] = useState(null);
-  const [opponentPlayerEmail, setOpponentPlayerEmail] = useState(null);
-  const [opponentAvailableDates, setOpponentAvailableDates] = useState([]);
-  const [playerAvailability, setPlayerAvailability] = useState([]);
-  const [openTimeSlotDialog, setOpenTimeSlotDialog] = useState(false);
-  const [selectedTimeSlots, setSelectedTimeSlots] = useState({
-    morning: false,
-    afternoon: false,
-    evening: false,
-  });
-  const [opponentTimeSlots, setOpponentTimeSlots] = useState({});
-  const [openMessageDialog, setOpenMessageDialog] = useState(false);
-  const [message, setMessage] = useState('');
-  const [allPlayersAvailability, setAllPlayersAvailability] = useState({});
-
+const MatchTableRowDoubles = ({ match, email, handleConfirmScoreClick }) => {
+  
   useEffect(() => {
   }, []);
-
-  const getTileClassName = ({ date }) => {
-    const dateString = date.toISOString().split('T')[0];
-
-    if (selectedTab === 1 && opponentAvailableDates.includes(dateString)) {
-      return 'green-date';
-    }
-
-    return '';
-  };
 
   return (
     <>

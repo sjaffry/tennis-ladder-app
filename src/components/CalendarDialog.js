@@ -70,9 +70,6 @@ const CalendarDialog = ({
         ) : (
           <>
             <Box mb={2}>
-              <Typography variant="body2" color="textSecondary">
-                Showing availability for {opponentName || 'Opponent'} ({opponentEmail || 'unknown'})
-              </Typography>
             </Box>
             <Box display="flex" justifyContent="center" mt={2}>
               <Calendar

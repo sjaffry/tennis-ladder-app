@@ -350,7 +350,7 @@ const App = ({ signOut, user }) => {
   
         {/* Main Content */}
         <Box sx={{ flex: 1, width: '100%', p: 2, overflow: 'auto' }}>
-          <Typography font-family="Verdana, sans-serif" variant="h5" gutterBottom sx={{ mb: 4, textTransform: 'capitalize' }}>
+          <Typography fontFamily="Verdana, sans-serif" variant="h5" gutterBottom sx={{ mb: 4, textTransform: 'capitalize' }}>
             Hello {user.signInUserSession.idToken.payload.given_name}!
           </Typography>
   
