@@ -178,7 +178,7 @@ const App = ({ signOut, user }) => {
       afternoon: selectedTimeSlots.afternoon,
       evening: selectedTimeSlots.evening,
       player_email: email,
-      recurring: recurringFlag
+      recurring_flag: recurringFlag
     };
 
     const url1 = 'https://lodf29a5ki.execute-api.us-west-2.amazonaws.com/Prod';
@@ -475,7 +475,8 @@ const App = ({ signOut, user }) => {
             leagueName={leagueName}
             leagueId={leagueId}
             leagueType={leagueType}
-            myName={user.signInUserSession.idToken.payload.given_name}
+            myFirstName={user.signInUserSession.idToken.payload.given_name}
+            myLastName={user.signInUserSession.idToken.payload.family_name}
           />
         </Box>
       </Box>

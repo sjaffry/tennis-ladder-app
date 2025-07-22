@@ -7,7 +7,7 @@ import TimeslotDialog from "./TimeslotDialog";
 import { fetchPlayerAvailability } from '../App';
 import config from "../config";
 
-const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myName, setOpenCalendar, openCalendar }) => {
+const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScoreClick, jwtToken, leagueName, myFirstName, myLastName, setOpenCalendar, openCalendar, sendingEmail, setSendingEmail }) => {
   // Keep existing states
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDateFormatted, setSelectedDateFormatted] = useState(null);
@@ -24,7 +24,6 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
   const [opponentTimeSlots, setOpponentTimeSlots] = useState({});
   const [openMessageDialog, setOpenMessageDialog] = useState(false);
   const [message, setMessage] = useState('');
-  const [sendingEmail, setSendingEmail] = useState(false);
   
   // Add a local state for calendar dialog control
   const [localOpenCalendar, setLocalOpenCalendar] = useState(false);
@@ -168,13 +167,17 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
     setOpenTimeSlotDialog(false);
     const url1 = 'https://f6f3hiboo3.execute-api.us-west-2.amazonaws.com/Prod';
 
+    // Format opponentPlayerEmail as a list before sending
+    const opponentEmails = [opponentPlayerEmail];
     axios.get(url1, {
       params: {
         player_email: email,
-        opponent_email: opponentPlayerEmail,
-        player_name: myName,
+        opponent_email: opponentEmails,
+        player_first_name: myFirstName,
+        player_last_name: myLastName,
         match_date: selectedDateFormatted,
         league_name: leagueName,
+        match_type: 'Singles',
         organizer_message: message
       },
       headers: {

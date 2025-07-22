@@ -1,21 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, List, ListItem, ListItemText, Divider, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, List, ListItem, ListItemText, Divider, Typography, CircularProgress, TextField, Box, Checkbox, FormControlLabel } from '@mui/material';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './CalendarDialogDoubles.css';
+import axios from 'axios';
 
 const CalendarDialogDoubles = ({ 
   openCalendar, 
   setOpenCalendar, 
   handleDateChange, 
   selectedDate, 
-  allPlayersAvailability
+  allPlayersAvailability,
+  sendingEmail,
+  setSendingEmail,
+  email,
+  jwtToken,
+  leagueName
 }) => {
   const [availabilityMap, setAvailabilityMap] = useState({});
   const [currentUserDates, setCurrentUserDates] = useState([]);
   const [showAvailablePlayers, setShowAvailablePlayers] = useState(false);
   const [selectedDateString, setSelectedDateString] = useState('');
   const [availablePlayers, setAvailablePlayers] = useState([]);
+  const [selectedPlayers, setSelectedPlayers] = useState([]);
+  const [openDoublesMessageDialog, setOpenDoublesMessageDialog] = useState(false);
+  const [doublesMessage, setDoublesMessage] = useState('');
   
   // Process player availability data when it changes
   useEffect(() => {
@@ -104,6 +113,9 @@ const CalendarDialogDoubles = ({
       });
       
       setAvailablePlayers(availablePlayersList);
+      // Auto-select the current user
+      const currentUser = availablePlayersList.find(player => player.id === 'current');
+      setSelectedPlayers(currentUser ? [currentUser] : []);
       setSelectedDateString(dateString);
       setShowAvailablePlayers(true);
     } else {
@@ -121,6 +133,83 @@ const CalendarDialogDoubles = ({
       month: 'long', 
       day: 'numeric' 
     });
+  };
+
+  const handleSendDoublesMessage = async () => {
+    if (!doublesMessage.trim()) {
+      alert('Please enter a message before sending.');
+      return;
+    }
+    
+    // Extract email addresses of selected players
+    const selectedPlayerEmails = selectedPlayers.map(player => {
+      if (player.id === 'current') {
+        // Get current user's email
+        return allPlayersAvailability.currentUser?.email || 'Current user email not found';
+      } else {
+        // Get other player's email
+        return allPlayersAvailability[player.id]?.email || 'Email not found';
+      }
+    });
+    
+    setSendingEmail(true);
+    const url = 'https://7vhzcxuhc8.execute-api.us-west-2.amazonaws.com/Prod';
+
+    // Filter out current user's email from selectedPlayerEmails
+    const opponentEmails = selectedPlayerEmails.filter(email => 
+      email !== allPlayersAvailability.currentUser?.email
+    );
+
+    axios.get(url, {
+      params: {
+      player_email: email,
+      opponent_email: opponentEmails,
+      player_first_name: `${allPlayersAvailability.currentUser?.first_name || ''}`,
+      player_last_name: `${allPlayersAvailability.currentUser?.last_name || ''}`,
+      match_date: selectedDateString,
+      league_name: leagueName,
+      match_type: 'Doubles',
+      organizer_message: doublesMessage
+      },
+      headers: {
+      Authorization: jwtToken
+      }
+    })
+    .then(response => {
+      alert("Email successfully sent to opponent!");
+      setSendingEmail(false);
+      setOpenDoublesMessageDialog(false);
+      setDoublesMessage('');
+      setShowAvailablePlayers(false);
+      setOpenCalendar(false);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error sending email to reciepients. Please try again!');
+    });
+  };
+
+  const handleScheduleDoublesMatch = (date) => {
+    setOpenDoublesMessageDialog(true);
+  };
+
+  // Handle player selection for doubles match
+  const handlePlayerSelection = (player, isChecked) => {
+    // Don't allow deselecting the current user
+    if (player.id === 'current') return;
+    
+    if (isChecked) {
+      if (selectedPlayers.length < 4) { // 1 current user + 3 others = 4 total
+        setSelectedPlayers([...selectedPlayers, player]);
+      }
+    } else {
+      setSelectedPlayers(selectedPlayers.filter(p => p.id !== player.id));
+    }
+  };
+
+  // Check if player is selected
+  const isPlayerSelected = (playerId) => {
+    return selectedPlayers.some(p => p.id === playerId);
   };
 
   return (
@@ -162,28 +251,79 @@ const CalendarDialogDoubles = ({
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1" gutterBottom>
-            The following players are available on this date:
+            Select 3 additional players to join you for the doubles match:
+          </Typography>
+          <Typography variant="body2" color="textSecondary" gutterBottom>
+            Selected: {selectedPlayers.length - 1}/3 additional players
           </Typography>
           <List>
             {availablePlayers.map((player, index) => (
               <React.Fragment key={player.id}>
                 <ListItem>
-                  <ListItemText primary={player.name} />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={isPlayerSelected(player.id)}
+                        onChange={(e) => handlePlayerSelection(player, e.target.checked)}
+                        disabled={
+                          player.id === 'current' || // Current user is always selected and disabled
+                          (!isPlayerSelected(player.id) && selectedPlayers.length >= 4) // Disable others when 4 are selected
+                        }
+                      />
+                    }
+                    label={player.name}
+                  />
                 </ListItem>
                 {index < availablePlayers.length - 1 && <Divider />}
               </React.Fragment>
             ))}
           </List>
-          <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-            Contact these players to set up a match.
-          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleDateChange(new Date(selectedDateString))}>
+          <Button 
+            onClick={() => handleScheduleDoublesMatch(new Date(selectedDateString))}
+            disabled={selectedPlayers.length !== 4}
+          >
             Schedule Match
           </Button>
           <Button onClick={() => setShowAvailablePlayers(false)}>
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Message Dialog */}
+      <Dialog open={openDoublesMessageDialog} onClose={() => setOpenDoublesMessageDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Doubles match for {formatDateForDisplay(selectedDateString)}</DialogTitle>
+        {sendingEmail && <CircularProgress color="inherit" />}    
+        <DialogContent>
+          {/* Show available players in the message dialog */}
+          <Box mb={2}>
+            <Typography variant="h6" gutterBottom>
+              Selected Players:
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {selectedPlayers.map(player => player.name).join(', ')}
+            </Typography>
+          </Box>
+          
+          <TextField
+            label="Enter your message"
+            multiline
+            fullWidth
+            rows={4}
+            value={doublesMessage}
+            onChange={(e) => setDoublesMessage(e.target.value)}
+            variant="outlined"
+            margin="dense"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDoublesMessageDialog(false)} color="secondary" variant="contained">
+            Cancel
+          </Button>
+          <Button onClick={handleSendDoublesMessage} color="primary" variant="contained">
+            Send
           </Button>
         </DialogActions>
       </Dialog>

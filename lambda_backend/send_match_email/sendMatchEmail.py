@@ -2,7 +2,7 @@ import json
 import boto3
 import os
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import *
 import base64
 
 def decode_base64_url(data):
@@ -24,34 +24,41 @@ def decode_jwt(token):
 
     return json.loads(payload)
 
-def send_email (business_name, organizer_email, organizer_name, organizer_message, opponent_email, match_date, league_name):
-    subject = f'New match request from {organizer_name.title()}'
+def send_email (business_name, organizer_email, organizer_first_name, organizer_last_name, organizer_message, opponent_email, match_date, match_type, league_name):
+    subject = f'New match request from {organizer_first_name.title()} ({match_type})'
     body_html = f'''<html>
             <body>
-            <b>{organizer_name.title()}</b> would like to play on {match_date}.
+            <b>{organizer_first_name.title()} {organizer_last_name.title()}</b> would like to play on {match_date}.
             <p>
-            <b>{organizer_name.title()}'s message</b>: {organizer_message}
+            <b>{organizer_first_name.title()}'s message</b>: {organizer_message}
             </p>
             <p>Reply to this email to confirm this match.<p>
             </body>
         </html>'''
 
     body_text = f'''
-                {organizer_name.title()} would like to play on {match_date}.
-                {organizer_name.title()}'s message: {organizer_message}
+                {organizer_first_name.title()} {organizer_last_name.title()} would like to play on {match_date}.
+                {organizer_first_name.title()}'s message: {organizer_message}
                 Reply to this email to confirm this match.
                 '''
 
     cc_emails = [organizer_email]
 
-    try:
+    try:        
         # Send the email
-        print('sending email to:' + opponent_email)
+        print('sending email to:')
+        print(opponent_email)
+
+        to_emails_list = [To(email) for email in opponent_email]
+        
         message = Mail(
             from_email=f'robot-{business_name}@onreaction.com',
-            to_emails=opponent_email,
+            to_emails=[To('zara.jaffry@gmail.com'), To('shoutavouch@gmail.com'), To('shoutavouch33@gmail.com')],
+            # to_emails=to_emails_list,
             subject=subject,
-            html_content=body_html)
+            plain_text_content=body_text,
+            html_content=body_html,
+        )
 
         if cc_emails:
             for cc_email in cc_emails:
@@ -71,12 +78,14 @@ def send_email (business_name, organizer_email, organizer_name, organizer_messag
     return 'Email sent successfully to opponent!'
 
 def lambda_handler(event, context):
-    organizer_email = event["queryStringParameters"]['player_email']
-    organizer_name = event["queryStringParameters"]['player_name']
-    opponent_email = event["queryStringParameters"]['opponent_email']
-    match_date = event["queryStringParameters"]['match_date']
-    league_name = event["queryStringParameters"]['league_name']
-    organizer_message = event["queryStringParameters"]['organizer_message']
+    organizer_email = event.get("queryStringParameters", {}).get('player_email', None)
+    organizer_first_name = event.get("queryStringParameters", {}).get('player_first_name', None)
+    organizer_last_name = event.get("queryStringParameters", {}).get('player_last_name', None)
+    opponent_email = event.get("multiValueQueryStringParameters", {}).get('opponent_email[]', None)
+    match_date = event.get("queryStringParameters", {}).get('match_date', None)
+    match_type = event.get("queryStringParameters", {}).get('match_type', None)
+    league_name = event.get("queryStringParameters", {}).get('league_name', None)
+    organizer_message = event.get("queryStringParameters", {}).get('organizer_message', None)
     token = event['headers']['Authorization']
     decoded = decode_jwt(token)
 
@@ -87,7 +96,7 @@ def lambda_handler(event, context):
     # We only ever expect one business name association to a user's profile
     business_name = filtered_values[0] if filtered_values else None
 
-    resp = send_email(business_name, organizer_email, organizer_name, organizer_message, opponent_email, match_date, league_name)
+    resp = send_email(business_name, organizer_email, organizer_first_name, organizer_last_name, organizer_message, opponent_email, match_date, match_type, league_name)
 
     result = {
         "Business_name": business_name,

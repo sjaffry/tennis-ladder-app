@@ -41,7 +41,8 @@ const Dashboard = ({
   leagueName,
   leagueId,
   leagueType,
-  myName
+  myFirstName,
+  myLastName
 }) => {
 
   const theme = useTheme();
@@ -86,6 +87,7 @@ const Dashboard = ({
   // Add state for all players' availability
   const [allPlayersAvailability, setAllPlayersAvailability] = useState({});
   const [fetchingAvailability, setFetchingAvailability] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
 
   useEffect(() => {
@@ -149,7 +151,8 @@ const Dashboard = ({
         formattedData.currentUser = {
           availability: currentUserData.availability,
           first_name: currentUserData.first_name,
-          last_name: currentUserData.last_name
+          last_name: currentUserData.last_name,
+          email: currentUserData.email
         };
       }
     
@@ -159,7 +162,8 @@ const Dashboard = ({
           formattedData[player.player_id] = {
             availability: player.availability,
             first_name: player.first_name,
-            last_name: player.last_name
+            last_name: player.last_name,
+            email: player.email
           };
         }
       });
@@ -204,7 +208,7 @@ const Dashboard = ({
     });
 
     // Properly append query parameter to the URL
-    const url = `https://7up7gc29q6.execute-api.us-west-2.amazonaws.com/Prod?league_id=${leagueId}`;
+    const url = `https://zlbsw7395m.execute-api.us-west-2.amazonaws.com/Prod?league_id=${leagueId}`;
     
     fetch(url, {
       method: 'GET',
@@ -670,13 +674,7 @@ const Dashboard = ({
                           <MatchTableRowDoubles
                             match={match}
                             email={email}
-                            handleDoublesScoreClickOpen={handleDoublesScoreClickOpen}
                             handleConfirmScoreClick={handleConfirmScoreClick}
-                            jwtToken={jwtToken}
-                            leagueName={leagueName}
-                            myName={myName}
-                            setOpenCalendar={setOpenCalendar}
-                            openCalendar={openCalendar}
                           />
                         </React.Fragment>
                       ) : (
@@ -688,9 +686,12 @@ const Dashboard = ({
                           handleConfirmScoreClick={handleConfirmScoreClick}
                           jwtToken={jwtToken}
                           leagueName={leagueName}
-                          myName={myName}
+                          myFirstName={myFirstName}
+                          myLastName={myLastName}
                           setOpenCalendar={setOpenCalendar}
                           openCalendar={openCalendar}
+                          sendingEmail={sendingEmail}
+                          setSendingEmail={setSendingEmail}
                         />
                       )
                     )}
@@ -1029,6 +1030,11 @@ const Dashboard = ({
         handleDateChange={handleDateChange}
         selectedDate={null} // Or use a state variable if you track the selected date
         allPlayersAvailability={allPlayersAvailability}
+        sendingEmail={sendingEmail}
+        setSendingEmail={setSendingEmail}
+        email={email}
+        leagueName={leagueName}
+        jwtToken={jwtToken}
       />
     </Box>
   );
