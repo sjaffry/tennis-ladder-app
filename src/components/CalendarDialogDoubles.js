@@ -153,7 +153,7 @@ const CalendarDialogDoubles = ({
     });
     
     setSendingEmail(true);
-    const url = 'https://7vhzcxuhc8.execute-api.us-west-2.amazonaws.com/Prod';
+    const url = 'https://f6f3hiboo3.execute-api.us-west-2.amazonaws.com/Prod';
 
     // Filter out current user's email from selectedPlayerEmails
     const opponentEmails = selectedPlayerEmails.filter(email => 
