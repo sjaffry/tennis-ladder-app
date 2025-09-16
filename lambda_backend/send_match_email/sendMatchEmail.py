@@ -25,7 +25,7 @@ def decode_jwt(token):
     return json.loads(payload)
 
 def send_email (business_name, organizer_email, organizer_first_name, organizer_last_name, organizer_message, opponent_email, match_date, match_type, league_name):
-    subject = f'New match request from {organizer_first_name.title()} ({match_type})'
+    subject = f'New match request from {organizer_first_name.title()} ({match_type} )'
     body_html = f'''<html>
             <body>
             <b>{organizer_first_name.title()} {organizer_last_name.title()}</b> would like to play on {match_date}.
@@ -53,8 +53,7 @@ def send_email (business_name, organizer_email, organizer_first_name, organizer_
         
         message = Mail(
             from_email=f'robot-{business_name}@onreaction.com',
-            to_emails=[To('zara.jaffry@gmail.com'), To('shoutavouch@gmail.com'), To('shoutavouch33@gmail.com')],
-            # to_emails=to_emails_list,
+            to_emails=to_emails_list,
             subject=subject,
             plain_text_content=body_text,
             html_content=body_html,

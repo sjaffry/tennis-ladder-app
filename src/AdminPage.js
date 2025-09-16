@@ -11,6 +11,7 @@ import foothillslogo from './images/FTSC-logo.jpeg';
 import config from "./config";
 import {
   ThemeProvider,
+  createTheme,
   Box,
   Button,
   Typography,
@@ -31,9 +32,63 @@ import {
   CircularProgress,
   IconButton,
   Paper,
+  Card,
+  CardContent,
+  Grid,
+  Avatar,
+  Chip,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 Amplify.configure(awsExports);
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#6366f1', // Modern indigo
+    },
+    secondary: {
+      main: '#8b5cf6', // Purple accent
+    },
+    background: {
+      default: '#f8fafc',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#1e293b',
+      secondary: '#64748b',
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    h4: {
+      fontWeight: 700,
+      fontSize: '2rem',
+    },
+    h5: {
+      fontWeight: 600,
+      fontSize: '1.5rem',
+    },
+    h6: {
+      fontWeight: 600,
+      fontSize: '1.25rem',
+    },
+    body1: {
+      fontSize: '1rem',
+      lineHeight: 1.6,
+    },
+  },
+  shape: {
+    borderRadius: 16,
+  },
+  shadows: [
+    'none',
+    '0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24)',
+    '0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23)',
+    '0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23)',
+    '0px 14px 28px rgba(0, 0, 0, 0.25), 0px 10px 10px rgba(0, 0, 0, 0.22)',
+    '0px 19px 38px rgba(0, 0, 0, 0.30), 0px 15px 12px rgba(0, 0, 0, 0.22)',
+  ],
+});
 
 const AdminPage = ({ signOut, user }) => {
   const user_groups = user.signInUserSession.idToken.payload['cognito:groups'];
@@ -75,7 +130,6 @@ const AdminPage = ({ signOut, user }) => {
   const [messageToPlayers, setMessageToPlayers] = useState('');
   const [selectedMatches, setSelectedMatches] = useState(null);
 
-  
   // Load data on component mount
   useEffect(() => {
     getLeaguesFromDB();
@@ -561,314 +615,695 @@ const AdminPage = ({ signOut, user }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: config.theme.secondaryBgColor, height: '100vh' }}>
-        {/* Color Banner at the Top */}
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Modern Header */}
         <Box sx={{ 
           width: '100%', 
-          bgcolor: config.theme.primaryBgColor, 
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between', 
-          py: 1, 
-          px: 2, 
-          boxShadow: 1 
+          py: 2, 
+          px: 4, 
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
         }}>
           {/* Left: Logo and Title */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <img src={foothillslogo} alt="Logo" style={{ height: '50px', marginRight: '10px' }} />
-            <Typography 
-              fontFamily="Copperplate, Papyrus, fantasy" 
-              variant="h5"
-              sx={{ fontWeight: 'bold', color: config.theme.buttonTextColor }}
-            >
-              Tennis & Pickleball Leagues
-            </Typography>
-          </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Button
-          variant="contained"
-          sx={{
-            position: 'absolute', 
-            top: 10, 
-            right: 102,
-            backgroundColor: config.theme.secondaryBgColor, 
-            border: 'none',
-            color: config.theme.buttonTextColor,
-            '&:hover': {
-              backgroundColor: config.theme.buttonHoverBgColor, 
-            },
-          }}
-          onClick={() => navigate('/')}
-        >
-          Back to Ladder
-        </Button>
-        <Button
-          variant="contained"
-          sx={{
-            position: 'absolute', 
-            top: 10, 
-            right: 2,
-            backgroundColor: config.theme.secondaryBgColor, 
-            border: 'none',
-            color: config.theme.buttonTextColor,
-            '&:hover': {
-              backgroundColor: config.theme.buttonHoverBgColor,
-            },
-          }}
-          onClick={signOut}
-        >
-          Logout
-        </Button>
-        </Box>
-      </Box>
-        <Box sx={{ width: '80%', p: 2, overflow: 'auto' }}>
-          <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
-            Welcome {user.signInUserSession.idToken.payload.given_name}
-          </Typography>
-          <Typography sx={{ mb: 5 }} variant="h5" gutterBottom>
-            Setup League & Matches
-          </Typography>
-          <Box sx={{ mb: 2, display: 'flex', gap: 2, width: '50%' }}>
-            <TextField
-              label="New league name"
-              variant="outlined"
-              value={newEventName}
-              onChange={handleNewEventNameChange}
-              sx={{ flexGrow: 1 }}
+            <Avatar
+              src={foothillslogo}
+              alt="Logo"
+              sx={{ 
+                width: 56, 
+                height: 56, 
+                mr: 2,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+              }}
             />
-            <Button variant="contained" 
-            sx={{ backgroundColor: config.theme.secondaryBgColor,
-              border: 'none',
-              color: config.theme.buttonTextColor,
-              '&:hover': {
-                backgroundColor: 'transparent', 
-                border: `2px solid ${config.theme.buttonBorderColor}`,
-              },  
-             }} 
-            onClick={handleCreateClick}>
-              Create
+            <Box>
+              <Typography 
+                variant="h5"
+                sx={{ 
+                  fontWeight: 700, 
+                  color: '#1e293b',
+                  letterSpacing: '-0.025em'
+                }}
+              >
+                Admin Panel
+              </Typography>
+              <Typography 
+                variant="body2"
+                sx={{ 
+                  color: '#64748b',
+                  mt: -0.5
+                }}
+              >
+                League & Match Management
+              </Typography>
+            </Box>
+          </Box>
+    
+          {/* Right: User info and Actions */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ textAlign: 'right', mr: 2 }}>
+              <Typography variant="body2" sx={{ color: '#64748b' }}>
+                Admin
+              </Typography>
+              <Typography variant="h6" sx={{ color: '#1e293b', mt: -0.5 }}>
+                {user.signInUserSession.idToken.payload.given_name}
+              </Typography>
+            </Box>
+            
+            <Button
+              variant="outlined"
+              sx={{
+                borderRadius: '12px',
+                px: 3,
+                py: 1,
+                border: '2px solid #e2e8f0',
+                color: '#475569',
+                fontWeight: 600,
+                textTransform: 'none',
+                '&:hover': {
+                  border: '2px solid #6366f1',
+                  backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                  color: '#6366f1',
+                },
+              }}
+              onClick={() => navigate('/')}
+            >
+              Back to Ladder
+            </Button>
+            
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: '12px',
+                px: 3,
+                py: 1,
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                fontWeight: 600,
+                textTransform: 'none',
+                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5855eb 0%, #7c3aed 100%)',
+                  boxShadow: '0 6px 16px rgba(99, 102, 241, 0.5)',
+                },
+              }}
+              onClick={signOut}
+            >
+              Logout
             </Button>
           </Box>
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>League Name</strong></TableCell>
-                <TableCell><strong>Category</strong></TableCell>
-                <TableCell><strong>League Type</strong></TableCell>
-                <TableCell><strong>End Date</strong></TableCell>
-                <TableCell> </TableCell> { /* empty cell to align the lines*/ }
-                <TableCell> </TableCell> { /* empty cell to align the lines*/ }
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {leagueData.map((league) => (
-                <TableRow key={league.league_id}>
-                  <TableCell>{league.league_name}</TableCell>
-                  <TableCell>{league.category}</TableCell>
-                  <TableCell>{league.league_type}</TableCell>
-                  <TableCell>{league.end_date}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      onClick={() => handleEdit(league)}
-                      sx={{ color: config.theme.buttonTextColor }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleDelete(league)}
-                      sx={{ color: config.theme.buttonTextColor }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell sx={{ gap: 1 }}>
-                    <Button 
-                      variant="contained" 
-                      sx={{ 
-                         minWidth: 'auto', 
-                         height: 32, 
-                         padding: '4px 10px', 
-                         fontSize: '12px', 
-                         backgroundColor: config.theme.secondaryBgColor, 
-                         border: 'none',
-                         color: config.theme.buttonTextColor,
-                         '&:hover': {
-                           backgroundColor: 'transparent', 
-                           border: `2px solid ${config.theme.buttonBorderColor}`,
-                         },
-                        }} 
-                      onClick={() => handleAddPlayers(league.league_id, league.league_type)}
-                    >
-                      Add players
-                    </Button>
-                    <Button 
-                      variant="contained" 
-                      sx={{ 
-                         minWidth: 'auto', 
-                         height: 32, 
-                         padding: '4px 10px', 
-                         fontSize: '12px', 
-                         backgroundColor: config.theme.secondaryBgColor, 
-                         border: 'none',
-                         color: config.theme.buttonTextColor,
-                         '&:hover': {
-                           backgroundColor: 'transparent', 
-                           border: `2px solid ${config.theme.buttonBorderColor}`,
-                         },
-                        }} 
-                      onClick={() => handleViewMatches(league.league_id, league.league_type)}
-                    >
-                      View Matches
-                    </Button>
-                    <Button 
-                      variant="contained" 
-                      sx={{ 
-                         minWidth: 'auto', 
-                         height: 32, 
-                         padding: '4px 10px', 
-                         fontSize: '12px', 
-                         backgroundColor: config.theme.secondaryBgColor, 
-                         border: 'none',
-                         color: config.theme.buttonTextColor,
-                         '&:hover': {
-                           backgroundColor: 'transparent', 
-                           border: `2px solid ${config.theme.buttonBorderColor}`,
-                         },
-                        }} 
-                      onClick={() => handleViewLadder(league.league_id, league.league_type)}
-                    >
-                      View Ladder
-                    </Button>
-                    <Button 
-                      variant="contained" 
-                      sx={{ 
-                         minWidth: 'auto', 
-                         height: 32, 
-                         padding: '4px 10px', 
-                         fontSize: '12px', 
-                         backgroundColor: config.theme.secondaryBgColor, 
-                         border: 'none',
-                         color: config.theme.buttonTextColor,
-                         '&:hover': {
-                           backgroundColor: 'transparent', 
-                           border: `2px solid ${config.theme.buttonBorderColor}`,
-                         },
-                        }} 
-                      onClick={() => handleViewScores(league.league_id, league.league_type)}
-                    >
-                      View scores
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        </Box>
+        {/* Main Content */}
+        <Box sx={{ 
+          flex: 1, 
+          p: 4, 
+          overflow: 'auto',
+          maxWidth: '1400px',
+          margin: '0 auto',
+          width: '100%'
+        }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              mb: 2, 
+              color: 'white',
+              fontWeight: 700,
+              textAlign: 'center',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            Welcome {user.signInUserSession.idToken.payload.given_name}
+          </Typography>
+          
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              mb: 6, 
+              color: 'rgba(255, 255, 255, 0.8)',
+              textAlign: 'center',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            Setup League & Matches
+          </Typography>
+
+          {/* Create New League Card */}
+          <Card sx={{ 
+            mb: 4,
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)'
+          }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h6" sx={{ mb: 3, color: '#1e293b', fontWeight: 600 }}>
+                Create New League
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
+                <TextField
+                  label="New league name"
+                  variant="outlined"
+                  value={newEventName}
+                  onChange={handleNewEventNameChange}
+                  sx={{ 
+                    flexGrow: 1,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '&:hover fieldset': {
+                        borderColor: '#6366f1',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#6366f1',
+                      },
+                    },
+                  }}
+                />
+                <Button 
+                  variant="contained" 
+                  sx={{ 
+                    borderRadius: 2,
+                    px: 4,
+                    py: 1.5,
+                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #5855eb 0%, #7c3aed 100%)',
+                      boxShadow: '0 6px 16px rgba(99, 102, 241, 0.5)',
+                    },
+                  }} 
+                  onClick={handleCreateClick}
+                >
+                  Create League
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+          {/* Leagues Table Card */}
+          <Card sx={{ 
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)'
+          }}>
+            <CardContent sx={{ p: 0 }}>
+              <Box sx={{ p: 3, pb: 2 }}>
+                <Typography variant="h6" sx={{ color: '#1e293b', fontWeight: 600 }}>
+                  Existing Leagues
+                </Typography>
+              </Box>
+              
+              <TableContainer>
+                <Table sx={{ 
+                  '& .MuiTableHead-root': {
+                    backgroundColor: '#f8fafc',
+                  },
+                  '& .MuiTableCell-head': {
+                    fontWeight: 600,
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  },
+                  '& .MuiTableRow-root:hover': {
+                    backgroundColor: 'rgba(99, 102, 241, 0.04)',
+                  },
+                }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>League Name</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell>League Type</TableCell>
+                      <TableCell>End Date</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                      <TableCell align="center">Management</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {leagueData.map((league) => (
+                      <TableRow key={league.league_id}>
+                        <TableCell sx={{ fontWeight: 500 }}>{league.league_name}</TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={league.category} 
+                            size="small" 
+                            sx={{ 
+                              backgroundColor: league.category === 'Tennis' ? '#dbeafe' : '#f3e8ff',
+                              color: league.category === 'Tennis' ? '#1e40af' : '#7c3aed',
+                              fontWeight: 500
+                            }} 
+                          />
+                        </TableCell>
+                        <TableCell>{league.league_type}</TableCell>
+                        <TableCell>{league.end_date}</TableCell>
+                        <TableCell align="center">
+                          <IconButton
+                            onClick={() => handleEdit(league)}
+                            sx={{ 
+                              color: '#6366f1', 
+                              mr: 1,
+                              '&:hover': { 
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)' 
+                              } 
+                            }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleDelete(league)}
+                            sx={{ 
+                              color: '#ef4444',
+                              '&:hover': { 
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)' 
+                              } 
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <Button 
+                              variant="outlined" 
+                              size="small"
+                              sx={{ 
+                                minWidth: 'auto', 
+                                px: 2,
+                                py: 0.5,
+                                borderRadius: 2,
+                                fontSize: '0.75rem',
+                                fontWeight: 500,
+                                textTransform: 'none',
+                                border: '1px solid #e2e8f0',
+                                color: '#475569',
+                                '&:hover': {
+                                  border: '1px solid #6366f1',
+                                  backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                                  color: '#6366f1',
+                                },
+                              }} 
+                              onClick={() => handleAddPlayers(league.league_id, league.league_type)}
+                            >
+                              Add Players
+                            </Button>
+                            <Button 
+                              variant="outlined" 
+                              size="small"
+                              sx={{ 
+                                minWidth: 'auto', 
+                                px: 2,
+                                py: 0.5,
+                                borderRadius: 2,
+                                fontSize: '0.75rem',
+                                fontWeight: 500,
+                                textTransform: 'none',
+                                border: '1px solid #e2e8f0',
+                                color: '#475569',
+                                '&:hover': {
+                                  border: '1px solid #10b981',
+                                  backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                                  color: '#10b981',
+                                },
+                              }} 
+                              onClick={() => handleViewMatches(league.league_id, league.league_type)}
+                            >
+                              View Matches
+                            </Button>
+                            <Button 
+                              variant="outlined" 
+                              size="small"
+                              sx={{ 
+                                minWidth: 'auto', 
+                                px: 2,
+                                py: 0.5,
+                                borderRadius: 2,
+                                fontSize: '0.75rem',
+                                fontWeight: 500,
+                                textTransform: 'none',
+                                border: '1px solid #e2e8f0',
+                                color: '#475569',
+                                '&:hover': {
+                                  border: '1px solid #f59e0b',
+                                  backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                                  color: '#f59e0b',
+                                },
+                              }} 
+                              onClick={() => handleViewLadder(league.league_id, league.league_type)}
+                            >
+                              View Ladder
+                            </Button>
+                            <Button 
+                              variant="outlined" 
+                              size="small"
+                              sx={{ 
+                                minWidth: 'auto', 
+                                px: 2,
+                                py: 0.5,
+                                borderRadius: 2,
+                                fontSize: '0.75rem',
+                                fontWeight: 500,
+                                textTransform: 'none',
+                                border: '1px solid #e2e8f0',
+                                color: '#475569',
+                                '&:hover': {
+                                  border: '1px solid #8b5cf6',
+                                  backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                                  color: '#8b5cf6',
+                                },
+                              }} 
+                              onClick={() => handleViewScores(league.league_id, league.league_type)}
+                            >
+                              View Scores
+                            </Button>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
         </Box>
 
-        {/* Dialog for league creation */}
-        <Dialog open={dialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>Create/Edit League</DialogTitle>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              label="League Name"
-              variant="outlined"
-              value={leagueName}
-              onChange={(e) => setLeagueName(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="League Admin Email"
-              variant="outlined"
-              value={leagueAdminEmail}
-              onChange={(e) => setLeagueAdminEmail(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="End Date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              fullWidth
-            />
-            <TextField
-              label="Category"
-              select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              fullWidth
-            >
-              <MenuItem value="Tennis">Tennis</MenuItem>
-              <MenuItem value="Pickleball">Pickleball</MenuItem>
-            </TextField>
-            <TextField
-              label="League Type"
-              select
-              value={leagueType}
-              onChange={(e) => setLeagueType(e.target.value)}
-              fullWidth
-            >
-              <MenuItem value="Singles">Singles</MenuItem>
-              <MenuItem value="Doubles">Doubles</MenuItem>
-              <MenuItem value="Mix doubles">Mix doubles</MenuItem>
-            </TextField>
+        {/* Modern Dialog for league creation */}
+        <Dialog 
+          open={dialogOpen} 
+          onClose={handleDialogClose}
+          PaperProps={{
+            sx: {
+              borderRadius: 4,
+              minWidth: 500,
+              maxWidth: 600,
+            }
+          }}
+        >
+          <DialogTitle sx={{ 
+            fontSize: '1.5rem', 
+            fontWeight: 600, 
+            color: '#1e293b',
+            borderBottom: '1px solid #e2e8f0',
+            pb: 2
+          }}>
+            {editLeague ? 'Edit League' : 'Create League'}
+          </DialogTitle>
+          <DialogContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+              <TextField
+                label="League Name"
+                variant="outlined"
+                value={leagueName}
+                onChange={(e) => setLeagueName(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    '&:hover fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                  },
+                }}
+              />
+              <TextField
+                label="League Admin Email"
+                variant="outlined"
+                value={leagueAdminEmail}
+                onChange={(e) => setLeagueAdminEmail(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    '&:hover fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                  },
+                }}
+              />
+              <TextField
+                label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    '&:hover fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                  },
+                }}
+              />
+              <TextField
+                label="Category"
+                select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    '&:hover fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                  },
+                }}
+              >
+                <MenuItem value="Tennis">Tennis</MenuItem>
+                <MenuItem value="Pickleball">Pickleball</MenuItem>
+              </TextField>
+              <TextField
+                label="League Type"
+                select
+                value={leagueType}
+                onChange={(e) => setLeagueType(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    '&:hover fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#6366f1',
+                    },
+                  },
+                }}
+              >
+                <MenuItem value="Singles">Singles</MenuItem>
+                <MenuItem value="Doubles">Doubles</MenuItem>
+                <MenuItem value="Mix doubles">Mix doubles</MenuItem>
+              </TextField>
+            </Box>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>Cancel</Button>
-            <Button variant="contained" onClick={handleSave}>
-              Save
+          <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+            <Button 
+              onClick={handleDialogClose}
+              sx={{
+                borderRadius: 2,
+                px: 3,
+                py: 1,
+                color: '#64748b',
+                fontWeight: 500,
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="contained" 
+              onClick={handleSave}
+              sx={{
+                borderRadius: 2,
+                px: 4,
+                py: 1,
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                fontWeight: 600,
+                textTransform: 'none',
+                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5855eb 0%, #7c3aed 100%)',
+                  boxShadow: '0 6px 16px rgba(99, 102, 241, 0.5)',
+                },
+              }}
+            >
+              {editLeague ? 'Update' : 'Save'}
             </Button>
           </DialogActions>
         </Dialog>
 
-        {/* Dialog for Adding Players */}
-        <Dialog open={addPlayersDialogOpen} onClose={() => setAddPlayersDialogOpen(false)}>
-          <DialogTitle>Confirm or upload players to create matches</DialogTitle>
-          <DialogContent>
-            {addingPlayers && <CircularProgress color="inherit"/>}
-            <input type="file" accept=".csv" onChange={handleFileUpload} />
-            <TableContainer component={Paper} sx={{ mt: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <strong>First Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Middle Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Last Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Email</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Gender</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>USTA rating</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {playerData.map((player, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{player.firstName}</TableCell>
-                      <TableCell>{player.middleName}</TableCell>
-                      <TableCell>{player.lastName}</TableCell>
-                      <TableCell>{player.email}</TableCell>
-                      <TableCell>{player.gender}</TableCell>
-                      <TableCell>{player.usta_rating}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+        {/* Modern Dialog for Adding Players */}
+        <Dialog 
+          open={addPlayersDialogOpen} 
+          onClose={() => setAddPlayersDialogOpen(false)}
+          maxWidth="lg"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 4,
+              maxHeight: '80vh',
+            }
+          }}
+        >
+          <DialogTitle sx={{ 
+            fontSize: '1.5rem', 
+            fontWeight: 600, 
+            color: '#1e293b',
+            borderBottom: '1px solid #e2e8f0',
+            pb: 2
+          }}>
+            Add Players to League
+          </DialogTitle>
+          <DialogContent sx={{ p: 3 }}>
+            {addingPlayers && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                <CircularProgress sx={{ color: '#6366f1' }} />
+              </Box>
+            )}
+            
+            <Box sx={{ 
+              mb: 3, 
+              p: 3, 
+              border: '2px dashed #e2e8f0', 
+              borderRadius: 2,
+              textAlign: 'center',
+              '&:hover': {
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.02)',
+              }
+            }}>
+              <Typography variant="body1" sx={{ mb: 2, color: '#64748b' }}>
+                Upload CSV file with player information
+              </Typography>
+              <input 
+                type="file" 
+                accept=".csv" 
+                onChange={handleFileUpload}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                  backgroundColor: '#f8fafc',
+                  fontSize: '0.875rem',
+                  fontFamily: 'inherit',
+                }}
+              />
+            </Box>
+            
+            {playerData.length > 0 && (
+              <Card sx={{ 
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                borderRadius: 3
+              }}>
+                <TableContainer sx={{ maxHeight: 400 }}>
+                  <Table stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ 
+                          fontWeight: 600, 
+                          backgroundColor: '#f8fafc',
+                          borderBottom: '2px solid #e2e8f0'
+                        }}>
+                          First Name
+                        </TableCell>
+                        <TableCell sx={{ 
+                          fontWeight: 600, 
+                          backgroundColor: '#f8fafc',
+                          borderBottom: '2px solid #e2e8f0'
+                        }}>
+                          Middle Name
+                        </TableCell>
+                        <TableCell sx={{ 
+                          fontWeight: 600, 
+                          backgroundColor: '#f8fafc',
+                          borderBottom: '2px solid #e2e8f0'
+                        }}>
+                          Last Name
+                        </TableCell>
+                        <TableCell sx={{ 
+                          fontWeight: 600, 
+                          backgroundColor: '#f8fafc',
+                          borderBottom: '2px solid #e2e8f0'
+                        }}>
+                          Email
+                        </TableCell>
+                        <TableCell sx={{ 
+                          fontWeight: 600, 
+                          backgroundColor: '#f8fafc',
+                          borderBottom: '2px solid #e2e8f0'
+                        }}>
+                          Gender
+                        </TableCell>
+                        <TableCell sx={{ 
+                          fontWeight: 600, 
+                          backgroundColor: '#f8fafc',
+                          borderBottom: '2px solid #e2e8f0'
+                        }}>
+                          USTA Rating
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {playerData.map((player, index) => (
+                        <TableRow 
+                          key={index}
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: 'rgba(99, 102, 241, 0.04)',
+                            },
+                          }}
+                        >
+                          <TableCell>{player.firstName}</TableCell>
+                          <TableCell>{player.middleName}</TableCell>
+                          <TableCell>{player.lastName}</TableCell>
+                          <TableCell>{player.email}</TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={player.gender} 
+                              size="small" 
+                              sx={{ 
+                                backgroundColor: player.gender === 'M' ? '#dbeafe' : '#fce7f3',
+                                color: player.gender === 'M' ? '#1e40af' : '#be185d',
+                                fontWeight: 500
+                              }} 
+                            />
+                          </TableCell>
+                          <TableCell>{player.usta_rating}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Card>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setAddPlayersDialogOpen(false)}>Cancel</Button>

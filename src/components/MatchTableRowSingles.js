@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { TextField, TableRow, TableCell, Button, Box } from '@mui/material';
+import { TextField, TableRow, TableCell, Button, Box, Chip } from '@mui/material';
 import MatchTableCell from './MatchTableCell';
 import CalendarDialog from "./CalendarDialog";
 import TimeslotDialog from "./TimeslotDialog";
@@ -197,11 +197,77 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
 
   return (
     <>
-      <TableRow>
-        {/* Existing table row content */}
-        <TableCell>{match.player1_fname} {match.player1_lname} {match.p1_rating} {match.player1_id === match.winner_id ? '(winner)' : ''}</TableCell>
-        <TableCell> vs </TableCell>
-        <TableCell>{match.player2_fname} {match.player2_lname} {match.p2_rating} {match.player2_id === match.winner_id ? '(winner)' : ''}</TableCell>
+      <TableRow sx={{ 
+        '&:hover': { 
+          backgroundColor: 'rgba(224, 231, 255, 0.1)',
+          transition: 'background-color 0.2s ease'
+        }
+      }}>
+        {/* Player names with modern styling */}
+        <TableCell sx={{ 
+          color: '#374151', 
+          fontWeight: match.player1_id === match.winner_id ? 700 : 500,
+          fontSize: '0.9rem'
+        }}>
+          {match.player1_fname} {match.player1_lname} 
+          {match.p1_rating && (
+            <Chip 
+              label={match.p1_rating} 
+              size="small" 
+              sx={{ 
+                ml: 1, 
+                height: 20, 
+                fontSize: '0.7rem',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                color: '#4F46E5'
+              }} 
+            />
+          )}
+          {match.player1_id === match.winner_id && (
+            <Chip 
+              label="Winner" 
+              size="small" 
+              color="success"
+              sx={{ ml: 1, height: 20, fontSize: '0.7rem' }} 
+            />
+          )}
+        </TableCell>
+        <TableCell sx={{ 
+          color: '#6B7280', 
+          fontWeight: 600,
+          textAlign: 'center',
+          fontSize: '0.9rem'
+        }}>
+          vs
+        </TableCell>
+        <TableCell sx={{ 
+          color: '#374151', 
+          fontWeight: match.player2_id === match.winner_id ? 700 : 500,
+          fontSize: '0.9rem'
+        }}>
+          {match.player2_fname} {match.player2_lname} 
+          {match.p2_rating && (
+            <Chip 
+              label={match.p2_rating} 
+              size="small" 
+              sx={{ 
+                ml: 1, 
+                height: 20, 
+                fontSize: '0.7rem',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                color: '#4F46E5'
+              }} 
+            />
+          )}
+          {match.player2_id === match.winner_id && (
+            <Chip 
+              label="Winner" 
+              size="small" 
+              color="success"
+              sx={{ ml: 1, height: 20, fontSize: '0.7rem' }} 
+            />
+          )}
+        </TableCell>
         <TableCell>
           <TableRow>
             {["set1_p1", "set1_p2", "set2_p1", "set2_p2", "set3_p1", "set3_p2"].map((setKey, idx) => (
@@ -213,21 +279,23 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
             ))}
             <TableCell>
               {match.entered_by === null ? (
-                <Box display="flex" gap={1}>
+                <Box display="flex" gap={1} flexWrap="wrap">
                   <Button
                     variant="contained"
                     onClick={() => handleClickOpen({ ...match })}
+                    size="small"
                     sx={{
-                      width: '60px', 
-                      height: '30px', 
-                      fontSize: '9px',
-                      fontWeight: 'bold',
-                      backgroundColor: config.theme.secondaryBgColor, 
-                      border: 'none',
-                      color: config.theme.buttonTextColor, 
+                      minWidth: 80,
+                      height: 32,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                      color: 'white',
+                      textTransform: 'none',
                       '&:hover': {
-                        backgroundColor: 'transparent', 
-                        border: `2px solid ${config.theme.buttonBorderColor}`,
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 4px 8px rgba(16, 185, 129, 0.3)',
                       },
                     }}
                   >
@@ -235,19 +303,20 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                   </Button>
                   <Button
                     variant="contained"
-                    color="secondary"
                     onClick={() => handleSetupMatchClick(match)}
+                    size="small"
                     sx={{
-                      width: '60px', 
-                      height: '30px', 
-                      fontSize: '9px',
-                      fontWeight: 'bold',
-                      backgroundColor: config.theme.secondaryBgColor,  
-                      border: 'none',
-                      color: config.theme.buttonTextColor, 
+                      minWidth: 80,
+                      height: 32,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+                      color: 'white',
+                      textTransform: 'none',
                       '&:hover': {
-                        backgroundColor: 'transparent', 
-                        border: `2px solid ${config.theme.buttonBorderColor}`,
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 4px 8px rgba(59, 130, 246, 0.3)',
                       },
                     }}
                   >
@@ -255,37 +324,47 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                   </Button>
                 </Box>
               ) : (
-                /* Rest of your button logic */
+                /* Confirm score button logic */
                 match.entered_by !== email &&
                 match.player1_confirmed !== email &&
                 match.player2_confirmed !== email ? (
                 <Button
                   variant="contained"
-                  color="secondary"
                   onClick={() => handleConfirmScoreClick({ ...match })}
+                  size="small"
                   sx={{
-                    width: '60px', 
-                    height: '30px', 
-                    fontSize: '9px',
-                    fontWeight: 'bold',
-                    backgroundColor: config.theme.secondaryBgColor, 
-                    border: 'none',
-                    color: config.theme.buttonTextColor, 
+                    minWidth: 80,
+                    height: 32,
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    borderRadius: 2,
+                    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                    color: 'white',
+                    textTransform: 'none',
                     '&:hover': {
-                      backgroundColor: 'transparent', 
-                      border: `2px solid ${config.theme.buttonBorderColor}`,
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 8px rgba(245, 158, 11, 0.3)',
                     },
                   }}
                 >
-                  Confirm score
+                  Confirm Score
                 </Button>
               ) : match.player1_confirmed == null || match.player2_confirmed == null ? (
                 <Button
-                  variant="contained"
-                  sx={{ width: '60px', height: '60px', fontSize: '9px' }}
+                  variant="outlined"
                   disabled
+                  size="small"
+                  sx={{
+                    minWidth: 80,
+                    height: 32,
+                    fontSize: '0.7rem',
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    borderColor: '#D1D5DB',
+                    color: '#9CA3AF',
+                  }}
                 >
-                  Pending confirm player 2
+                  Pending Confirmation
                 </Button>
               ) : null
               )}

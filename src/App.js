@@ -5,7 +5,7 @@ import { withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import awsExports from './aws-exports';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { List, ListItem, ListItemIcon, Box, Paper, TextField, Typography, Button, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
+import { List, ListItem, ListItemIcon, Box, Paper, TextField, Typography, Button, CircularProgress, useMediaQuery, useTheme, Card, CardContent, Grid, Avatar, Chip } from '@mui/material';
 import { Link } from "react-router-dom";
 import Dashboard from './components/Dashboard';
 import foothillslogo from './images/FTSC-logo.jpeg';
@@ -19,9 +19,51 @@ Amplify.configure(awsExports);
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#000000',
+      main: '#6366f1', // Modern indigo
+    },
+    secondary: {
+      main: '#8b5cf6', // Purple accent
+    },
+    background: {
+      default: '#f8fafc',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#1e293b',
+      secondary: '#64748b',
     },
   },
+  typography: {
+    fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    h4: {
+      fontWeight: 700,
+      fontSize: '2rem',
+    },
+    h5: {
+      fontWeight: 600,
+      fontSize: '1.5rem',
+    },
+    h6: {
+      fontWeight: 600,
+      fontSize: '1.25rem',
+    },
+    body1: {
+      fontSize: '1rem',
+      lineHeight: 1.6,
+    },
+  },
+  shape: {
+    borderRadius: 16,
+  },
+  shadows: [
+    'none',
+    '0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24)',
+    '0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23)',
+    '0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23)',
+    '0px 14px 28px rgba(0, 0, 0, 0.25), 0px 10px 10px rgba(0, 0, 0, 0.22)',
+    '0px 19px 38px rgba(0, 0, 0, 0.30), 0px 15px 12px rgba(0, 0, 0, 0.22)',
+    // Add more shadows as needed
+  ],
 });
 
 export const loadLadder = async (league_id, league_type, jwtToken, setLadderData, setPageLoading, setDataLoading, setErrorMsg, setLeagueName) => {
@@ -284,199 +326,469 @@ const App = ({ signOut, user }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: config.theme.secondaryBgColor, height: '100vh' }}>
-        {/* Color Banner at the Top */}
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Modern Header */}
         <Box sx={{ 
           width: '100%', 
-          bgcolor: config.theme.primaryBgColor, 
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between', 
-          py: 1, 
-          px: 2, 
-          boxShadow: 1 
+          py: 2, 
+          px: 4, 
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
         }}>
           {/* Left: Logo and Title */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <img src={foothillslogo} alt="Logo" style={{ height: '50px', marginRight: '10px' }} />
-            <Typography 
-              fontFamily="Copperplate, Papyrus, fantasy" 
-              variant="h5"
-              sx={{ fontWeight: 'bold', color: "white" }}
-            >
-              Tennis & Pickleball Leagues
-            </Typography>
+            <Avatar
+              src={foothillslogo}
+              alt="Logo"
+              sx={{ 
+                width: 56, 
+                height: 56, 
+                mr: 2,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+              }}
+            />
+            <Box>
+              <Typography 
+                variant="h5"
+                sx={{ 
+                  fontWeight: 700, 
+                  color: '#1e293b',
+                  letterSpacing: '-0.025em'
+                }}
+              >
+                FTSC
+              </Typography>
+              <Typography 
+                variant="body2"
+                sx={{ 
+                  color: '#64748b',
+                  mt: -0.5
+                }}
+              >
+                Tennis & Pickleball Leagues
+              </Typography>
+            </Box>
           </Box>
     
-          {/* Right: Admin and Logout Buttons */}
-          {!isMobile && (
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              {user_groups.includes('tennis-admin') && (
-                <Button
-                  variant="contained"
-                  sx={{
-                    mr: 1,
-                    minWidth: 100,
-                    height: 40,
-                    backgroundColor: config.theme.secondaryBgColor, 
-                    border: 'none',
-                    color: config.theme.buttonTextColor,
-                    '&:hover': {
-                      backgroundColor: config.theme.buttonHoverBgColor, 
-                    },
-                  }}
-                  onClick={launchAdminPage}
-                >
-                  Admin
-                </Button>
-              )}
+          {/* Right: User info and Actions */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ textAlign: 'right', mr: 2 }}>
+              <Typography variant="body2" sx={{ color: '#64748b' }}>
+                Welcome back
+              </Typography>
+              <Typography variant="h6" sx={{ color: '#1e293b', mt: -0.5 }}>
+                {user.signInUserSession.idToken.payload.given_name}
+              </Typography>
+            </Box>
+            
+            {!isMobile && user_groups.includes('tennis-admin') && (
               <Button
-                variant="contained"
+                variant="outlined"
                 sx={{
-                  minWidth: 100,
-                  height: 40,
-                  backgroundColor: config.theme.secondaryBgColor, 
-                  border: 'none',
-                  color: config.theme.buttonTextColor,
+                  borderRadius: '12px',
+                  px: 3,
+                  py: 1,
+                  border: '2px solid #e2e8f0',
+                  color: '#475569',
+                  fontWeight: 600,
+                  textTransform: 'none',
                   '&:hover': {
-                    backgroundColor: config.theme.buttonHoverBgColor, 
+                    border: '2px solid #6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                    color: '#6366f1',
                   },
                 }}
-                onClick={signOut}
+                onClick={launchAdminPage}
               >
-                Logout
+                Admin
               </Button>
+            )}
+            
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: '12px',
+                px: 3,
+                py: 1,
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                fontWeight: 600,
+                textTransform: 'none',
+                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5855eb 0%, #7c3aed 100%)',
+                  boxShadow: '0 6px 16px rgba(99, 102, 241, 0.5)',
+                },
+              }}
+              onClick={signOut}
+            >
+              Logout
+            </Button>
           </Box>
-        )}
-      </Box>
+        </Box>
   
         {/* Main Content */}
-        <Box sx={{ flex: 1, width: '100%', p: 2, overflow: 'auto' }}>
-          <Typography fontFamily="Verdana, sans-serif" variant="h5" gutterBottom sx={{ mb: 4, textTransform: 'capitalize' }}>
-            Hello {user.signInUserSession.idToken.payload.given_name}!
-          </Typography>
-  
-          {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
-  
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 6 }}>
-          <Button
-            key="1"
-            variant="contained"
-            sx={{
-              width: '30%',
-              p: 2,
-              m: 0.5,
-              backgroundColor: selectedCategoryTile === "1" ? 'transparent' : config.theme.secondaryBgColor, 
-              border: selectedCategoryTile === "1" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
-              color: selectedCategoryTile === "1" ? config.theme.buttonTextColor : 'black', 
-              '&:hover': {
-                backgroundColor: selectedCategoryTile === "1" ? 'transparent' : config.theme.secondaryBgColor,
-                border: selectedCategoryTile === "1" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
-              },
-            }}
-            onClick={() => handleCategoryClick("1", "Tennis")}
-          >
-            Tennis    
-          </Button>
-            <Button
-              key="2"
-              variant="contained"
-              sx={{
-                width: '30%',
-                p: 2,
-                m: 0.5,
-                backgroundColor: selectedCategoryTile === "2" ? 'transparent' : config.theme.secondaryBgColor,
-                border: selectedCategoryTile === "2" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
-                color: selectedCategoryTile === "2" ? config.theme.buttonTextColor : 'black',
-                '&:hover': {
-                  backgroundColor: selectedCategoryTile === "2" ? 'transparent' : config.theme.secondaryBgColor,
-                  border: selectedCategoryTile === "2" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
-                },
-              }}
-              onClick={() => handleCategoryClick("2", "Pickleball")}
-            >
-              Pickleball    
-            </Button>
-            <Button
-              key="3"
-              variant="contained"
-              sx={{
-                width: '30%',
-                p: 2,
-                m: 0.5,
-                backgroundColor: selectedCategoryTile === "3" ? 'transparent' : config.theme.secondaryBgColor,
-                border: selectedCategoryTile === "3" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
-                color: selectedCategoryTile === "3" ? config.theme.buttonTextColor : 'black',
-                '&:hover': {
-                  backgroundColor: selectedCategoryTile === "3" ? 'transparent' : config.theme.secondaryBgColor,
-                  border: selectedCategoryTile === "3" ? `2px solid ${config.theme.buttonBorderColor}` : 'none', 
-                },
-              }}
-              onClick={() => handleAvailabilityClick("3")}
-            >
-              My Availability    
-            </Button>
-            <CalendarDialog
-              openCalendar={openCalendar}
-              setOpenCalendar={setOpenCalendar}
-              handleDateChange={handleDateChange}
-              selectedDate={selectedDate}
-              getTileClassName={getTileClassName}
-            />
-            {/* Time Slot Selection Dialog */}
-            <TimeslotDialog
-              openTimeSlotDialog={openTimeSlotDialog}
-              setOpenTimeSlotDialog={setOpenTimeSlotDialog}
-              isOpponentTab={false}
-              selectedTimeSlots={selectedTimeSlots}
-              handleTimeSlotChange={handleTimeSlotChange}
-              handleSaveAvailability={handleSaveAvailability}
-              handleClearAvailability={handleClearAvailability}
-              selectedDateFormatted={selectedDateFormatted}
-              savingAvailability={savingAvailability}
-              recurringFlag={recurringFlag}
-              setRecurringFlag={setRecurringFlag}
-            />
-          </Box>
-  
-          {pageLoading && <CircularProgress color="inherit" />}
-          {externalData && (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 6 }}>
-              {externalData["Leagues"].map((league, index) => (
-                <Button
-                  key={index}
-                  variant="contained"
-                  sx={{
-                    width: '30%',
-                    p: 2,
-                    m: 0.5,
-                    backgroundColor: selectedTile === index ? 'transparent' : config.theme.secondaryBgColor,
-                    border: selectedTile === index ? `2px solid ${config.theme.buttonBorderColor}` : 'none',
-                    color: selectedTile === index ? config.theme.buttonTextColor : 'black',
-                    '&:hover': {
-                      backgroundColor: selectedTile === index ? 'transparent' : config.theme.secondaryBgColor, 
-                      border: selectedTile === index ? `2px solid ${config.theme.buttonBorderColor}` : 'none',
-                    },
-                  }}
-                  onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}
-                >
-                  {league["league_name"]}
-                </Button>
-              ))}
+        <Box sx={{ 
+          flex: 1, 
+          p: 4, 
+          overflow: 'auto',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          width: '100%'
+        }}>
+          {errorMsg && (
+            <Box sx={{ 
+              mb: 3, 
+              p: 2, 
+              bgcolor: '#fef2f2', 
+              border: '1px solid #fecaca',
+              borderRadius: 2,
+              color: '#dc2626'
+            }}>
+              {errorMsg}
             </Box>
           )}
   
-          <Dashboard
-            matchData={matchData}
-            ladderData={ladderData}
-            dataLoading={dataLoading}
-            jwtToken={jwtToken}
-            email={email}
-            leagueName={leagueName}
-            leagueId={leagueId}
-            leagueType={leagueType}
-            myFirstName={user.signInUserSession.idToken.payload.given_name}
-            myLastName={user.signInUserSession.idToken.payload.family_name}
+          {/* Category Cards */}
+          <Box sx={{ mb: 6 }}>
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                mb: 4, 
+                color: 'white',
+                fontWeight: 700,
+                textAlign: 'center',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              Choose Your Activity
+            </Typography>
+            
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} sm={6} md={4}>
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: selectedCategoryTile === "1" 
+                      ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    border: selectedCategoryTile === "1" ? '1px solid rgba(242, 235, 235, 0.87)' : '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: selectedCategoryTile === "1" 
+                      ? '0 20px 40px rgba(99, 102, 241, 0.4)'
+                      : '0 8px 32px rgba(0, 0, 0, 0.12)',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: selectedCategoryTile === "1" 
+                        ? '0 25px 50px rgba(99, 102, 241, 0.5)'
+                        : '0 12px 40px rgba(0, 0, 0, 0.15)',
+                    },
+                  }}
+                  onClick={() => handleCategoryClick("1", "Tennis")}
+                >
+                  <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                    <Box sx={{ 
+                      width: 80, 
+                      height: 80, 
+                      borderRadius: '50%',
+                      background: selectedCategoryTile === "1" 
+                        ? 'rgba(255, 255, 255, 0.2)' 
+                        : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px',
+                      fontSize: '2rem'
+                    }}>
+                      🎾
+                    </Box>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        mb: 1,
+                        color: selectedCategoryTile === "1" ? 'white' : '#1e293b',
+                        fontWeight: 600
+                      }}
+                    >
+                      Tennis
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: selectedCategoryTile === "1" ? 'rgba(255, 255, 255, 0.8)' : '#64748b'
+                      }}
+                    >
+                      View tennis leagues and matches
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={4}>
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: selectedCategoryTile === "2" 
+                      ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    border: selectedCategoryTile === "2" ? '1px solid rgba(242, 235, 235, 0.87)' : '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: selectedCategoryTile === "2" 
+                      ? '0 20px 40px rgba(99, 102, 241, 0.4)'
+                      : '0 8px 32px rgba(0, 0, 0, 0.12)',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: selectedCategoryTile === "2" 
+                        ? '0 25px 50px rgba(99, 102, 241, 0.5)'
+                        : '0 12px 40px rgba(0, 0, 0, 0.15)',
+                    },
+                  }}
+                  onClick={() => handleCategoryClick("2", "Pickleball")}
+                >
+                  <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                    <Box sx={{ 
+                      width: 80, 
+                      height: 80, 
+                      borderRadius: '50%',
+                      background: selectedCategoryTile === "2" 
+                        ? 'rgba(255, 255, 255, 0.2)' 
+                        : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px',
+                      fontSize: '2rem'
+                    }}>
+                      🏓
+                    </Box>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        mb: 1,
+                        color: selectedCategoryTile === "2" ? 'white' : '#1e293b',
+                        fontWeight: 600
+                      }}
+                    >
+                      Pickleball
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: selectedCategoryTile === "2" ? 'rgba(255, 255, 255, 0.8)' : '#64748b'
+                      }}
+                    >
+                      View pickleball leagues and matches
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={4}>
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: selectedCategoryTile === "3" 
+                      ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    border: selectedCategoryTile === "3" ? '1px solid rgba(242, 235, 235, 0.87)' : '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: selectedCategoryTile === "3" 
+                      ? '0 20px 40px rgba(99, 102, 241, 0.4)'
+                      : '0 8px 32px rgba(0, 0, 0, 0.12)',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: selectedCategoryTile === "3" 
+                        ? '0 25px 50px rgba(99, 102, 241, 0.5)'
+                        : '0 12px 40px rgba(0, 0, 0, 0.15)',
+                    },
+                  }}
+                  onClick={() => handleAvailabilityClick("3")}
+                >
+                  <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                    <Box sx={{ 
+                      width: 80, 
+                      height: 80, 
+                      borderRadius: '50%',
+                      background: selectedCategoryTile === "3" 
+                        ? 'rgba(255, 255, 255, 0.2)' 
+                        : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px',
+                      fontSize: '2rem'
+                    }}>
+                      📅
+                    </Box>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        mb: 1,
+                        color: selectedCategoryTile === "3" ? 'white' : '#1e293b',
+                        fontWeight: 600
+                      }}
+                    >
+                      My Availability
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: selectedCategoryTile === "3" ? 'rgba(255, 255, 255, 0.8)' : '#64748b'
+                      }}
+                    >
+                      Manage your playing schedule
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Box>
+          {/* Loading indicator */}
+          {pageLoading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+              <CircularProgress sx={{ color: 'white' }} size={48} />
+            </Box>
+          )}
+          
+          {/* League Cards */}
+          {externalData && (
+            <Box sx={{ mb: 6 }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  mb: 4, 
+                  color: 'white',
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                }}
+              >
+                Available Leagues
+              </Typography>
+              
+              <Grid container spacing={3}>
+                {externalData["Leagues"].map((league, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card
+                      sx={{
+                        cursor: 'pointer',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        background: selectedTile === index 
+                          ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                          : 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(10px)',
+                        border: selectedTile === index ? '1px solid rgba(242, 235, 235, 0.87)' : '1px solid rgba(255, 255, 255, 0.2)',
+                        boxShadow: selectedTile === index 
+                          ? '0 20px 40px rgba(99, 102, 241, 0.4)'
+                          : '0 8px 32px rgba(0, 0, 0, 0.12)',
+                        '&:hover': {
+                          transform: 'translateY(-8px)',
+                          boxShadow: selectedTile === index
+                            ? '0 25px 50px rgba(99, 102, 241, 0.5)'
+                            : '0 12px 40px rgba(0, 0, 0, 0.15)',
+                        },
+                      }}
+                      onClick={() => handleLeagueClick(index, league["league_id"], league["league_name"], league["league_type"], email)}
+                    >
+                      <CardContent sx={{ p: 3 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                          <Chip
+                            label={league["league_type"]}
+                            size="small"
+                            sx={{
+                              background: selectedTile === index 
+                                ? 'rgba(255, 255, 255, 0.2)' 
+                                : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                              color: selectedTile === index ? 'white' : 'white',
+                              fontWeight: 600,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        </Box>
+                        <Typography 
+                          variant="h6" 
+                          sx={{ 
+                            color: selectedTile === index ? 'white' : '#1e293b',
+                            fontWeight: 600,
+                            mb: 1
+                          }}
+                        >
+                          {league["league_name"]}
+                        </Typography>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: selectedTile === index ? 'rgba(255, 255, 255, 0.8)' : '#64748b'
+                          }}
+                        >
+                          Click to view matches and standings
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
+  
+          {/* Dashboard Component - Only show when there's data */}
+          {(matchData && matchData.length > 0) || (ladderData && ladderData.length > 0) ? (
+            <Box sx={{ 
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 4,
+              p: 4,
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              <Dashboard
+                matchData={matchData}
+                ladderData={ladderData}
+                dataLoading={dataLoading}
+                jwtToken={jwtToken}
+                email={email}
+                leagueName={leagueName}
+                leagueId={leagueId}
+                leagueType={leagueType}
+                myFirstName={user.signInUserSession.idToken.payload.given_name}
+                myLastName={user.signInUserSession.idToken.payload.family_name}
+              />
+            </Box>
+          ) : null}
+          
+          {/* Calendar and Timeslot Dialogs */}
+          <CalendarDialog
+            openCalendar={openCalendar}
+            setOpenCalendar={setOpenCalendar}
+            handleDateChange={handleDateChange}
+            selectedDate={selectedDate}
+            getTileClassName={getTileClassName}
+          />
+          
+          <TimeslotDialog
+            openTimeSlotDialog={openTimeSlotDialog}
+            setOpenTimeSlotDialog={setOpenTimeSlotDialog}
+            isOpponentTab={false}
+            selectedTimeSlots={selectedTimeSlots}
+            handleTimeSlotChange={handleTimeSlotChange}
+            handleSaveAvailability={handleSaveAvailability}
+            handleClearAvailability={handleClearAvailability}
+            selectedDateFormatted={selectedDateFormatted}
+            savingAvailability={savingAvailability}
+            recurringFlag={recurringFlag}
+            setRecurringFlag={setRecurringFlag}
           />
         </Box>
       </Box>

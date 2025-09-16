@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import MatchTableRowSingles from './MatchTableRowSingles';
 import MatchTableRowDoubles from './MatchTableRowDoubles';
 import CalendarDialogDoubles from './CalendarDialogDoubles'; // Import the new component
@@ -28,9 +28,123 @@ import {
   MenuItem,
   FormControl,
   Select,
-  InputLabel
+  InputLabel,
+  Card,
+  CardContent
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+
+// Modern theme configuration
+const modernTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#4F46E5',
+      light: '#818CF8',
+      dark: '#3730A3',
+    },
+    secondary: {
+      main: '#7C3AED',
+      light: '#A78BFA',
+      dark: '#5B21B6',
+    },
+    background: {
+      default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      paper: 'rgba(255, 255, 255, 0.95)',
+    },
+  },
+  typography: {
+    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    h4: {
+      fontWeight: 700,
+      color: '#1F2937',
+    },
+    h5: {
+      fontWeight: 600,
+      color: '#374151',
+    },
+    h6: {
+      fontWeight: 600,
+      color: '#4B5563',
+    },
+  },
+  shape: {
+    borderRadius: 16,
+  },
+  shadows: [
+    'none',
+    '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+  ],
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          textTransform: 'none',
+          fontWeight: 600,
+          padding: '10px 24px',
+          transition: 'all 0.2s ease-in-out',
+        },
+        contained: {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          '&:hover': {
+            transform: 'translateY(-1px)',
+            boxShadow: '0 8px 15px -3px rgba(0, 0, 0, 0.2)',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: 16,
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          },
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: 16,
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+        },
+      },
+    },
+  },
+});
 
 const Dashboard = ({
   matchData: initialMatchData,
@@ -587,166 +701,282 @@ const Dashboard = ({
   };
 
   return (
-    <Box>
-      <Grid container spacing={isMobile ? 1 : 3} mb={6}>
-        {/* Mobile-only View Ladder button */}
-        {isMobile && matchData && matchData.length > 0 && ladderData && ladderData.length > 0 && (
-          <Grid item xs={12}>
-            <Button 
-              variant="contained"
-              fullWidth
-              onClick={scrollToLadder}
-              sx={{
-                mb: 2,
-                backgroundColor: 'transparent',
-                border: 'none',
-                color:  'black',
-                '&:hover': {
-                  backgroundColor: 'transparent', 
-                  border: 'none',
-                },
-              }}
-            >
-              View Ladder Results
-            </Button>
-          </Grid>
-        )}
+    <ThemeProvider theme={modernTheme}>
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        p: { xs: 1, sm: 2 } // Much smaller padding to maximize card width
+      }}>
+        <Grid container spacing={isMobile ? 1 : 2} mb={3}>
+          {/* Mobile-only View Ladder button */}
+          {isMobile && matchData && matchData.length > 0 && ladderData && ladderData.length > 0 && (
+            <Grid item xs={12}>
+              <Button 
+                variant="contained"
+                fullWidth
+                onClick={scrollToLadder}
+                sx={{
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  borderRadius: 2,
+                  '&:hover': {
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 8px 15px -3px rgba(0, 0, 0, 0.2)',
+                  },
+                }}
+              >
+                View Ladder Results
+              </Button>
+            </Grid>
+          )}
 
-        {/* Existing My Matches grid */}
-        {matchData && matchData.length > 0 && (
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-              <Typography fontFamily="Verdana, sans-serif" variant="h5" gutterBottom>My matches</Typography>
-              
-              {/* Action buttons for doubles leagues - shown only once at the top */}
-              {leagueType && leagueType.toLowerCase().includes('doubles') && (
-                <Box sx={{ display: 'flex', justifyContent: 'space-around', gap: 2, mb: 2 }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => handleDoublesScoreClickOpen()}
-                    sx={{
-                      py: 1,
-                      px: 2,
-                      flex: 1,
-                      backgroundColor: config.theme.secondaryBgColor, 
-                      border: 'none',
-                      color: config.theme.buttonTextColor, 
-                      '&:hover': {
-                        backgroundColor: 'transparent', 
-                        border: `2px solid ${config.theme.buttonBorderColor}`,
-                      },
-                    }}
-                  >
-                    Add New Score
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={handleSetupNewMatch} // Use the new function here
-                    disabled={fetchingAvailability} // Disable button while fetching
-                    sx={{
-                      py: 1,
-                      px: 2,
-                      flex: 1,
-                      backgroundColor: config.theme.secondaryBgColor, 
-                      border: 'none',
-                      color: config.theme.buttonTextColor, 
-                      '&:hover': {
-                        backgroundColor: 'transparent', 
-                        border: `2px solid ${config.theme.buttonBorderColor}`,
-                      },
-                    }}
-                  >
-                    {fetchingAvailability ? 'Loading...' : 'Setup New Match'}
-                  </Button>
-                </Box>
-              )}
-              
-              {dataLoading && <CircularProgress color="inherit"/>}
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                  </TableHead>
-                  <TableBody>
-                    {matchData.map((match, index) =>
-                      match.type === "doubles" ? (
-                        // Just render the match row without the action buttons row
-                        <React.Fragment key={index}>
-                          <MatchTableRowDoubles
-                            match={match}
-                            email={email}
-                            handleConfirmScoreClick={handleConfirmScoreClick}
-                          />
-                        </React.Fragment>
-                      ) : (
-                        <MatchTableRowSingles
-                          key={index}
-                          match={match}
-                          email={email}
-                          handleClickOpen={handleClickOpen}
-                          handleConfirmScoreClick={handleConfirmScoreClick}
-                          jwtToken={jwtToken}
-                          leagueName={leagueName}
-                          myFirstName={myFirstName}
-                          myLastName={myLastName}
-                          setOpenCalendar={setOpenCalendar}
-                          openCalendar={openCalendar}
-                          sendingEmail={sendingEmail}
-                          setSendingEmail={setSendingEmail}
-                        />
-                      )
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          </Grid>
-        )}
-
-        {/* Ladder Results grid with ref */}
-        {ladderData && ladderData.length > 0 && (
-          <Grid item xs={12} md={6} ref={ladderRef}>
-            <Paper sx={{ p: 2, borderColor: 'black', border: 0.3 }}>
-              <Typography fontFamily="Verdana, sans-serif" variant="h5" gutterBottom>Ladder results</Typography>
-              {dataLoading && <CircularProgress color="inherit"/>}
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Rank</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Player Name</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Matches</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Points</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Wins</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Losses</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', borderBottom: '1px solid black' }}>Win %</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {ladderData.map((ladder, index) => (
-                      <TableRow 
-                        key={index}
-                        sx={{ backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#ffffff' }}
+          {/* My Matches Card - Full width always to prevent horizontal scrolling */}
+          {matchData && matchData.length > 0 && (
+            <Grid item xs={12}>
+              <Card sx={{ 
+                height: 'fit-content',
+                boxShadow: 3,
+                width: '100%',
+                maxWidth: '100%',
+              }}>
+                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                  <Typography variant="h5" gutterBottom sx={{ 
+                    fontWeight: 700,
+                    color: '#1F2937',
+                    mb: 3
+                  }}>
+                    My Matches
+                  </Typography>
+                  
+                  {/* Action buttons for doubles leagues */}
+                  {leagueType && leagueType.toLowerCase().includes('doubles') && (
+                    <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleDoublesScoreClickOpen()}
+                        sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: 140 }}
                       >
-                        <TableCell sx={{textAlign: 'center'}}>{ladder.rank}</TableCell>
-                        <TableCell sx={{textAlign: 'center'}}>{ladder.first_name} {ladder.last_name}</TableCell>
-                        <TableCell sx={{textAlign: 'center'}}>{ladder.matches}</TableCell>
-                        <TableCell sx={{textAlign: 'center'}}>{ladder.points}</TableCell>
-                        <TableCell sx={{textAlign: 'center'}}>{ladder.wins}</TableCell>
-                        <TableCell sx={{textAlign: 'center'}}>{ladder.losses}</TableCell>
-                        <TableCell sx={{textAlign: 'center'}}>{ladder.win_rate ?? '0.00'}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          </Grid>
-        )}
-      </Grid>
+                        Add New Score
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={handleSetupNewMatch}
+                        disabled={fetchingAvailability}
+                        sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: 140 }}
+                      >
+                        {fetchingAvailability ? 'Loading...' : 'Setup New Match'}
+                      </Button>
+                    </Box>
+                  )}
+                  
+                  {dataLoading && <CircularProgress color="primary" sx={{ mb: 2 }} />}
+                  
+                  {/* Remove nested card and make table fill entire width */}
+                  <Box sx={{ 
+                    borderRadius: 2, 
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    border: '1px solid rgba(226, 232, 240, 0.8)',
+                    overflow: 'auto',
+                    width: '100%'
+                  }}>
+                    <TableContainer sx={{ width: '100%' }}>
+                      <Table size="small" sx={{ minWidth: '100%' }}>
+                        <TableHead>
+                        </TableHead>
+                        <TableBody>
+                          {matchData.map((match, index) =>
+                            match.type === "doubles" ? (
+                              <React.Fragment key={index}>
+                                <MatchTableRowDoubles
+                                  match={match}
+                                  email={email}
+                                  handleConfirmScoreClick={handleConfirmScoreClick}
+                                />
+                              </React.Fragment>
+                            ) : (
+                              <MatchTableRowSingles
+                                key={index}
+                                match={match}
+                                email={email}
+                                handleClickOpen={handleClickOpen}
+                                handleConfirmScoreClick={handleConfirmScoreClick}
+                                jwtToken={jwtToken}
+                                leagueName={leagueName}
+                                myFirstName={myFirstName}
+                                myLastName={myLastName}
+                                setOpenCalendar={setOpenCalendar}
+                                openCalendar={openCalendar}
+                                sendingEmail={sendingEmail}
+                                setSendingEmail={setSendingEmail}
+                              />
+                            )
+                          )}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+
+          {/* Ladder Results Card - Full width always to prevent horizontal scrolling */}
+          {ladderData && ladderData.length > 0 && (
+            <Grid item xs={12} ref={ladderRef}>
+              <Card sx={{ 
+                height: 'fit-content',
+                boxShadow: 3,
+                width: '100%',
+                maxWidth: '100%',
+              }}>
+                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                  <Typography variant="h5" gutterBottom sx={{ 
+                    fontWeight: 700,
+                    color: '#1F2937',
+                    mb: 3
+                  }}>
+                    Ladder Results
+                  </Typography>
+                  
+                  {dataLoading && <CircularProgress color="primary" sx={{ mb: 2 }} />}
+                  
+                  {/* Remove nested card and make table fill entire width */}
+                  <Box sx={{ 
+                    borderRadius: 2, 
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    border: '1px solid rgba(226, 232, 240, 0.8)',
+                    overflow: 'auto',
+                    width: '100%'
+                  }}>
+                    <TableContainer sx={{ width: '100%' }}>
+                      <Table size="small" sx={{ minWidth: '100%' }}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ 
+                              fontWeight: 700, 
+                              color: '#374151',
+                              borderBottom: '2px solid #E5E7EB',
+                              textAlign: 'center',
+                              width: '10%'
+                            }}>
+                              Rank
+                            </TableCell>
+                            <TableCell sx={{ 
+                              fontWeight: 700, 
+                              color: '#374151',
+                              borderBottom: '2px solid #E5E7EB',
+                              textAlign: 'center',
+                              width: '25%'
+                            }}>
+                              Player
+                            </TableCell>
+                            <TableCell sx={{ 
+                              fontWeight: 700, 
+                              color: '#374151',
+                              borderBottom: '2px solid #E5E7EB',
+                              textAlign: 'center',
+                              width: '15%'
+                            }}>
+                              Matches
+                            </TableCell>
+                            <TableCell sx={{ 
+                              fontWeight: 700, 
+                              color: '#374151',
+                              borderBottom: '2px solid #E5E7EB',
+                              textAlign: 'center',
+                              width: '15%'
+                            }}>
+                              Points
+                            </TableCell>
+                            <TableCell sx={{ 
+                              fontWeight: 700, 
+                              color: '#374151',
+                              borderBottom: '2px solid #E5E7EB',
+                              textAlign: 'center',
+                              width: '10%'
+                            }}>
+                              Wins
+                            </TableCell>
+                            <TableCell sx={{ 
+                              fontWeight: 700, 
+                              color: '#374151',
+                              borderBottom: '2px solid #E5E7EB',
+                              textAlign: 'center',
+                              width: '12%'
+                            }}>
+                              Losses
+                            </TableCell>
+                            <TableCell sx={{ 
+                              fontWeight: 700, 
+                              color: '#374151',
+                              borderBottom: '2px solid #E5E7EB',
+                              textAlign: 'center',
+                              width: '13%'
+                            }}>
+                              Win %
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {ladderData.map((ladder, index) => (
+                            <TableRow 
+                              key={index}
+                              sx={{ 
+                                backgroundColor: index % 2 === 0 ? 'rgba(249, 250, 251, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(224, 231, 255, 0.3)',
+                                  transition: 'background-color 0.2s ease'
+                                }
+                              }}
+                            >
+                              <TableCell sx={{ textAlign: 'center', color: '#374151', fontWeight: 500 }}>
+                                {ladder.rank}
+                              </TableCell>
+                              <TableCell sx={{ textAlign: 'center', color: '#374151', fontWeight: 500 }}>
+                                {ladder.first_name} {ladder.last_name}
+                              </TableCell>
+                              <TableCell sx={{ textAlign: 'center', color: '#374151' }}>
+                                {ladder.matches}
+                              </TableCell>
+                              <TableCell sx={{ textAlign: 'center', color: '#374151' }}>
+                                {ladder.points}
+                              </TableCell>
+                              <TableCell sx={{ textAlign: 'center', color: '#374151' }}>
+                                {ladder.wins}
+                              </TableCell>
+                              <TableCell sx={{ textAlign: 'center', color: '#374151' }}>
+                                {ladder.losses}
+                              </TableCell>
+                              <TableCell sx={{ textAlign: 'center', color: '#374151' }}>
+                                {ladder.win_rate ?? '0.00'}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+        </Grid>
       {/* Dialog (popup window) for adding singles score */}
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Match Score</DialogTitle>
-        {addingScore && <CircularProgress color="inherit"/>}
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ 
+          fontWeight: 700, 
+          color: '#1F2937',
+          borderBottom: '1px solid #E5E7EB',
+          pb: 2
+        }}>
+          Add Match Score
+        </DialogTitle>
+        {addingScore && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+            <CircularProgress color="primary"/>
+          </Box>
+        )}
         <DialogContent>
           {selectedMatch && (
           <TableContainer component={Paper}>
@@ -831,15 +1061,43 @@ const Dashboard = ({
           </TableContainer>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleAddScoreClick} color="primary">Submit</Button>
+        <DialogActions sx={{ p: 3, gap: 2, borderTop: '1px solid #E5E7EB' }}>
+          <Button 
+            onClick={handleClose}
+            variant="outlined"
+            sx={{ 
+              borderColor: '#D1D5DB',
+              color: '#6B7280',
+              '&:hover': {
+                borderColor: '#9CA3AF',
+                backgroundColor: 'rgba(243, 244, 246, 0.5)'
+              }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleAddScoreClick} 
+            variant="contained"
+            sx={{ 
+              minWidth: 100
+            }}
+          >
+            Submit
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Dialog (popup window) for adding doubles score */}
-      <Dialog open={doublesScoreOpen} onClose={handleClose} maxWidth="md">
-        <DialogTitle>Add Doubles Match Score</DialogTitle>
+      <Dialog open={doublesScoreOpen} onClose={handleClose} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ 
+          fontWeight: 700, 
+          color: '#1F2937',
+          borderBottom: '1px solid #E5E7EB',
+          pb: 2
+        }}>
+          Add Doubles Match Score
+        </DialogTitle>
         {addingScore && <CircularProgress color="inherit"/>}
         <DialogContent>
           {/* Team Selection Section */}
@@ -1017,9 +1275,30 @@ const Dashboard = ({
             </Table>
           </TableContainer>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleDoublesAddScoreClick} color="primary">Submit</Button>
+        <DialogActions sx={{ p: 3, gap: 2, borderTop: '1px solid #E5E7EB' }}>
+          <Button 
+            onClick={handleClose}
+            variant="outlined"
+            sx={{ 
+              borderColor: '#D1D5DB',
+              color: '#6B7280',
+              '&:hover': {
+                borderColor: '#9CA3AF',
+                backgroundColor: 'rgba(243, 244, 246, 0.5)'
+              }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDoublesAddScoreClick} 
+            variant="contained"
+            sx={{ 
+              minWidth: 100
+            }}
+          >
+            Submit
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -1036,7 +1315,8 @@ const Dashboard = ({
         leagueName={leagueName}
         jwtToken={jwtToken}
       />
-    </Box>
+      </Box>
+    </ThemeProvider>
   );
 };
 
