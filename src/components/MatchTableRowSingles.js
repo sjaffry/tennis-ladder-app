@@ -285,7 +285,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                     onClick={() => handleClickOpen({ ...match })}
                     size="small"
                     sx={{
-                      minWidth: 80,
+                      width: 130,
                       height: 32,
                       fontSize: '0.75rem',
                       fontWeight: 600,
@@ -306,7 +306,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                     onClick={() => handleSetupMatchClick(match)}
                     size="small"
                     sx={{
-                      minWidth: 80,
+                      width: 130,
                       height: 32,
                       fontSize: '0.75rem',
                       fontWeight: 600,
@@ -333,7 +333,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                   onClick={() => handleConfirmScoreClick({ ...match })}
                   size="small"
                   sx={{
-                    minWidth: 80,
+                    width: 130,
                     height: 32,
                     fontSize: '0.75rem',
                     fontWeight: 600,
@@ -355,7 +355,7 @@ const MatchTableRowSingles = ({ match, email, handleClickOpen, handleConfirmScor
                   disabled
                   size="small"
                   sx={{
-                    minWidth: 80,
+                    width: 130,
                     height: 32,
                     fontSize: '0.7rem',
                     borderRadius: 2,
